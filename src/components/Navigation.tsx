@@ -1,49 +1,44 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Navigation = () => {
   return (
-    <header className="justify-between items-center backdrop-blur-[10px] bg-[rgba(0,0,0,0.10)] absolute z-50 flex min-h-[60px] w-full text-white h-[60px] px-1.5 py-3.5 border-b-[rgba(255,255,255,0.10)] border-b border-solid top-0 max-md:max-w-full">
-      <div className="self-stretch flex min-w-60 w-full max-w-screen-xl mx-auto gap-[40px_100px] justify-between flex-wrap my-auto px-4">
-        <div className="flex min-w-60 items-center gap-5 whitespace-nowrap">
-          <div className="self-stretch flex items-center gap-1 text-lg font-bold tracking-[-0.9px] my-auto p-1">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/a296e6f6909345febc364568fca847ed/287d02f5b15436f84cb0b3b36e585320804b8ba8?placeholderIfAbsent=true"
-              className="aspect-[1] object-contain w-6 self-stretch shrink-0 my-auto"
-              alt="Stellar Logo"
-            />
-            <div className="text-white self-stretch my-auto">
-              Stellar
-            </div>
-          </div>
-          <nav className="self-stretch flex min-w-60 gap-2.5 text-sm font-medium leading-none my-auto">
-            <button className="justify-center items-center flex gap-2 overflow-hidden px-4 py-1.5 rounded-[99px] hover:bg-white/10 transition-colors">
-              <div className="text-white self-stretch my-auto">
-                Product
-              </div>
-            </button>
-            <button className="justify-center items-center flex gap-2 overflow-hidden px-4 py-1.5 rounded-[99px] hover:bg-white/10 transition-colors">
-              <div className="text-white self-stretch my-auto">
-                Pricing
-              </div>
-            </button>
-            <button className="justify-center items-center flex gap-2 overflow-hidden px-4 py-1.5 rounded-[99px] hover:bg-white/10 transition-colors">
-              <div className="text-white self-stretch my-auto">
-                Changelog
-              </div>
-            </button>
-          </nav>
-        </div>
-        <div className="flex items-center gap-2.5 text-sm font-medium leading-none">
-          <button className="justify-center items-center self-stretch flex gap-2 overflow-hidden my-auto px-4 py-1.5 rounded-[99px] hover:bg-white/10 transition-colors">
-            <div className="text-white self-stretch my-auto">
-              Log in
-            </div>
-          </button>
-          <button className="items-center border shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] self-stretch flex gap-2 overflow-hidden my-auto px-4 py-1.5 rounded-lg border-solid border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors">
-            <div className="text-white self-stretch my-auto">
-              Sign up
-            </div>
-          </button>
+    <header className="sticky top-0 z-50 w-full backdrop-blur-md" style={{
+      background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0) 100%)'
+    }}>
+      <div className="flex items-center justify-between h-16 px-4 md:px-8 max-w-7xl mx-auto">
+        {/* Logo */}
+        <Link to="/" className="font-bold text-xl text-white hover:text-white transition-colors">
+          Results Pro
+        </Link>
+
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-2">
+          {['Features', 'Pricing', 'About', 'Contact', 'Help'].map((item, index) => (
+            <Link 
+              key={item}
+              to={`/${item.toLowerCase()}`}
+              className="justify-center items-center shadow-[0_1px_0_0_rgba(0,0,0,0.05),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] flex gap-2 overflow-hidden px-4 py-1.5 rounded-[74.25px] transition-colors text-gray-300 hover:text-white text-sm font-medium hover:bg-[rgba(255,255,255,0.05)]"
+            >
+              {item}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Auth Links */}
+        <div className="flex items-center gap-3">
+          <Link 
+            to="/auth/login" 
+            className="text-gray-300 hover:text-blue-400 transition-colors text-sm font-medium px-4 py-2"
+          >
+            Login
+          </Link>
+          <Link 
+            to="/auth/register"
+            className="items-center border shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] flex gap-2 overflow-hidden px-4 py-2 rounded-lg border-solid border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors text-white text-sm font-medium"
+          >
+            Sign Up
+          </Link>
         </div>
       </div>
     </header>
