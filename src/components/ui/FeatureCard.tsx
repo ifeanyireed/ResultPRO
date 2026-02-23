@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight } from '@hugeicons/react';
 
 interface FeatureCardProps {
   preview?: React.ReactNode;
@@ -7,6 +7,7 @@ interface FeatureCardProps {
   description: string;
   buttonText?: string;
   onClick?: () => void;
+  isImagePreview?: boolean;
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ 
@@ -14,7 +15,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   title, 
   description, 
   buttonText = 'Learn More →',
-  onClick
+  onClick,
+  isImagePreview = false
 }) => {
   return (
     <div 
@@ -56,9 +58,15 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       {/* Preview Section */}
       {preview && (
         <div className="relative z-10 mb-8">
-          <div className="rounded-[8px] border-[0.75px] border-solid border-[rgba(255,255,255,0.10)] backdrop-blur-[10px] bg-[rgba(0,0,0,0.40)] p-4">
-            {preview}
-          </div>
+          {isImagePreview ? (
+            <>
+              {preview}
+            </>
+          ) : (
+            <div className="rounded-[8px] border-[0.75px] border-solid border-[rgba(255,255,255,0.10)] backdrop-blur-[10px] bg-[rgba(0,0,0,0.40)] p-4">
+              {preview}
+            </div>
+          )}
         </div>
       )}
 
@@ -70,16 +78,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
         </h3>
         
         {/* Description */}
-        <p className="text-[14px] font-normal leading-[1.6] text-gray-300 mb-6 flex-1 drop-shadow-[0_0_4px_rgba(198,220,255,0.15)]">
+        <p className="text-[14px] font-normal leading-[1.6] text-gray-400 opacity-70 mb-6 flex-1 drop-shadow-[0_0_4px_rgba(198,220,255,0.15)]">
           {description}
         </p>
-
-        {/* CTA Button */}
-        <button className="inline-flex items-center justify-start gap-2 px-0 py-0 text-white text-sm font-medium hover:gap-3 transition-all duration-300 group/btn w-fit">
-          <span className="relative">
-            {buttonText}
-          </span>
-        </button>
       </div>
     </div>
   );

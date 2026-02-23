@@ -8,16 +8,17 @@ const Navigation = () => {
     }}>
       <div className="flex items-center justify-between h-16 px-4 md:px-8 max-w-7xl mx-auto">
         {/* Logo */}
-        <Link to="/" className="font-bold text-xl text-white hover:text-white transition-colors">
-          Results Pro
+        <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <img src="/logo.png" alt="Results Pro" className="h-10 w-auto" />
+          <span className="font-bold text-lg text-white hidden sm:inline">Results Pro</span>
         </Link>
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-2">
-          {['Features', 'Pricing', 'About', 'Contact', 'Help'].map((item, index) => (
+          {['Features', 'Pricing', 'About', 'Contact', 'Results', 'Scratch Card'].map((item, index) => (
             <Link 
               key={item}
-              to={`/${item.toLowerCase()}`}
+              to={`/${item.toLowerCase().replace(/\s+/g, '-')}`}
               className="justify-center items-center shadow-[0_1px_0_0_rgba(0,0,0,0.05),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] flex gap-2 overflow-hidden px-4 py-1.5 rounded-[74.25px] transition-colors text-gray-300 hover:text-white text-sm font-medium hover:bg-[rgba(255,255,255,0.05)]"
             >
               {item}

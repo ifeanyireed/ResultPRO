@@ -1,0 +1,228 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["views"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model School {
+  id                                String   @id @default(cuid())
+  name                              String   @unique
+  slug                              String   @unique
+  motto                             String?
+  logoUrl                           String?  @map("logo_url")
+  logoEmoji                         String?  @map("logo_emoji")
+  primaryColor                      String?  @map("primary_color")
+  secondaryColor                    String?  @map("secondary_color")
+  accentColor                       String?  @map("accent_color")
+  contactEmail                      String   @unique @map("contact_email")
+  contactPhone                      String?  @map("contact_phone")
+  contactPersonName                 String?  @map("contact_person_name")
+  altContactEmail                   String?  @map("alt_contact_email")
+  altContactPhone                   String?  @map("alt_contact_phone")
+  fullAddress                       String?  @map("full_address")
+  state                             String?
+  lga                               String?
+  status                            String   @default("PENDING_VERIFICATION")
+  verificationStatus                String   @default("NOT_VERIFIED") @map("verification_status")
+  verifiedAt                        DateTime? @map("verified_at")
+  verifiedBy                        String?  @map("verified_by")
+  rejectionReason                   String?  @map("rejection_reason")
+  documentVerificationType          String?  @map("document_verification_type")
+  documentVerificationUrl           String?  @map("document_verification_url")
+  documentVerificationSubmittedAt   DateTime? @map("document_verification_submitted_at")
+  onboardingStatus                  String   @default("NOT_STARTED") @map("onboarding_status")
+  onboardingCompletedAt             DateTime? @map("onboarding_completed_at")
+  currentOnboardingStep             Int      @default(0) @map("current_onboarding_step")
+  subscriptionTier                  String?  @map("subscription_tier")
+  subscriptionStartDate             DateTime? @map("subscription_start_date")
+  subscriptionEndDate               DateTime? @map("subscription_end_date")
+  maxStudents                       Int?     @map("max_students")
+  maxTeachers                       Int?     @map("max_teachers")
+  createdAt                         DateTime @default(now()) @map("created_at")
+  updatedAt                         DateTime @updatedAt @map("updated_at")
+  deletedAt                         DateTime? @map("deleted_at")
+
+  adminUsers SchoolAdminUser[]
+  academicSessions AcademicSession[]
+  classes Class[]
+  subjects Subject[]
+  gradingSystems GradingSystem[]
+  grades Grade[]
+  onboardingState OnboardingState[]
+
+  @@index([status])
+  @@index([verificationStatus])
+  @@map("schools")
+}
+
+model SchoolAdminUser {
+  id            String   @id @default(cuid())
+  schoolId      String   @map("school_id")
+  email         String   @unique
+  firstName     String?  @map("first_name")
+  lastName      String?  @map("last_name")
+  fullName      String?  @map("full_name")
+  passwordHash  String   @map("password_hash")
+  role          String   @default("SCHOOL_ADMIN")
+  status        String   @default("ACTIVE")
+  firstLogin    Boolean  @default(true) @map("first_login")
+  lastLoginAt   DateTime? @map("last_login_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@map("school_admin_users")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  firstName     String?  @map("first_name")
+  lastName      String?  @map("last_name")
+  fullName      String?  @map("full_name")
+  passwordHash  String   @map("password_hash")
+  role          String   @default("ADMIN")  // SUPER_ADMIN, FINANCE_ADMIN, SUPPORT_ADMIN, etc.
+  status        String   @default("ACTIVE")
+  firstLogin    Boolean  @default(true) @map("first_login")
+  lastLoginAt   DateTime? @map("last_login_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
+
+  @@index([role])
+  @@map("users")
+}
+
+model AcademicSession {
+  id            String   @id @default(cuid())
+  schoolId      String   @map("school_id")
+  name          String
+  startDate     DateTime @map("start_date")
+  endDate       DateTime @map("end_date")
+  isActive      Boolean  @default(false) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  terms Term[]
+
+  @@unique([schoolId, name])
+  @@index([schoolId])
+  @@map("academic_sessions")
+}
+
+model Term {
+  id            String   @id @default(cuid())
+  sessionId     String   @map("session_id")
+  name          String
+  startDate     DateTime @map("start_date")
+  endDate       DateTime @map("end_date")
+  isActive      Boolean  @default(false) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  session AcademicSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, name])
+  @@index([sessionId])
+  @@map("terms")
+}
+
+model Class {
+  id            String   @id @default(cuid())
+  schoolId      String   @map("school_id")
+  name          String
+  level        String
+  maxCapacity   Int?     @map("max_capacity")
+  classTeacher  String?  @map("class_teacher")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, name])
+  @@index([schoolId])
+  @@map("classes")
+}
+
+model Subject {
+  id            String   @id @default(cuid())
+  schoolId      String   @map("school_id")
+  name          String
+  code          String
+  description   String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  grades Grade[]
+
+  @@unique([schoolId, code])
+  @@index([schoolId])
+  @@map("subjects")
+}
+
+model GradingSystem {
+  id            String   @id @default(cuid())
+  schoolId      String   @map("school_id")
+  name          String
+  description   String?
+  isDefault     Boolean  @default(false) @map("is_default")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  grades Grade[]
+
+  @@unique([schoolId, name])
+  @@index([schoolId])
+  @@map("grading_systems")
+}
+
+model Grade {
+  id            String   @id @default(cuid())
+  schoolId      String   @map("school_id")
+  subjectId     String   @map("subject_id")
+  gradingSystemId String  @map("grading_system_id")
+  gradeName     String   @map("grade_name")
+  minScore      Float    @map("min_score")
+  maxScore      Float    @map("max_score")
+  description   String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  gradingSystem GradingSystem @relation(fields: [gradingSystemId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectId, gradeName])
+  @@index([schoolId])
+  @@index([subjectId])
+  @@index([gradingSystemId])
+  @@map("grades")
+}
+
+model OnboardingState {
+  id            String   @id @default(cuid())
+  schoolId      String   @unique @map("school_id")
+  completedSteps String? @map("completed_steps")
+  currentStep   Int     @default(1) @map("current_step")
+  isComplete    Boolean @default(false) @map("is_complete")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@map("onboarding_states")
+}

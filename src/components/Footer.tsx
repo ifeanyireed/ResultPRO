@@ -4,14 +4,14 @@ const Footer = () => {
   return (
     <footer className="justify-center items-stretch z-0 flex w-full flex-col bg-black max-md:max-w-full">
       <div className="justify-between backdrop-blur-[30px] flex w-full gap-[40px_100px] flex-wrap p-24 rounded-[30px_30px_0_0] max-md:max-w-full max-md:px-5">
-        <div className="flex items-center gap-1 text-lg text-white font-bold whitespace-nowrap tracking-[-0.9px] p-1">
+        <div className="flex items-center gap-3 text-lg text-white font-bold whitespace-nowrap tracking-[-0.9px] p-1">
           <img
-            src="https://api.builder.io/api/v1/image/assets/a296e6f6909345febc364568fca847ed/287d02f5b15436f84cb0b3b36e585320804b8ba8?placeholderIfAbsent=true"
-            className="aspect-[1] object-contain w-6 self-stretch shrink-0 my-auto"
-            alt="Stellar Logo"
+            src="/logo.png"
+            className="h-12 w-auto object-contain"
+            alt="Results Pro Logo"
           />
-          <div className="text-white self-stretch my-auto">
-            Stellar
+          <div className="text-white">
+            Results Pro
           </div>
         </div>
         <div className="flex min-w-60 max-w-[720px] gap-[40px_88px] justify-between flex-wrap flex-1 shrink basis-[0%] max-md:max-w-full">

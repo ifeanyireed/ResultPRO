@@ -22,3 +22,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+results-pro-ses_accessKeys.csv
+myAppKey.pem

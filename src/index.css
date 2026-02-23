@@ -97,6 +97,7 @@ All colors MUST be HSL.
 @layer base {
   * {
     @apply border-border;
+    letter-spacing: -0.3px;
   }
 
   body {

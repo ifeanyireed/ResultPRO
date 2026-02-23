@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, ArrowRight, Zap, Users, TrendingUp, Smartphone, Share2, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Navigation from '@/components/Navigation';
 import FeatureCard from '@/components/ui/FeatureCard';
@@ -8,6 +7,9 @@ import FeatureCard from '@/components/ui/FeatureCard';
 const Landing = () => {
   const [scrollY, setScrollY] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [playCount, setPlayCount] = useState(0);
+  const [showVideo, setShowVideo] = useState(true);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -18,11 +20,33 @@ const Landing = () => {
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
 
+    // Play video on page load
+    if (videoRef.current && playCount < 3) {
+      videoRef.current.play();
+    }
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+
+  const handleVideoEnd = () => {
+    const newPlayCount = playCount + 1;
+    setPlayCount(newPlayCount);
+    
+    if (newPlayCount >= 3) {
+      setShowVideo(false);
+    } else if (videoRef.current) {
+      videoRef.current.play();
+    }
+  };
+
+  const handleVideoHover = () => {
+    if (playCount < 3 && videoRef.current) {
+      videoRef.current.play();
+    }
+  };
 
   return (
     <div className="w-full bg-black text-white">
@@ -43,18 +67,30 @@ const Landing = () => {
       <Navigation />
 
       {/* Hero Section */}
-      <section className="relative w-full h-screen flex items-center justify-between px-4 md:px-12 lg:px-20 overflow-hidden bg-black -mt-16">
+      <section className="relative w-full h-screen flex items-center justify-between px-4 md:px-12 lg:px-20 overflow-hidden bg-black -mt-16" onMouseEnter={handleVideoHover}>
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0 z-0">
-          {/* Try to load cover4.png, fallback to gradient background */}
+          {/* Video Background */}
+          {showVideo && playCount < 3 && (
+            <video
+              ref={videoRef}
+              src="/cover4.mp4"
+              className="absolute inset-0 w-full h-full object-cover"
+              muted
+              onEnded={handleVideoEnd}
+            />
+          )}
+          
+          {/* Image Background - Always visible as fallback */}
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-300 ${showVideo && playCount < 3 ? 'opacity-0' : 'opacity-100'}`}
             style={{
               backgroundImage: "url('/cover4.png')",
               backgroundSize: 'cover',
               backgroundPosition: 'center right'
             }}
           />
+          
           {/* Gradient Overlay - Left to Right */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/40" />
           {/* Dissolving Gradient - Bottom Fade */}
@@ -63,14 +99,6 @@ const Landing = () => {
 
         {/* Content Container */}
         <div className="relative z-10 max-w-2xl pt-20">
-          {/* Badge */}
-          <div className="mb-8 inline-flex items-center gap-3 px-4 py-3 rounded-[15px] border-[0.75px] border-solid border-[rgba(255,255,255,0.10)] backdrop-blur-[10px] bg-[rgba(0,0,0,0.40)] hover:bg-white/5 transition-colors">
-            <div className="shadow-[0_0.75px_0_0_rgba(0,0,0,0.05),0_3px_3px_0_rgba(0,0,0,0.05),0_7.5px_7.5px_0_rgba(0,0,0,0.10)] backdrop-blur-[7.5px] flex w-7 h-7 shrink-0 rounded-full border-[0.75px] border-solid border-[rgba(255,255,255,0.10)] items-center justify-center bg-[#3395FF]">
-              <Zap className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xs text-white font-medium">Trusted by Nigerian Schools</span>
-          </div>
-
           {/* Main Heading */}
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 tracking-tight leading-tight text-white">
             Results Pro
@@ -78,7 +106,7 @@ const Landing = () => {
 
           {/* Subheading */}
           <p className="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed max-w-xl">
-            The all-in-one platform that makes publishing, sharing, and analyzing student results effortless. Join thousands of schools already using Results Pro by Scholars.ng. Free for first 500 students!
+            The all-in-one platform that makes publishing, sharing, and analyzing student results effortless. Join thousands of schools already using Results Pro by Scholars.ng. Free for first 200 students!
           </p>
 
           {/* CTA Buttons */}
@@ -94,7 +122,7 @@ const Landing = () => {
 
           {/* Social proof */}
           <div className="text-sm text-gray-400">
-            Free for first 500 students • No credit card required
+            Free for first 200 students • No credit card required
           </div>
         </div>
 
@@ -104,9 +132,26 @@ const Landing = () => {
         </div>
       </section>
 
+      {/* Teams Section */}
+      <section className="relative w-full bg-black overflow-hidden">
+        <img
+          src="/Teams.png"
+          className="w-full h-auto object-cover"
+          alt="Teams"
+        />
+      </section>
+
       {/* Features Overview Section */}
-      <section className="relative py-20 px-4 md:px-8 bg-gradient-to-b from-black via-blue-950/10 to-black">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-20 px-4 md:px-8 bg-black overflow-hidden">
+        {/* Blurry Background Image */}
+        <img
+          src="/Hero.png"
+          className="absolute h-full w-full object-cover inset-0"
+          alt="Background"
+        />
+        {/* Gradient Overlay - Dark edges to transparent center */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+        <div className="max-w-6xl mx-auto relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
             Why Schools Love <span className="text-blue-400">Results Pro</span>
           </h2>
@@ -120,32 +165,38 @@ const Landing = () => {
               {
                 title: 'Zero Teacher Login',
                 description: 'CSV upload system means teachers never need an account. Simple, fast, secure. Streamline your workflow and reduce administrative burden.',
-                icon: Users,
+                icon: null,
+                image: '/Score.png',
               },
               {
                 title: 'Social-First Design',
                 description: 'Auto-generated shareable achievement graphics that parents love. Transform student success into celebration-worthy moments.',
-                icon: Share2,
+                icon: null,
+                image: '/Social.png',
               },
               {
                 title: 'Mobile App',
                 description: 'Real-time academic monitoring. Parents stay engaged on the go with push notifications and instant result updates.',
-                icon: Smartphone,
+                icon: null,
+                image: '/video.png',
               },
               {
                 title: 'Beautiful Analytics',
                 description: 'Disney-inspired glassomorphic dashboards with engaging visualizations. See trends, patterns, and student growth at a glance.',
-                icon: TrendingUp,
+                icon: null,
+                image: '/LessonDashboard.png',
               },
               {
                 title: 'Result Checker',
                 description: 'Innovative scratch card system for result verification and validation. Gamify the result-checking experience for students.',
-                icon: Zap,
+                icon: null,
+                image: '/Results.png',
               },
               {
                 title: 'Built-In Monetization',
                 description: 'Premium features that generate revenue while helping schools. Create additional income streams without compromising quality.',
-                icon: BarChart3,
+                icon: null,
+                image: '/Payment.png',
               },
             ].map((feature, index) => {
               const IconComponent = feature.icon;
@@ -153,16 +204,25 @@ const Landing = () => {
                 <FeatureCard
                   key={index}
                   preview={
-                    <div className="flex items-center gap-3">
-                      <div className="flex w-8 h-8 shrink-0 rounded-lg items-center justify-center bg-[#3395FF]">
-                        <IconComponent className="w-4 h-4 text-white" />
+                    feature.image ? (
+                      <img 
+                        src={feature.image} 
+                        alt={feature.title}
+                        className={`h-auto rounded-md object-cover ${feature.image === '/Score.png' ? 'w-1/2 mx-auto' : 'w-full'}`}
+                      />
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <div className="flex w-8 h-8 shrink-0 rounded-lg items-center justify-center bg-[#3395FF]">
+                          <IconComponent className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="text-xs">
+                          <div className="text-gray-300 font-medium">Feature {index + 1}</div>
+                          <div className="text-gray-500">Learn more →</div>
+                        </div>
                       </div>
-                      <div className="text-xs">
-                        <div className="text-gray-300 font-medium">Feature {index + 1}</div>
-                        <div className="text-gray-500">Learn more →</div>
-                      </div>
-                    </div>
+                    )
                   }
+                  isImagePreview={!!feature.image}
                   title={feature.title}
                   description={feature.description}
                   buttonText="Start learning →"
@@ -188,28 +248,38 @@ const Landing = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                step: '01',
                 title: 'Upload Results',
                 description: 'Simply upload your student results via CSV. No complex setup needed.',
+                image: '/Upload.png',
               },
               {
-                step: '02',
-                title: 'Auto Share',
-                description: 'Our system generates beautiful achievement graphics automatically.',
+                title: 'Publish Results',
+                description: 'Our system auto-generates the result for the assessment for you, Which can be printed or forwarded to parents via email in one click.',
+                image: '/Result.png',
               },
               {
-                step: '03',
                 title: 'Parent Engagement',
                 description: 'Parents check results and stay engaged via mobile app in real-time.',
+                image: '/Results.png',
               },
             ].map((item, index) => (
-              <div key={index} className="relative">
-                <div className="text-6xl font-bold text-blue-500/20 mb-4">{item.step}</div>
-                <h3 className="text-2xl font-semibold mb-3 text-white">{item.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{item.description}</p>
-                {index < 2 && (
-                  <div className="hidden md:flex absolute top-16 -right-4 w-8 h-0.5 bg-gradient-to-r from-blue-500 to-transparent" />
+              <div key={index} className="relative rounded-[20px] border border-[rgba(255,255,255,0.10)] backdrop-blur-[10px] bg-[rgba(0,0,0,0.40)] overflow-hidden hover:bg-white/5 transition-all duration-300 flex flex-col">
+                {/* Image Container */}
+                {item.image && (
+                  <div className={`w-full flex items-center justify-center py-6 ${item.image === '/Upload.png' ? '' : 'px-6'}`}>
+                    <img 
+                      src={item.image} 
+                      alt={item.title}
+                      className={`object-cover ${item.image === '/Upload.png' ? 'w-1/2' : 'w-full'}`}
+                    />
+                  </div>
                 )}
+                
+                {/* Content */}
+                <div className="px-6 pb-6">
+                  <h3 className="text-xl font-semibold mb-3 text-white">{item.title}</h3>
+                  <p className="text-gray-400 text-sm leading-relaxed">{item.description}</p>
+                </div>
               </div>
             ))}
           </div>
