@@ -20,8 +20,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Card } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Trash01, Plus } from '@hugeicons/react';
 import { useOnboardingStore, Step3Data } from '@/stores/onboardingStore';
 
@@ -105,136 +103,140 @@ export const Step3Classes = ({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Classes</h2>
-        <p className="text-gray-600 mt-2">
-          Define all the classes in your school. You can add more classes later.
-        </p>
-      </div>
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-8 backdrop-blur-xl">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white">Classes</h2>
+          <p className="text-gray-400 mt-2">
+            Define all the classes in your school. You can add more classes later.
+          </p>
+        </div>
 
-      {submitError && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{submitError}</AlertDescription>
-        </Alert>
-      )}
+        {submitError && (
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex gap-3">
+            <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-red-400 text-sm">{submitError}</p>
+          </div>
+        )}
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Classes List */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Class List
-            </h3>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Classes List */}
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-6">
+                Class List
+              </h3>
 
-            <div className="space-y-4">
-              {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="border rounded-lg p-4 bg-gray-50"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name={`classes.${index}.name`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Class Name</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="e.g., SS1A, Class 3B"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name={`classes.${index}.classLevel`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Class Level</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
+              <div className="space-y-4">
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    className="border border-[rgba(255,255,255,0.07)] rounded-lg p-6 bg-[rgba(255,255,255,0.01)]"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name={`classes.${index}.name`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">Class Name</FormLabel>
                             <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select class level" />
-                              </SelectTrigger>
+                              <Input
+                                placeholder="e.g., SS1A, Class 3B"
+                                className="bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-white placeholder:text-gray-600"
+                                {...field}
+                              />
                             </FormControl>
-                            <SelectContent>
-                              {CLASS_LEVELS.map((level) => (
-                                <SelectItem key={level.value} value={level.value}>
-                                  {level.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  {/* Remove Button */}
-                  {fields.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => remove(index)}
-                      className="mt-4 flex items-center gap-2 text-sm text-red-600 hover:text-red-700 font-medium"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Remove Class
-                    </button>
-                  )}
-                </div>
-              ))}
+                      <FormField
+                        control={form.control}
+                        name={`classes.${index}.classLevel`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-gray-300">Class Level</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <FormControl>
+                                <SelectTrigger className="bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-white">
+                                  <SelectValue placeholder="Select class level" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {CLASS_LEVELS.map((level) => (
+                                  <SelectItem key={level.value} value={level.value}>
+                                    {level.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    {/* Remove Button */}
+                    {fields.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        className="mt-4 flex items-center gap-2 text-sm text-red-400 hover:text-red-300 font-medium"
+                      >
+                        <Trash01 className="w-4 h-4" />
+                        Remove Class
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Add More Button */}
+              <button
+                type="button"
+                onClick={addClas}
+                className="mt-6 flex items-center gap-2 text-sm text-blue-400 hover:text-blue-300 font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Add Another Class
+              </button>
             </div>
 
-            {/* Add More Button */}
-            <button
-              type="button"
-              onClick={addClas}
-              className="mt-4 flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
-            >
-              <Plus className="w-4 h-4" />
-              Add Another Class
-            </button>
-          </div>
+            {/* Summary */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-sm text-blue-300">
+                <strong>Added {fields.length} class{fields.length !== 1 ? 'es' : ''}:</strong>{' '}
+                {form.watch('classes').filter(c => c.name && c.classLevel).map(c => c.name).join(', ') || 'None yet'}
+              </p>
+            </div>
 
-          {/* Summary */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900">
-              <strong>Added {fields.length} class{fields.length !== 1 ? 'es' : ''}:</strong>{' '}
-              {form.watch('classes').filter(c => c.name && c.classLevel).map(c => c.name).join(', ') || 'None yet'}
-            </p>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="border-t pt-6 flex gap-4 justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onPrevious}
-              disabled={isLoading}
-            >
-              Back
-            </Button>
-            <Button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Saving...' : 'Next: Subjects'}
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </Card>
+            {/* Action Buttons */}
+            <div className="border-t border-[rgba(255,255,255,0.07)] pt-8 flex gap-4 justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onPrevious}
+                disabled={isLoading}
+                className="bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
+              >
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {isLoading ? 'Saving...' : 'Next: Subjects'}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 };

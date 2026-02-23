@@ -28,21 +28,21 @@ export const StepIndicator = ({
             {/* Step Circle */}
             <div className="flex flex-col items-center">
               {completedSteps.includes(step) ? (
-                <CheckCircle2
-                  className="w-10 h-10 text-green-600 flex-shrink-0"
+                <CheckCircle
+                  className="w-10 h-10 text-emerald-400 flex-shrink-0"
                   strokeWidth={2}
                 />
               ) : step === currentStep ? (
-                <div className="w-10 h-10 rounded-full border-3 border-blue-600 bg-blue-50 flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-600 font-bold">{step}</span>
+                <div className="w-10 h-10 rounded-full border-2 border-blue-400 bg-blue-400/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-blue-400 font-bold text-sm">{step}</span>
                 </div>
               ) : (
                 <Circle
-                  className="w-10 h-10 text-gray-300 flex-shrink-0"
+                  className="w-10 h-10 text-gray-600 flex-shrink-0"
                   strokeWidth={2}
                 />
               )}
-              <p className="text-xs md:text-sm font-medium text-gray-700 mt-2 text-center">
+              <p className="text-xs md:text-sm font-medium text-gray-400 mt-2 text-center">
                 {stepLabels[index]}
               </p>
             </div>
@@ -53,8 +53,8 @@ export const StepIndicator = ({
                 <div
                   className={`h-full transition-colors ${
                     completedSteps.includes(step)
-                      ? 'bg-green-600'
-                      : 'bg-gray-300'
+                      ? 'bg-emerald-400'
+                      : 'bg-gray-700'
                   }`}
                 />
               </div>
@@ -65,12 +65,12 @@ export const StepIndicator = ({
 
       {/* Progress Text */}
       <div className="text-center mt-6">
-        <p className="text-sm text-gray-600">
-          Step <span className="font-bold text-blue-600">{currentStep}</span> of{' '}
-          <span className="font-bold">{totalSteps}</span>
+        <p className="text-sm text-gray-400">
+          Step <span className="font-bold text-blue-400">{currentStep}</span> of{' '}
+          <span className="font-bold text-gray-300">{totalSteps}</span>
         </p>
         {completedSteps.length > 0 && (
-          <p className="text-xs text-green-600 mt-1">
+          <p className="text-xs text-emerald-400 mt-1">
             {completedSteps.length} of {totalSteps} steps completed
           </p>
         )}

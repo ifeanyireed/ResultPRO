@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SuperAdminLayout from '@/components/SuperAdminLayout';
 import { CheckCircle, XClose, FileText, Phone01, Mail, MapPin, Calendar, ChevronDown, ChevronUp, AlertCircle } from '@hugeicons/react';
+import { Phone, XCircle } from '@/lib/hugeicons-compat';
 import axios from 'axios';
 
 const API_BASE = 'http://localhost:5000/api';
@@ -56,6 +57,20 @@ const SchoolVerifications: React.FC = () => {
       
       if (response.data.success) {
         console.log('✅ Schools fetched:', response.data.data.length);
+        
+        // Log document URLs to see if they contain presigned signatures
+        response.data.data.forEach((school: any) => {
+          if (school.documents && school.documents.length > 0) {
+            school.documents.forEach((doc: any) => {
+              console.log(`   School: ${school.schoolName}`);
+              console.log(`   Document Type: ${doc.documentType}`);
+              console.log(`   URL length: ${doc.documentUrl.length}`);
+              console.log(`   Has X-Amz-Signature: ${doc.documentUrl.includes('X-Amz-Signature')}`);
+              console.log(`   URL preview: ${doc.documentUrl.substring(0, 100)}...`);
+            });
+          }
+        });
+        
         setSchools(response.data.data);
       }
     } catch (error: any) {
@@ -123,6 +138,60 @@ const SchoolVerifications: React.FC = () => {
       setActionStatus({ ...actionStatus, [schoolId]: 'error' });
     } finally {
       setApprovalLoading(null);
+    }
+  };
+
+  const handleViewDocument = async (documentUrl: string) => {
+    try {
+      console.log('📄 handleViewDocument called');
+      console.log('   URL length:', documentUrl.length);
+      console.log('   URL starts with:', documentUrl.substring(0, 80));
+      console.log('   Contains X-Amz-Signature:', documentUrl.includes('X-Amz-Signature'));
+      console.log('   Contains X-Amz-Algorithm:', documentUrl.includes('X-Amz-Algorithm'));
+      console.log('   Is S3 URL:', documentUrl.includes('s3') && documentUrl.includes('amazonaws'));
+      
+      // If it's an S3 URL (with or without presigning), open directly
+      // S3 presigned URLs are self-contained and don't need backend intervention
+      if ((documentUrl.includes('s3') && documentUrl.includes('amazonaws')) ||
+          documentUrl.includes('X-Amz-Signature') || 
+          documentUrl.includes('X-Amz-Algorithm')) {
+        console.log('✓ URL appears to be valid S3/presigned URL, opening directly');
+        window.open(documentUrl, '_blank');
+        return;
+      }
+
+      // If URL doesn't look like an S3 URL, try to get presigned URL from backend
+      console.log('⚠️ URL does not appear to be an S3 URL, calling backend endpoint');
+      
+      const response = await axios.get(`${API_BASE}/auth/document-url`, {
+        params: {
+          documentUrl,
+        },
+      });
+
+      if (response.data.success && response.data.data.presignedUrl) {
+        console.log('✓ Backend returned presigned URL, opening...');
+        window.open(response.data.data.presignedUrl, '_blank');
+      } else {
+        console.log('⚠️ Backend response unexpected, trying original URL');
+        window.open(documentUrl, '_blank');
+      }
+    } catch (error: any) {
+      console.error('❌ Error viewing document:', error);
+      console.error('   Error message:', error.message);
+      console.error('   Response status:', error.response?.status);
+      console.error('   Response data:', error.response?.data);
+      
+      // Show user-friendly error
+      const errorMsg = error.response?.data?.message || error.message || 'Failed to view document';
+      
+      if (errorMsg.includes('Document not found') || errorMsg.includes('NoSuchKey')) {
+        alert('❌ Document not found in storage. It may have been deleted or never uploaded successfully. Please ask the school to re-upload the document.');
+      } else if (errorMsg.includes('presigned URL')) {
+        alert('❌ Could not generate access link for this document. Please try again.');
+      } else {
+        alert(`❌ Error: ${errorMsg}`);
+      }
     }
   };
 
@@ -285,14 +354,12 @@ const SchoolVerifications: React.FC = () => {
                                 </div>
                               </div>
                             </div>
-                            <a
-                              href={doc.documentUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={() => handleViewDocument(doc.documentUrl)}
                               className="px-3 py-1 rounded text-xs font-medium bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 transition-colors"
                             >
                               View
-                            </a>
+                            </button>
                           </div>
                         ))}
                       </div>

@@ -63,20 +63,22 @@ model School {
 }
 
 model SchoolAdminUser {
-  id            String   @id @default(cuid())
-  schoolId      String   @map("school_id")
-  email         String   @unique
-  firstName     String?  @map("first_name")
-  lastName      String?  @map("last_name")
-  fullName      String?  @map("full_name")
-  passwordHash  String   @map("password_hash")
-  role          String   @default("SCHOOL_ADMIN")
-  status        String   @default("ACTIVE")
-  firstLogin    Boolean  @default(true) @map("first_login")
-  lastLoginAt   DateTime? @map("last_login_at")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
+  id                          String   @id @default(cuid())
+  schoolId                    String   @map("school_id")
+  email                       String   @unique
+  firstName                   String?  @map("first_name")
+  lastName                    String?  @map("last_name")
+  fullName                    String?  @map("full_name")
+  passwordHash                String   @map("password_hash")
+  passwordResetToken          String?  @map("password_reset_token")
+  passwordResetTokenExpiry    DateTime? @map("password_reset_token_expiry")
+  role                        String   @default("SCHOOL_ADMIN")
+  status                      String   @default("ACTIVE")
+  firstLogin                  Boolean  @default(true) @map("first_login")
+  lastLoginAt                 DateTime? @map("last_login_at")
+  createdAt                   DateTime @default(now()) @map("created_at")
+  updatedAt                   DateTime @updatedAt @map("updated_at")
+  deletedAt                   DateTime? @map("deleted_at")
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
@@ -85,19 +87,21 @@ model SchoolAdminUser {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  firstName     String?  @map("first_name")
-  lastName      String?  @map("last_name")
-  fullName      String?  @map("full_name")
-  passwordHash  String   @map("password_hash")
-  role          String   @default("ADMIN")  // SUPER_ADMIN, FINANCE_ADMIN, SUPPORT_ADMIN, etc.
-  status        String   @default("ACTIVE")
-  firstLogin    Boolean  @default(true) @map("first_login")
-  lastLoginAt   DateTime? @map("last_login_at")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
-  deletedAt     DateTime? @map("deleted_at")
+  id                          String   @id @default(cuid())
+  email                       String   @unique
+  firstName                   String?  @map("first_name")
+  lastName                    String?  @map("last_name")
+  fullName                    String?  @map("full_name")
+  passwordHash                String   @map("password_hash")
+  passwordResetToken          String?  @map("password_reset_token")
+  passwordResetTokenExpiry    DateTime? @map("password_reset_token_expiry")
+  role                        String   @default("ADMIN")  // SUPER_ADMIN, FINANCE_ADMIN, SUPPORT_ADMIN, etc.
+  status                      String   @default("ACTIVE")
+  firstLogin                  Boolean  @default(true) @map("first_login")
+  lastLoginAt                 DateTime? @map("last_login_at")
+  createdAt                   DateTime @default(now()) @map("created_at")
+  updatedAt                   DateTime @updatedAt @map("updated_at")
+  deletedAt                   DateTime? @map("deleted_at")
 
   @@index([role])
   @@map("users")

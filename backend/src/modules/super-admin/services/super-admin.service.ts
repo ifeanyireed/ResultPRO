@@ -58,11 +58,21 @@ export class SuperAdminService {
         
         // Add document if one exists
         if (school.documentVerificationType && school.documentVerificationUrl) {
+          console.log(`📄 School "${school.name}" has document:`);
+          console.log(`   Type: ${school.documentVerificationType}`);
+          console.log(`   URL length: ${school.documentVerificationUrl.length}`);
+          console.log(`   Has X-Amz-Signature: ${school.documentVerificationUrl.includes('X-Amz-Signature')}`);
+          console.log(`   Preview: ${school.documentVerificationUrl.substring(0, 100)}...`);
+          
           documents.push({
             documentType: school.documentVerificationType,
             documentUrl: school.documentVerificationUrl,
             uploadedAt: school.documentVerificationSubmittedAt?.toISOString() || new Date().toISOString(),
           });
+        } else {
+          console.log(`⚠️ School "${school.name}" missing document verification data:`);
+          console.log(`   has type: ${!!school.documentVerificationType}`);
+          console.log(`   has url: ${!!school.documentVerificationUrl}`);
         }
 
         return {
@@ -97,31 +107,36 @@ export class SuperAdminService {
    */
   async getSchoolDetails(schoolId: string) {
     try {
-      const school = await (global as any).School.findByPk(schoolId);
+      const school = await prisma.school.findUnique({
+        where: { id: schoolId },
+        include: { adminUsers: true },
+      });
 
       if (!school) {
         throw new NotFoundException('School not found');
       }
 
-      const admin = await (global as any).SchoolAdminUser.findOne({
-        where: { schoolId },
-      });
+      const admin = school.adminUsers[0];
 
       return {
         school: {
           id: school.id,
           name: school.name,
-          registrationNumber: school.registrationNumber,
-          email: school.email,
-          phone: school.phone,
-          contactPerson: school.contactPerson,
-          address: school.address,
-          city: school.city,
+          slug: school.slug,
+          contactEmail: school.contactEmail,
+          contactPhone: school.contactPhone,
+          contactPersonName: school.contactPersonName,
+          fullAddress: school.fullAddress,
           state: school.state,
-          logo: school.logo,
+          lga: school.lga,
+          logoUrl: school.logoUrl,
           subscriptionTier: school.subscriptionTier,
-          studentCapacity: school.studentCapacity,
-          registeredAt: school.createdAt,
+          maxStudents: school.maxStudents,
+          maxTeachers: school.maxTeachers,
+          status: school.status,
+          verificationStatus: school.verificationStatus,
+          documentVerificationUrl: school.documentVerificationUrl,
+          createdAt: school.createdAt,
         },
         admin: admin
           ? {
@@ -129,12 +144,13 @@ export class SuperAdminService {
               firstName: admin.firstName,
               lastName: admin.lastName,
               email: admin.email,
-              phone: admin.phone,
+              role: admin.role,
             }
           : null,
-        onboardingProgress: school.onboardingStatus,
+        onboardingStatus: school.onboardingStatus,
       };
     } catch (error: any) {
+      console.error('❌ Error getting school details:', error);
       throw error;
     }
   }
@@ -146,22 +162,24 @@ export class SuperAdminService {
     try {
       const { schoolId, remarks } = data;
 
-      const school = await (global as any).School.findByPk(schoolId);
+      // Check if school exists and is pending verification
+      const school = await prisma.school.findUnique({
+        where: { id: schoolId },
+        include: { adminUsers: true },
+      });
 
       if (!school) {
         throw new NotFoundException('School not found');
       }
 
-      if (school.onboardingStatus !== 'PENDING_VERIFICATION') {
+      if (school.status !== 'PENDING_VERIFICATION') {
         throw new ValidationException(
-          `School cannot be approved. Current status: ${school.onboardingStatus}`
+          `School cannot be approved. Current status: ${school.status}`
         );
       }
 
       // Get admin user
-      const admin = await (global as any).SchoolAdminUser.findOne({
-        where: { schoolId },
-      });
+      const admin = school.adminUsers[0];
 
       if (!admin) {
         throw new NotFoundException('School admin user not found');
@@ -171,33 +189,46 @@ export class SuperAdminService {
       const tempPassword = this.generateTempPassword();
       const hashedPassword = await PasswordHelper.hashPassword(tempPassword);
 
-      // Update admin password
-      await admin.update({
-        passwordHash: hashedPassword,
-        isApproved: true,
-        approvedAt: new Date(),
-      });
+      // Update admin and school in a transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Update admin user
+        await tx.schoolAdminUser.update({
+          where: { id: admin.id },
+          data: {
+            passwordHash: hashedPassword,
+            status: 'ACTIVE',
+          },
+        });
 
-      // Update school status
-      await school.update({
-        onboardingStatus: 'ACTIVE',
-        verifiedAt: new Date(),
-        verificationRemarks: remarks || null,
+        // Update school status
+        const updatedSchool = await tx.school.update({
+          where: { id: schoolId },
+          data: {
+            status: 'APPROVED',
+            onboardingStatus: 'ACTIVE',
+            verifiedAt: new Date(),
+            verifiedBy: 'super-admin',
+            rejectionReason: null,
+          },
+        });
+
+        return updatedSchool;
       });
 
       // Send approval email to admin with temp password
-      await this.emailService.sendSchoolApprovalEmail(admin.email, admin.firstName, tempPassword);
+      await this.emailService.sendSchoolApprovalEmail(admin.email, admin.firstName || 'Admin', tempPassword);
 
       return {
         success: true,
         message: 'School approved successfully',
         school: {
-          id: school.id,
-          name: school.name,
-          status: 'ACTIVE',
+          id: result.id,
+          name: result.name,
+          status: result.status,
         },
       };
     } catch (error: any) {
+      console.error('❌ Error approving school:', error);
       throw error;
     }
   }
@@ -213,28 +244,32 @@ export class SuperAdminService {
         throw new ValidationException('Rejection reason is required');
       }
 
-      const school = await (global as any).School.findByPk(schoolId);
+      // Check if school exists and is pending verification
+      const school = await prisma.school.findUnique({
+        where: { id: schoolId },
+        include: { adminUsers: true },
+      });
 
       if (!school) {
         throw new NotFoundException('School not found');
       }
 
-      if (school.onboardingStatus !== 'PENDING_VERIFICATION') {
+      if (school.status !== 'PENDING_VERIFICATION') {
         throw new ValidationException(
-          `School cannot be rejected. Current status: ${school.onboardingStatus}`
+          `School cannot be rejected. Current status: ${school.status}`
         );
       }
 
       // Get admin contact
-      const admin = await (global as any).SchoolAdminUser.findOne({
-        where: { schoolId },
-      });
+      const admin = school.adminUsers[0];
 
       // Update school status
-      await school.update({
-        onboardingStatus: 'REJECTED',
-        rejectionReason: reason,
-        rejectedAt: new Date(),
+      const updatedSchool = await prisma.school.update({
+        where: { id: schoolId },
+        data: {
+          status: 'REJECTED',
+          rejectionReason: reason,
+        },
       });
 
       // Send rejection email
@@ -250,12 +285,13 @@ export class SuperAdminService {
         success: true,
         message: 'School rejected successfully',
         school: {
-          id: school.id,
-          name: school.name,
-          status: 'REJECTED',
+          id: updatedSchool.id,
+          name: updatedSchool.name,
+          status: updatedSchool.status,
         },
       };
     } catch (error: any) {
+      console.error('❌ Error rejecting school:', error);
       throw error;
     }
   }
@@ -272,25 +308,28 @@ export class SuperAdminService {
         where.onboardingStatus = status;
       }
 
-      const { count, rows } = await (global as any).School.findAndCountAll({
-        where,
-        offset,
-        limit,
-        order: [['createdAt', 'DESC']],
-      });
+      const [schools, count] = await Promise.all([
+        prisma.school.findMany({
+          where,
+          skip: offset,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.school.count({ where }),
+      ]);
 
-      const schools = rows.map((school: any) => ({
+      const mappedSchools = schools.map((school) => ({
         id: school.id,
         name: school.name,
-        email: school.email,
+        contactEmail: school.contactEmail,
         status: school.onboardingStatus,
         subscriptionTier: school.subscriptionTier,
-        registeredAt: school.createdAt,
+        createdAt: school.createdAt,
         verifiedAt: school.verifiedAt,
       }));
 
       return {
-        data: schools,
+        data: mappedSchools,
         pagination: {
           page,
           limit,
@@ -299,6 +338,7 @@ export class SuperAdminService {
         },
       };
     } catch (error: any) {
+      console.error('❌ Error getting all schools:', error);
       throw error;
     }
   }

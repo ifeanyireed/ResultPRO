@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight01, Eye, EyeOff, CheckSquare, Loading01 } from '@hugeicons/react';
+import { ArrowRight01, Eye, EyeOff, CheckSquare, Loading01, ChevronDown } from '@hugeicons/react';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
+import { STATES, getLGAsByState } from '@/lib/nigerian-states-lgas';
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -12,6 +13,7 @@ const Register: React.FC = () => {
   const [phone, setPhone] = useState('');
   const [fullAddress, setFullAddress] = useState('');
   const [state, setState] = useState('');
+  const [lga, setLga] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -21,11 +23,13 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const lgas = state ? getLGAsByState(state) : [];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    if (!schoolName.trim() || !email.trim() || !phone.trim() || !fullAddress.trim() || !state.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!schoolName.trim() || !email.trim() || !phone.trim() || !fullAddress.trim() || !state.trim() || !lga.trim() || !password.trim() || !confirmPassword.trim()) {
       setError('Please fill in all fields');
       return;
     }
@@ -60,6 +64,7 @@ const Register: React.FC = () => {
         phone: phone.trim(),
         fullAddress: fullAddress.trim(),
         state: state.trim(),
+        lga: lga.trim(),
         password,
       });
 
@@ -177,24 +182,56 @@ const Register: React.FC = () => {
                 </label>
               </div>
 
-              {/* State Field */}
+              {/* State Dropdown */}
               <div className="relative">
-                <input
-                  type="text"
+                <label className="absolute left-6 -top-2 text-gray-400 text-xs transition-all pointer-events-none z-10">
+                  State
+                </label>
+                <select
                   value={state}
                   onChange={(e) => {
                     setState(e.target.value);
+                    setLga(''); // Reset LGA when state changes
                     setError('');
                   }}
-                  placeholder=" "
-                  className="w-full px-6 py-3 rounded-[12px] bg-white/5 border border-white/10 text-white placeholder-transparent focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all text-base"
+                  className="w-full px-6 py-3 rounded-[12px] bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all text-base appearance-none cursor-pointer"
                   disabled={loading}
-                />
-                <label className="absolute left-6 top-3 text-gray-400 text-sm transition-all pointer-events-none"
-                  style={state ? { top: '-8px', fontSize: '12px', color: 'rgb(96, 165, 250)' } : {}}>
-                  State
-                </label>
+                >
+                  <option value="">Select State</option>
+                  {STATES.map((s) => (
+                    <option key={s} value={s} className="bg-gray-900 text-white">
+                      {s}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
               </div>
+
+              {/* LGA Dropdown */}
+              {state && (
+                <div className="relative">
+                  <label className="absolute left-6 -top-2 text-gray-400 text-xs transition-all pointer-events-none z-10">
+                    LGA
+                  </label>
+                  <select
+                    value={lga}
+                    onChange={(e) => {
+                      setLga(e.target.value);
+                      setError('');
+                    }}
+                    className="w-full px-6 py-3 rounded-[12px] bg-white/5 border border-white/10 text-white focus:outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all text-base appearance-none cursor-pointer"
+                    disabled={loading || !state}
+                  >
+                    <option value="">Select LGA</option>
+                    {lgas.map((l) => (
+                      <option key={l} value={l} className="bg-gray-900 text-white">
+                        {l}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                </div>
+              )}
 
               {/* Password Field */}
               <div className="relative">
@@ -281,7 +318,7 @@ const Register: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={loading || !schoolName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim() || !agreeTerms}
+                disabled={loading || !schoolName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim() || !state || !lga || !agreeTerms}
                 className="w-full py-4 rounded-[15px] font-bold text-lg transition-all duration-200 flex items-center justify-center gap-2 border shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] border-solid border-[rgba(255,255,255,0.07)] hover:bg-white/5 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (

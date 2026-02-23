@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { authService } from '../services/auth.service';
 import { S3Upload } from '../utils/s3-upload';
+import { S3PresignedUrl } from '../utils/s3-presigned-url';
 import { RegisterDTO } from '../dtos/register.dto';
 import { VerifyEmailDTO } from '../dtos/verify-email.dto';
 import { LoginDTO } from '../dtos/login.dto';
@@ -16,10 +17,10 @@ export class AuthController {
       const dto: RegisterDTO = req.body;
 
       // Validate required fields
-      if (!dto.schoolName || !dto.email || !dto.phone || !dto.fullAddress || !dto.state || !dto.password) {
+      if (!dto.schoolName || !dto.email || !dto.phone || !dto.fullAddress || !dto.state || !dto.lga || !dto.password) {
         return res.status(400).json({
           success: false,
-          message: 'Missing required fields',
+          message: 'Missing required fields. Please provide: school name, email, phone, address, state, LGA, and password.',
           code: 'VALIDATION_ERROR',
         });
       }
@@ -320,6 +321,146 @@ export class AuthController {
         success: false,
         message: error.message || 'Failed to get school status',
         code: error.code || 'STATUS_ERROR',
+      });
+    }
+  }
+
+  /**
+   * GET /api/auth/document-url
+   * Get a presigned URL for viewing a document
+   * Query param: documentUrl (can be raw S3 URL or existing presigned URL)
+   */
+  static async getDocumentPresignedUrl(req: Request, res: Response) {
+    try {
+      const { documentUrl } = req.query;
+
+      if (!documentUrl || typeof documentUrl !== 'string') {
+        return res.status(400).json({
+          success: false,
+          message: 'Document URL is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      // If URL already contains X-Amz-Signature (presigned), return as-is
+      if (documentUrl.includes('X-Amz-Signature')) {
+        return res.json({
+          success: true,
+          data: {
+            presignedUrl: documentUrl,
+            note: 'Already a presigned URL',
+          },
+        });
+      }
+
+      // Otherwise try to generate presigned URL (requires S3 GetObject permission)
+      try {
+        const presignedUrl = await S3PresignedUrl.generatePresignedUrl(documentUrl, 31536000);
+
+        res.json({
+          success: true,
+          data: {
+            presignedUrl,
+            expiresIn: 31536000, // 1 year in seconds
+          },
+        });
+      } catch (presignError: any) {
+        const errorMsg = presignError instanceof Error ? presignError.message : String(presignError);
+        console.warn('⚠️ Presigned URL generation failed:', errorMsg);
+        
+        // Check if it's a "file not found" error
+        if (errorMsg.includes('Document not found') || errorMsg.includes('NoSuchKey')) {
+          return res.status(404).json({
+            success: false,
+            message: `Document not found in storage: ${errorMsg}`,
+            code: 'DOCUMENT_NOT_FOUND',
+          });
+        }
+        
+        // For other errors, try to return original URL as fallback
+        res.json({
+          success: true,
+          data: {
+            presignedUrl: documentUrl,
+            note: 'Direct S3 URL - may require public bucket access',
+          },
+        });
+      }
+    } catch (error: any) {
+      console.error('❌ Document URL error:', error);
+      res.status(500).json({
+        success: false,
+        message: error.message || 'Failed to process document URL',
+        code: error.code || 'DOCUMENT_URL_ERROR',
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/forgot-password
+   * Request password reset email
+   */
+  static async forgotPassword(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const result = await authService.forgotPassword(email);
+
+      res.json({
+        success: true,
+        message: result.message,
+        data: {
+          expiresIn: result.expiresIn,
+        },
+      });
+    } catch (error: any) {
+      console.error('❌ Forgot password error:', error);
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        message: error.message || 'Failed to process password reset request',
+        code: error.code || 'FORGOT_PASSWORD_ERROR',
+      });
+    }
+  }
+
+  /**
+   * POST /api/auth/reset-password
+   * Reset password with token
+   */
+  static async resetPassword(req: Request, res: Response) {
+    try {
+      const { email, token, newPassword } = req.body;
+
+      if (!email || !token || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email, token, and new password are required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const result = await authService.resetPassword(email, token, newPassword);
+
+      res.json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error: any) {
+      console.error('❌ Reset password error:', error);
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        message: error.message || 'Failed to reset password',
+        code: error.code || 'RESET_PASSWORD_ERROR',
       });
     }
   }

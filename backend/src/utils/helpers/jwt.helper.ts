@@ -21,6 +21,12 @@ export class JwtHelper {
     return jwt.sign(payload, config.jwt.refreshSecret, options) as string;
   }
 
+  static generateResetToken(payload: any): string {
+    // Reset token valid for 1 hour (3600 seconds)
+    const options: any = { expiresIn: '1h' };
+    return jwt.sign(payload, config.jwt.secret, options) as string;
+  }
+
   static verifyToken(token: string): TokenPayload {
     try {
       return jwt.verify(token, config.jwt.secret) as TokenPayload;

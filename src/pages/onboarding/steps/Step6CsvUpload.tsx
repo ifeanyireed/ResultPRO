@@ -12,8 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Card } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Upload01, CheckCircle } from '@hugeicons/react';
 import { useOnboardingStore, Step6Data } from '@/stores/onboardingStore';
 
@@ -94,154 +92,158 @@ export const Step6CsvUpload = ({
   const fileName = form.watch('csvFile')?.name;
 
   return (
-    <Card className="w-full max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">CSV Upload (Optional)</h2>
-        <p className="text-gray-600 mt-2">
-          Bulk import student and teacher data using a CSV file. You can skip this and add users manually later.
-        </p>
-      </div>
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-8 backdrop-blur-xl">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white">CSV Upload (Optional)</h2>
+          <p className="text-gray-400 mt-2">
+            Bulk import student and teacher data using a CSV file. You can skip this and add users manually later.
+          </p>
+        </div>
 
-      {submitError && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{submitError}</AlertDescription>
-        </Alert>
-      )}
+        {submitError && (
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex gap-3">
+            <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-red-400 text-sm">{submitError}</p>
+          </div>
+        )}
 
-      {uploadComplete && (
-        <Alert className="mb-6 bg-green-50 border-green-200">
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
-            Onboarding complete! Your school is now set up and ready to use.
-          </AlertDescription>
-        </Alert>
-      )}
+        {uploadComplete && (
+          <div className="mb-6 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex gap-3">
+            <CheckCircle className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <p className="text-emerald-300 text-sm">
+              Onboarding complete! Your school is now set up and ready to use.
+            </p>
+          </div>
+        )}
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* File Upload Section */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Import Data
-            </h3>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* File Upload Section */}
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-6">
+                Import Data
+              </h3>
 
-            {/* Drop Zone */}
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const droppedFile = e.dataTransfer.files?.[0];
-                if (droppedFile) {
-                  handleFileChange({
-                    target: { files: [droppedFile] },
-                  } as any);
-                }
-              }}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition"
-            >
-              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-900 font-medium">
-                Drag and drop your CSV file here
-              </p>
-              <p className="text-gray-600 text-sm mt-1">
-                or click to browse
-              </p>
-              <p className="text-gray-500 text-xs mt-3">
-                CSV files up to 5MB
-              </p>
+              {/* Drop Zone */}
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const droppedFile = e.dataTransfer.files?.[0];
+                  if (droppedFile) {
+                    handleFileChange({
+                      target: { files: [droppedFile] },
+                    } as any);
+                  }
+                }}
+                className="border-2 border-dashed border-[rgba(255,255,255,0.2)] rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-500/5 transition"
+              >
+                <Upload01 className="w-12 h-12 text-gray-500 mx-auto mb-3" />
+                <p className="text-white font-medium">
+                  Drag and drop your CSV file here
+                </p>
+                <p className="text-gray-400 text-sm mt-1">
+                  or click to browse
+                </p>
+                <p className="text-gray-500 text-xs mt-3">
+                  CSV files up to 5MB
+                </p>
+              </div>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </div>
-
-          {/* File Info */}
-          {fileName && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-center gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
-                <div>
-                  <p className="font-medium text-gray-900">{fileName}</p>
-                  <p className="text-sm text-gray-600">
-                    {(form.watch('csvFile')?.size || 0) / 1024 < 1024
-                      ? `${((form.watch('csvFile')?.size || 0) / 1024).toFixed(1)} KB`
-                      : `${((form.watch('csvFile')?.size || 0) / (1024 * 1024)).toFixed(1)} MB`}
-                  </p>
+            {/* File Info */}
+            {fileName && (
+              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-emerald-400" />
+                  <div>
+                    <p className="font-medium text-white">{fileName}</p>
+                    <p className="text-sm text-gray-400">
+                      {(form.watch('csvFile')?.size || 0) / 1024 < 1024
+                        ? `${((form.watch('csvFile')?.size || 0) / 1024).toFixed(1)} KB`
+                        : `${((form.watch('csvFile')?.size || 0) / (1024 * 1024)).toFixed(1)} MB`}
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* CSV Format Info */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-900 mb-3 text-sm">
-              CSV File Format
-            </h4>
-            <p className="text-sm text-gray-700 mb-3">
-              Your CSV file should contain the following columns:
-            </p>
-            <div className="bg-white rounded p-3 font-mono text-xs overflow-x-auto">
-              <div className="text-gray-600">
-                <div>firstName,lastName,email,role,class</div>
-                <div className="text-gray-400 mt-2">John,Doe,john.doe@example.com,student,SS1</div>
-                <div className="text-gray-400">Jane,Smith,jane.smith@example.com,teacher,</div>
+            {/* CSV Format Info */}
+            <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.07)] rounded-lg p-4">
+              <h4 className="font-semibold text-white mb-4 text-sm">
+                CSV File Format
+              </h4>
+              <p className="text-sm text-gray-300 mb-3">
+                Your CSV file should contain the following columns:
+              </p>
+              <div className="bg-[rgba(0,0,0,0.3)] rounded p-4 font-mono text-xs overflow-x-auto">
+                <div className="text-gray-400">
+                  <div className="text-gray-200">firstName,lastName,email,role,class</div>
+                  <div className="text-gray-500 mt-2">John,Doe,john.doe@example.com,student,SS1</div>
+                  <div className="text-gray-500">Jane,Smith,jane.smith@example.com,teacher,</div>
+                </div>
               </div>
+              <p className="text-xs text-gray-400 mt-3">
+                For students: role=&quot;student&quot;, class=class name (e.g., SS1A)<br/>
+                For teachers: role=&quot;teacher&quot;, class can be empty
+              </p>
             </div>
-            <p className="text-xs text-gray-600 mt-3">
-              For students: role=&quot;student&quot;, class=class name (e.g., SS1A)<br/>
-              For teachers: role=&quot;teacher&quot;, class can be empty
-            </p>
-          </div>
 
-          {/* Skip Option */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900">
-              <strong>Can't find the file?</strong> Don't worry! You can skip this step 
-              and add users manually later from the admin dashboard.
-            </p>
-          </div>
+            {/* Skip Option */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-sm text-blue-300">
+                <strong>Can't find the file?</strong> Don't worry! You can skip this step 
+                and add users manually later from the admin dashboard.
+              </p>
+            </div>
 
-          {/* Action Buttons */}
-          <div className="border-t pt-6 flex gap-4 justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onPrevious}
-              disabled={isLoading}
-            >
-              Back
-            </Button>
-            <div className="flex gap-4">
+            {/* Action Buttons */}
+            <div className="border-t border-[rgba(255,255,255,0.07)] pt-8 flex gap-4 justify-between">
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => onNext({ csvFile: undefined })}
+                onClick={onPrevious}
                 disabled={isLoading}
+                className="bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
               >
-                Skip & Complete
+                Back
               </Button>
-              <Button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700"
-                disabled={isLoading || !fileName}
-              >
-                {isLoading ? 'Uploading...' : 'Upload & Complete'}
-              </Button>
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onNext({ csvFile: undefined })}
+                  disabled={isLoading}
+                  className="bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
+                >
+                  Skip & Complete
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isLoading || !fileName}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  {isLoading ? 'Uploading...' : 'Upload & Complete'}
+                </Button>
+              </div>
             </div>
-          </div>
-        </form>
-      </Form>
-    </Card>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 };

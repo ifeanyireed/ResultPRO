@@ -2,6 +2,8 @@ import { createApp } from './app';
 import { initializeDatabase } from '@config/database';
 import { initializeMailer } from '@config/mail';
 import { config } from '@config/environment';
+import { uploadLogoToS3 } from '@modules/common/utils/logo-upload';
+import { EmailTemplateService } from '@modules/common/services/email-template.service';
 
 async function startServer() {
   try {
@@ -14,6 +16,17 @@ async function startServer() {
     // Initialize mailer
     console.log('📧 Initializing mail service...');
     initializeMailer();
+
+    // Upload logo to S3 and set it in email templates
+    console.log('☁️ Uploading logo to S3...');
+    try {
+      const logoUrl = await uploadLogoToS3();
+      EmailTemplateService.setLogoUrl(logoUrl);
+      console.log('✅ Logo uploaded to S3:', logoUrl);
+    } catch (logoError) {
+      console.warn('⚠️ Failed to upload logo to S3:', logoError instanceof Error ? logoError.message : logoError);
+      console.log('📧 Email templates will display as text fallback');
+    }
 
     // Create Express app
     const app = await createApp();

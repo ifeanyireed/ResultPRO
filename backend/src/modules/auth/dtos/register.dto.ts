@@ -4,8 +4,8 @@ export class RegisterDTO {
   phone!: string;
   fullAddress!: string;
   state!: string;
+  lga!: string;
   password!: string;
-  lga?: string;
 }
 
 export class RegisterResponseDTO {

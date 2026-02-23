@@ -48,33 +48,57 @@ export const OnboardingWizard = () => {
     const checkApi = async () => {
       try {
         // Get auth token from localStorage
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
         if (!token) {
-          navigate('/auth/login');
+          console.log('❌ No auth token found. Redirecting to login...');
+          navigate('/auth/login', { replace: true });
           return;
         }
+
+        console.log('🔐 Auth token found, checking API...');
 
         // Check API health
         const healthRes = await axios.get(`${API_BASE}/health`);
         if (healthRes.status === 200) {
+          console.log('✅ API is healthy');
           setApiStatus('ready');
 
           // Fetch current onboarding status
+          console.log('📡 Fetching onboarding status with token:', token.substring(0, 20) + '...');
           const statusRes = await axios.get(`${API_BASE}/onboarding/status`, {
             headers: { Authorization: `Bearer ${token}` },
           });
 
           if (statusRes.data.data?.currentStep) {
             // TODO: Load progress from server if resuming
-            console.log('Current server step:', statusRes.data.data.currentStep);
+            console.log('✅ Current server step:', statusRes.data.data.currentStep);
           }
         }
-      } catch (error) {
-        console.error('API check failed:', error);
+      } catch (error: any) {
+        console.error('❌ API check failed:', {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+        });
+        
+        // If 401, redirect to login
+        if (error.response?.status === 401) {
+          console.log('🔐 Unauthorized (401) - Clearing session and redirecting to login');
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          navigate('/auth/login', { replace: true });
+          return;
+        }
+        
         setApiStatus('error');
         toast({
           title: 'Server Error',
-          description: 'Could not connect to backend. Please check if server is running on port 5000.',
+          description: error.response?.status === 401 
+            ? 'Your session has expired. Please login again.'
+            : 'Could not connect to backend. Please check if server is running on port 5000.',
           variant: 'destructive',
         });
       }
@@ -341,17 +365,17 @@ export const OnboardingWizard = () => {
 
   if (apiStatus === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white rounded-lg shadow p-8 max-w-md text-center">
-          <h2 className="text-xl font-bold text-red-600 mb-2">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+        <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] backdrop-blur-xl shadow-2xl p-8 max-w-md text-center">
+          <h2 className="text-xl font-bold text-red-400 mb-2">
             Server Connection Error
           </h2>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-300 mb-6">
             Could not connect to the backend server. Please ensure the server is running on port 5000.
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition"
           >
             Retry
           </button>
@@ -362,24 +386,24 @@ export const OnboardingWizard = () => {
 
   if (apiStatus === 'checking') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading onboarding wizard...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+          <p className="text-gray-300">Loading onboarding wizard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-white">
             Welcome to Results Pro
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-400 mt-3 text-lg">
             Let's set up your school in just a few minutes
           </p>
         </div>
@@ -392,7 +416,7 @@ export const OnboardingWizard = () => {
         />
 
         {/* Steps */}
-        <div className="mt-8">
+        <div className="mt-12">
           {currentStep === 1 && (
             <Step1SchoolProfile
               onNext={handleStep1Next}
@@ -450,13 +474,13 @@ export const OnboardingWizard = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+          <div className="mt-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
             {error}
           </div>
         )}
 
         {/* Footer */}
-        <div className="mt-12 text-center text-sm text-gray-600">
+        <div className="mt-12 text-center text-sm text-gray-400">
           <p>
             Questions? Contact support@resultspro.io
           </p>

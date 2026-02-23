@@ -38,16 +38,39 @@ export class S3Upload {
     };
 
     try {
-      await s3.putObject(params).promise();
+      console.log(`📤 Uploading file to S3: ${key}`);
+      const uploadResult = await s3.putObject(params).promise();
+      console.log('✓ File uploaded successfully:', uploadResult.ETag);
+
+      // Verify file was actually uploaded by checking if it exists
+      try {
+        console.log('🔍 Verifying file exists in S3...');
+        await s3.headObject({
+          Bucket: config.aws.s3Bucket,
+          Key: key,
+        }).promise();
+        console.log('✓ File verified in S3');
+      } catch (headError: any) {
+        console.error('⚠️ File verification failed:', headError.message);
+        throw new Error(`File upload verification failed: ${headError.message}`);
+      }
+
+      // Generate a presigned URL valid for 1 year (31536000 seconds)
+      // This is a long validity so presigned URLs stored in DB remain valid
+      console.log('🔗 Generating presigned URL...');
+      const presignedUrl = await s3.getSignedUrlPromise('getObject', {
+        Bucket: config.aws.s3Bucket,
+        Key: key,
+        Expires: 31536000, // 1 year
+      });
+
+      console.log(`✓ File uploaded to S3 with presigned URL: ${key}`);
       
-      // Return the S3 URL
-      const url = `https://${config.aws.s3Bucket}.s3.${config.aws.region}.amazonaws.com/${key}`;
-      console.log(`✓ File uploaded to S3: ${url}`);
-      
-      return url;
+      return presignedUrl;
     } catch (error) {
-      console.error('✗ S3 upload error:', error);
-      throw new Error(`Failed to upload file to S3: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('❌ S3 upload error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to upload file to S3: ${errorMessage}`);
     }
   }
 

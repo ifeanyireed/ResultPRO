@@ -159,4 +159,58 @@ export class AuthRepository {
     });
     return !!school;
   }
+
+  /**
+   * Update admin user reset token
+   */
+  async updateAdminUserResetToken(userId: string, data: {
+    passwordResetToken: string | null;
+    passwordResetTokenExpiry: Date | null;
+  }) {
+    return await prisma.schoolAdminUser.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  /**
+   * Update admin user password
+   */
+  async updateAdminPassword(userId: string, data: {
+    passwordHash: string;
+    passwordResetToken: null;
+    passwordResetTokenExpiry: null;
+  }) {
+    return await prisma.schoolAdminUser.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  /**
+   * Update user reset token (super-admin)
+   */
+  async updateUserResetToken(userId: string, data: {
+    passwordResetToken: string | null;
+    passwordResetTokenExpiry: Date | null;
+  }) {
+    return await prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+  }
+
+  /**
+   * Update user password (super-admin)
+   */
+  async updateUserPassword(userId: string, data: {
+    passwordHash: string;
+    passwordResetToken: null;
+    passwordResetTokenExpiry: null;
+  }) {
+    return await prisma.user.update({
+      where: { id: userId },
+      data,
+    });
+  }
 }

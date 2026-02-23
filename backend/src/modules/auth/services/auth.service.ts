@@ -26,8 +26,8 @@ export class AuthService {
     phone: string;
     fullAddress: string;
     state: string;
+    lga: string;
     password: string;
-    lga?: string;
   }) {
     try {
       // Normalize email
@@ -151,7 +151,6 @@ export class AuthService {
 
     await this.repository.updateSchool(school.id, {
       verificationStatus: 'EMAIL_VERIFIED',
-      emailVerifiedAt: new Date(),
       status: 'AWAITING_VERIFICATION_DOCS',
     });
 
@@ -209,6 +208,142 @@ export class AuthService {
     return {
       expiresIn: 600,
     };
+  }
+
+  /**
+   * Initiate forgot password flow
+   */
+  async forgotPassword(email: string) {
+    const normalizedEmail = EmailValidator.normalizeEmail(email);
+
+    // Try to find admin user first (school admins)
+    let adminUser = await this.repository.findAdminUserByEmail(normalizedEmail);
+    
+    if (adminUser) {
+      // Generate password reset token (valid for 1 hour)
+      const resetToken = JwtHelper.generateResetToken({ userId: adminUser.id, email: normalizedEmail });
+      const expiryTime = new Date();
+      expiryTime.setHours(expiryTime.getHours() + 1);
+
+      // Store reset token in database
+      await this.repository.updateAdminUserResetToken(adminUser.id, {
+        passwordResetToken: resetToken,
+        passwordResetTokenExpiry: expiryTime,
+      });
+
+      // Send reset email
+      const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/auth/password-reset-confirm?token=${resetToken}&email=${encodeURIComponent(normalizedEmail)}`;
+      await emailService.sendPasswordResetEmail(normalizedEmail, resetLink);
+
+      console.log(`✓ Password reset link sent to school admin: ${normalizedEmail}`);
+      return {
+        message: 'Password reset link sent to your email',
+        expiresIn: 3600, // 1 hour in seconds
+      };
+    }
+
+    // Try to find super admin user
+    let superAdminUser = await this.repository.findUserByEmail(normalizedEmail);
+    
+    if (superAdminUser) {
+      // Generate password reset token (valid for 1 hour)
+      const resetToken = JwtHelper.generateResetToken({ userId: superAdminUser.id, email: normalizedEmail });
+      const expiryTime = new Date();
+      expiryTime.setHours(expiryTime.getHours() + 1);
+
+      // Store reset token in database
+      await this.repository.updateUserResetToken(superAdminUser.id, {
+        passwordResetToken: resetToken,
+        passwordResetTokenExpiry: expiryTime,
+      });
+
+      // Send reset email
+      const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/auth/password-reset-confirm?token=${resetToken}&email=${encodeURIComponent(normalizedEmail)}`;
+      await emailService.sendPasswordResetEmail(normalizedEmail, resetLink);
+
+      console.log(`✓ Password reset link sent to super admin: ${normalizedEmail}`);
+      return {
+        message: 'Password reset link sent to your email',
+        expiresIn: 3600, // 1 hour in seconds
+      };
+    }
+
+    // Don't reveal if email exists or not (security best practice)
+    console.log(`⚠️ Password reset requested for non-existent email: ${normalizedEmail}`);
+    return {
+      message: 'If an account exists with this email, you will receive a password reset link',
+      expiresIn: 3600,
+    };
+  }
+
+  /**
+   * Reset password using token
+   */
+  async resetPassword(email: string, token: string, newPassword: string) {
+    const normalizedEmail = EmailValidator.normalizeEmail(email);
+
+    // Validate password
+    if (!newPassword || newPassword.length < 8) {
+      throw new ConflictException('Password must be at least 8 characters long', 'INVALID_PASSWORD');
+    }
+
+    // Try to find admin user first
+    let adminUser = await this.repository.findAdminUserByEmail(normalizedEmail);
+    
+    if (adminUser) {
+      // Verify token exists, matches, and hasn't expired
+      if (!adminUser.passwordResetToken || adminUser.passwordResetToken !== token) {
+        throw new ConflictException('Invalid or expired reset token', 'INVALID_TOKEN');
+      }
+
+      if (!adminUser.passwordResetTokenExpiry || adminUser.passwordResetTokenExpiry < new Date()) {
+        throw new ConflictException('Password reset token has expired. Please request a new one.', 'TOKEN_EXPIRED');
+      }
+
+      // Hash new password and update
+      const passwordHash = await PasswordHelper.hashPassword(newPassword);
+      
+      await this.repository.updateAdminPassword(adminUser.id, {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetTokenExpiry: null,
+      });
+
+      console.log(`✓ Password reset successful for school admin: ${normalizedEmail}`);
+      return {
+        message: 'Password reset successful. Please login with your new password.',
+      };
+    }
+
+    // Try to find super admin user
+    let superAdminUser = await this.repository.findUserByEmail(normalizedEmail);
+    
+    if (superAdminUser) {
+      // Verify token exists, matches, and hasn't expired
+      if (!superAdminUser.passwordResetToken || superAdminUser.passwordResetToken !== token) {
+        throw new ConflictException('Invalid or expired reset token', 'INVALID_TOKEN');
+      }
+
+      if (!superAdminUser.passwordResetTokenExpiry || superAdminUser.passwordResetTokenExpiry < new Date()) {
+        throw new ConflictException('Password reset token has expired. Please request a new one.', 'TOKEN_EXPIRED');
+      }
+
+      // Hash new password and update
+      const passwordHash = await PasswordHelper.hashPassword(newPassword);
+      
+      await this.repository.updateUserPassword(superAdminUser.id, {
+        passwordHash,
+        passwordResetToken: null,
+        passwordResetTokenExpiry: null,
+      });
+
+      console.log(`✓ Password reset successful for super admin: ${normalizedEmail}`);
+      return {
+        message: 'Password reset successful. Please login with your new password.',
+      };
+    }
+
+    throw new NotFoundException('No account found with this email');
   }
 
   /**
@@ -435,6 +570,14 @@ export class AuthService {
 
     if (school.status === 'SUSPENDED') {
       throw new ConflictException('School account is suspended. Contact support.', 'SCHOOL_SUSPENDED');
+    }
+
+    if (school.status === 'REJECTED') {
+      console.error('❌ Login rejected - School status is REJECTED:', { schoolId: school.id, schoolName: school.name });
+      throw new ConflictException(
+        'Your school application has been rejected. Please contact support for more information.',
+        'SCHOOL_REJECTED'
+      );
     }
 
     // Generate tokens for approved schools

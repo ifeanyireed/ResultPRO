@@ -32,6 +32,7 @@ import SystemSettings from "./pages/super-admin/Settings";
 import SuperAdminProfile from "./pages/super-admin/Profile";
 import SuperAdminNotifications from "./pages/super-admin/Notifications";
 import SchoolAdminLayout from "./components/SchoolAdminLayout";
+import SchoolRejected from "./pages/school-admin/SchoolRejected";
 import {
   Overview as SchoolOverview,
   SessionTermManagement,
@@ -115,6 +116,7 @@ const App = () => (
           <Route path="/school-admin/billing" element={<SchoolAdminLayout><BillingSubscription /></SchoolAdminLayout>} />
           <Route path="/school-admin/profile" element={<SchoolAdminLayout><SchoolAdminProfile /></SchoolAdminLayout>} />
           <Route path="/school-admin/notifications" element={<SchoolAdminLayout><SchoolAdminNotifications /></SchoolAdminLayout>} />
+          <Route path="/school-admin/school-rejected" element={<SchoolRejected />} />
           
           <Route path="/:schoolSlug/result-checker" element={<ResultChecker />} />
           <Route path="/original" element={<Index />} />

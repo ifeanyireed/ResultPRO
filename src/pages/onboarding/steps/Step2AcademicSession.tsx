@@ -13,8 +13,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from '@hugeicons/react';
 import { useOnboardingStore, Step2Data } from '@/stores/onboardingStore';
 
@@ -91,91 +89,45 @@ export const Step2AcademicSession = ({
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Academic Session</h2>
-        <p className="text-gray-600 mt-2">
-          Set up the academic year and term dates for your school.
-        </p>
-      </div>
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-8 backdrop-blur-xl">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-white">Academic Session</h2>
+          <p className="text-gray-400 mt-2">
+            Set up the academic year and term dates for your school.
+          </p>
+        </div>
 
-      {submitError && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{submitError}</AlertDescription>
-        </Alert>
-      )}
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Session Information */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Session Details
-            </h3>
-
-            <FormField
-              control={form.control}
-              name="academicSessionName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Academic Session Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={defaultSessionName}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Format: e.g., {defaultSessionName} or {currentYear}/2025
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        {submitError && (
+          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex gap-3">
+            <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+            <p className="text-red-400 text-sm">{submitError}</p>
           </div>
+        )}
 
-          {/* Term Dates Section */}
-          <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Session Duration
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="startDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Session Start Date</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="date"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      When does the academic year begin?
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Session Information */}
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-6">
+                Session Details
+              </h3>
 
               <FormField
                 control={form.control}
-                name="endDate"
+                name="academicSessionName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Session End Date</FormLabel>
+                    <FormLabel className="text-gray-300">Academic Session Name</FormLabel>
                     <FormControl>
                       <Input
-                        type="date"
+                        placeholder={defaultSessionName}
+                        className="bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-white placeholder:text-gray-600"
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      When does the academic year end?
+                    <FormDescription className="text-gray-500">
+                      Format: e.g., {defaultSessionName} or {currentYear}/2025
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -183,61 +135,113 @@ export const Step2AcademicSession = ({
               />
             </div>
 
-            {/* Date Range Summary */}
-            {form.watch('startDate') && form.watch('endDate') && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-gray-700">
-                  <span className="font-semibold">Session Duration:</span>{' '}
-                  {new Date(form.watch('startDate')).toLocaleDateString(
-                    undefined,
-                    { year: 'numeric', month: 'long', day: 'numeric' }
-                  )}{' '}
-                  to{' '}
-                  {new Date(form.watch('endDate')).toLocaleDateString(
-                    undefined,
-                    { year: 'numeric', month: 'long', day: 'numeric' }
+            {/* Term Dates Section */}
+            <div className="border-t border-[rgba(255,255,255,0.07)] pt-8">
+              <h3 className="text-lg font-semibold text-white mb-6">
+                Session Duration
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="startDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Session Start Date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          className="bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-white placeholder:text-gray-600"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-gray-500">
+                        When does the academic year begin?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </p>
-                <p className="text-xs text-gray-600 mt-2">
-                  {Math.ceil(
-                    (new Date(form.watch('endDate')).getTime() -
-                      new Date(form.watch('startDate')).getTime()) /
-                      (1000 * 60 * 60 * 24)
-                  )}{' '}
-                  days total
-                </p>
+                />
+
+                <FormField
+                  control={form.control}
+                  name="endDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-300">Session End Date</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          className="bg-[rgba(255,255,255,0.03)] border-[rgba(255,255,255,0.1)] text-white placeholder:text-gray-600"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription className="text-gray-500">
+                        When does the academic year end?
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            )}
-          </div>
 
-          {/* Info Box */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-900">
-              <strong>Note:</strong> You can add multiple terms (1st, 2nd, 3rd term) 
-              after this step. For now, we're setting up the overall academic session.
-            </p>
-          </div>
+              {/* Date Range Summary */}
+              {form.watch('startDate') && form.watch('endDate') && (
+                <div className="mt-6 p-4 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                  <p className="text-sm text-blue-300">
+                    <span className="font-semibold">Session Duration:</span>{' '}
+                    {new Date(form.watch('startDate')).toLocaleDateString(
+                      undefined,
+                      { year: 'numeric', month: 'long', day: 'numeric' }
+                    )}{' '}
+                    to{' '}
+                    {new Date(form.watch('endDate')).toLocaleDateString(
+                      undefined,
+                      { year: 'numeric', month: 'long', day: 'numeric' }
+                    )}
+                  </p>
+                  <p className="text-xs text-blue-400 mt-2">
+                    {Math.ceil(
+                      (new Date(form.watch('endDate')).getTime() -
+                        new Date(form.watch('startDate')).getTime()) /
+                        (1000 * 60 * 60 * 24)
+                    )}{' '}
+                    days total
+                  </p>
+                </div>
+              )}
+            </div>
 
-          {/* Action Buttons */}
-          <div className="border-t pt-6 flex gap-4 justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onPrevious}
-              disabled={isLoading}
-            >
-              Back
-            </Button>
-            <Button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Saving...' : 'Next: Classes'}
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </Card>
+            {/* Info Box */}
+            <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-sm text-blue-300">
+                <strong>Note:</strong> You can add multiple terms (1st, 2nd, 3rd term) 
+                after this step. For now, we're setting up the overall academic session.
+              </p>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="border-t border-[rgba(255,255,255,0.07)] pt-8 flex gap-4 justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onPrevious}
+                disabled={isLoading}
+                className="bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
+              >
+                Back
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {isLoading ? 'Saving...' : 'Next: Classes'}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
+    </div>
   );
 };

@@ -5,9 +5,13 @@ async function seedDatabase() {
   try {
     console.log('\n🌱 Seeding database with test data...\n');
     
-    // Test Prisma connection
-    await prisma.$executeRaw`SELECT 1`;
-    console.log('✓ Database connection established');
+    // Test Prisma connection by trying to query a user
+    try {
+      await prisma.user.findFirst({ take: 1 });
+      console.log('✓ Database connection established');
+    } catch (error) {
+      console.log('⚠️ Could not verify connection, proceeding with seed');
+    }
     
     // Always ensure super admin user exists in User table (system-level, not school-specific)
     const existingSuperAdmin = await prisma.user.findUnique({

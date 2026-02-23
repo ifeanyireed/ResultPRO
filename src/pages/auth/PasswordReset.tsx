@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight01, Loading01 } from '@hugeicons/react';
 import Navigation from '@/components/Navigation';
+import axios from 'axios';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const PasswordReset: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +13,7 @@ const PasswordReset: React.FC = () => {
   const [submitted, setSubmitted] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
@@ -26,11 +29,23 @@ const PasswordReset: React.FC = () => {
 
     setLoading(true);
     
-    // Simulate sending reset email
-    setTimeout(() => {
-      setSubmitted(true);
+    try {
+      const response = await axios.post(`${API_BASE}/auth/forgot-password`, {
+        email: email.trim(),
+      });
+
+      if (response.data.success) {
+        setSubmitted(true);
+      } else {
+        setError(response.data.message || 'Failed to send reset link');
+      }
+    } catch (err: any) {
+      console.error('Password reset error:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to send reset link. Please try again.';
+      setError(errorMsg);
+    } finally {
       setLoading(false);
-    }, 800);
+    }
   };
 
   if (submitted) {

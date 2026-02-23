@@ -23,7 +23,6 @@ async function verifyEmail() {
     // Manual verification status (simulating email verification)
     await school.update({
       verificationStatus: 'EMAIL_VERIFIED',
-      emailVerifiedAt: new Date(),
       status: 'AWAITING_VERIFICATION_DOCS',
     });
     

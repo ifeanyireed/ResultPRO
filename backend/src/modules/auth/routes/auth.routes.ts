@@ -22,11 +22,14 @@ const router = Router();
 router.post('/register', AuthController.register);
 router.post('/verify-email', AuthController.verifyEmail);
 router.post('/resend-verification', AuthController.resendVerification);
+router.post('/forgot-password', AuthController.forgotPassword);
+router.post('/reset-password', AuthController.resetPassword);
 router.post('/login', AuthController.login);
 router.post('/refresh-token', AuthController.refreshToken);
 router.post('/logout', AuthController.logout);
 router.post('/upload-document', upload.single('document'), AuthController.uploadDocument);
 router.post('/submit-verification-documents', AuthController.submitVerificationDocuments);
+router.get('/document-url', AuthController.getDocumentPresignedUrl);
 router.get('/school-status/:schoolId', AuthController.getSchoolStatus);
 
 export default router;

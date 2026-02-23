@@ -36,6 +36,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   File: LucideIcons.File,
   FileText: LucideIcons.FileText,
   Filter: LucideIcons.Filter,
+  Info: LucideIcons.Info,
   GripVertical: LucideIcons.GripVertical,
   LayoutDashboard: LucideIcons.LayoutDashboard,
   Layers: LucideIcons.Layers,
@@ -65,10 +66,12 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   TrendingUp: LucideIcons.TrendingUp,
   Trophy: LucideIcons.Trophy,
   Trash01: LucideIcons.Trash2,
+  Upload: LucideIcons.Upload,
   Upload01: LucideIcons.Upload,
   Users: LucideIcons.Users,
   X: LucideIcons.X,
   XClose: LucideIcons.X,
+  XCircle: LucideIcons.XCircle,
   Zap: LucideIcons.Zap,
   Bell: LucideIcons.Bell,
   User: LucideIcons.User,
@@ -118,6 +121,7 @@ export const EyeOff = iconMap.EyeOff || LucideIcons.EyeOff;
 export const File = iconMap.File || LucideIcons.File;
 export const FileText = iconMap.FileText || LucideIcons.FileText;
 export const Filter = iconMap.Filter || LucideIcons.Filter;
+export const Info = iconMap.Info || LucideIcons.Info;
 export const GripVertical = iconMap.GripVertical || LucideIcons.GripVertical;
 export const LayoutDashboard = iconMap.LayoutDashboard || LucideIcons.LayoutDashboard;
 export const Layers = iconMap.Layers || LucideIcons.Layers;
@@ -147,10 +151,12 @@ export const TrendingDown = iconMap.TrendingDown || LucideIcons.TrendingDown;
 export const TrendingUp = iconMap.TrendingUp || LucideIcons.TrendingUp;
 export const Trophy = iconMap.Trophy || LucideIcons.Trophy;
 export const Trash01 = iconMap.Trash01 || LucideIcons.Trash2;
+export const Upload = iconMap.Upload || LucideIcons.Upload;
 export const Upload01 = iconMap.Upload01 || LucideIcons.Upload;
 export const Users = iconMap.Users || LucideIcons.Users;
 export const X = iconMap.X || LucideIcons.X;
 export const XClose = iconMap.XClose || LucideIcons.X;
+export const XCircle = iconMap.XCircle || LucideIcons.XCircle;
 export const Zap = iconMap.Zap || LucideIcons.Zap;
 export const Bell = iconMap.Bell || LucideIcons.Bell;
 export const User = iconMap.User || LucideIcons.User;

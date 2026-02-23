@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Upload01, CheckCircle, Loading01 } from '@hugeicons/react';
+import { Upload } from '@/lib/hugeicons-compat';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
 
