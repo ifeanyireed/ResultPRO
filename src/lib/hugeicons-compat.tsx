@@ -15,6 +15,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   BookOpen: LucideIcons.BookOpen,
   Building2: LucideIcons.Building2,
   Calendar: LucideIcons.Calendar,
+  Check: LucideIcons.Check,
   CheckCircle: LucideIcons.CheckCircle,
   CheckSquare: LucideIcons.CheckSquare2,
   ChevronDown: LucideIcons.ChevronDown,
@@ -41,19 +42,24 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   Loading01: LucideIcons.Loader,
   Mail: LucideIcons.Mail,
   MapPin: LucideIcons.MapPin,
+  MessageCircle: LucideIcons.MessageCircle,
   MoreHorizontal: LucideIcons.MoreHorizontal,
   MoreVertical: LucideIcons.MoreVertical,
   PanelLeft: LucideIcons.PanelLeft,
   Pause: LucideIcons.Pause,
   PieChart01: LucideIcons.PieChart,
+  Phone: LucideIcons.Phone,
   Phone01: LucideIcons.Phone,
   Plus: LucideIcons.Plus,
+  ShoppingCart: LucideIcons.ShoppingCart,
+  Headphones: LucideIcons.Headphones,
   RotateCcw: LucideIcons.RotateCcw,
   Save: LucideIcons.Save,
   Search: LucideIcons.Search,
   Send: LucideIcons.Send,
   Settings: LucideIcons.Settings,
   Share01: LucideIcons.Share2,
+  Shield: LucideIcons.Shield,
   Ticket: LucideIcons.Ticket,
   TrendingDown: LucideIcons.TrendingDown,
   TrendingUp: LucideIcons.TrendingUp,
@@ -61,7 +67,9 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   Trash01: LucideIcons.Trash2,
   Upload01: LucideIcons.Upload,
   Users: LucideIcons.Users,
+  X: LucideIcons.X,
   XClose: LucideIcons.X,
+  Zap: LucideIcons.Zap,
   Bell: LucideIcons.Bell,
   User: LucideIcons.User,
   LogOut: LucideIcons.LogOut,
@@ -89,6 +97,7 @@ export const BarChart01 = iconMap.BarChart01 || LucideIcons.BarChart3;
 export const BookOpen = iconMap.BookOpen || LucideIcons.BookOpen;
 export const Building2 = iconMap.Building2 || LucideIcons.Building2;
 export const Calendar = iconMap.Calendar || LucideIcons.Calendar;
+export const Check = iconMap.Check || LucideIcons.Check;
 export const CheckCircle = iconMap.CheckCircle || LucideIcons.CheckCircle;
 export const CheckSquare = iconMap.CheckSquare || LucideIcons.CheckSquare2;
 export const ChevronDown = iconMap.ChevronDown || LucideIcons.ChevronDown;
@@ -115,19 +124,24 @@ export const Layers = iconMap.Layers || LucideIcons.Layers;
 export const Loading01 = iconMap.Loading01 || LucideIcons.Loader;
 export const Mail = iconMap.Mail || LucideIcons.Mail;
 export const MapPin = iconMap.MapPin || LucideIcons.MapPin;
+export const MessageCircle = iconMap.MessageCircle || LucideIcons.MessageCircle;
 export const MoreHorizontal = iconMap.MoreHorizontal || LucideIcons.MoreHorizontal;
 export const MoreVertical = iconMap.MoreVertical || LucideIcons.MoreVertical;
 export const PanelLeft = iconMap.PanelLeft || LucideIcons.PanelLeft;
 export const Pause = iconMap.Pause || LucideIcons.Pause;
 export const PieChart01 = iconMap.PieChart01 || LucideIcons.PieChart;
+export const Phone = iconMap.Phone || LucideIcons.Phone;
 export const Phone01 = iconMap.Phone01 || LucideIcons.Phone;
 export const Plus = iconMap.Plus || LucideIcons.Plus;
+export const ShoppingCart = iconMap.ShoppingCart || LucideIcons.ShoppingCart;
+export const Headphones = iconMap.Headphones || LucideIcons.Headphones;
 export const RotateCcw = iconMap.RotateCcw || LucideIcons.RotateCcw;
 export const Save = iconMap.Save || LucideIcons.Save;
 export const Search = iconMap.Search || LucideIcons.Search;
 export const Send = iconMap.Send || LucideIcons.Send;
 export const Settings = iconMap.Settings || LucideIcons.Settings;
 export const Share01 = iconMap.Share01 || LucideIcons.Share2;
+export const Shield = iconMap.Shield || LucideIcons.Shield;
 export const Ticket = iconMap.Ticket || LucideIcons.Ticket;
 export const TrendingDown = iconMap.TrendingDown || LucideIcons.TrendingDown;
 export const TrendingUp = iconMap.TrendingUp || LucideIcons.TrendingUp;
@@ -135,7 +149,9 @@ export const Trophy = iconMap.Trophy || LucideIcons.Trophy;
 export const Trash01 = iconMap.Trash01 || LucideIcons.Trash2;
 export const Upload01 = iconMap.Upload01 || LucideIcons.Upload;
 export const Users = iconMap.Users || LucideIcons.Users;
+export const X = iconMap.X || LucideIcons.X;
 export const XClose = iconMap.XClose || LucideIcons.X;
+export const Zap = iconMap.Zap || LucideIcons.Zap;
 export const Bell = iconMap.Bell || LucideIcons.Bell;
 export const User = iconMap.User || LucideIcons.User;
 export const LogOut = iconMap.LogOut || LucideIcons.LogOut;

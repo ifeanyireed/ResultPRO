@@ -17,14 +17,19 @@ const ProtectedSuperAdminRoute: React.FC<ProtectedSuperAdminRouteProps> = ({ chi
   try {
     const user = JSON.parse(userJson);
 
+    console.log('🔒 ProtectedSuperAdminRoute: Checking user role:', user.role, 'Type:', typeof user.role);
+
     // Check if user is a super admin
-    if (user.role !== 'SUPER_ADMIN') {
+    if (user.role !== 'SUPER_ADMIN' && user.role?.toUpperCase() !== 'SUPER_ADMIN') {
+      console.log('❌ Access denied: User role is not SUPER_ADMIN, redirecting to /');
       return <Navigate to="/" replace />;
     }
 
+    console.log('✅ Super admin access granted');
     return <>{children}</>;
   } catch (error) {
     // Invalid user data
+    console.error('❌ Error parsing user data:', error);
     return <Navigate to="/auth/login" replace />;
   }
 };

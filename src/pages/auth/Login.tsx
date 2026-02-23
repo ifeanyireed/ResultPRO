@@ -46,15 +46,17 @@ const Login: React.FC = () => {
       localStorage.setItem('schoolId', school?.id);
       localStorage.setItem('schoolName', school?.name);
 
-      console.log('✅ Login successful for user:', user.email, 'Role:', user.role);
+      console.log('✅ Login successful for user:', user.email, 'Role:', user.role, 'Type:', typeof user.role);
 
       // Check if user is a super admin - redirect to super admin dashboard
-      if (user.role === 'SUPER_ADMIN') {
+      if (user.role === 'SUPER_ADMIN' || user.role?.toUpperCase() === 'SUPER_ADMIN') {
         console.log('🔐 Super admin detected, redirecting to /super-admin/verifications');
         setLoading(false);
         navigate('/super-admin/verifications');
         return;
       }
+
+      console.log('📋 User role is:', user.role, '- checking other conditions...');
 
       // Check if school is awaiting approval after document submission
       if (user.awaitingApproval) {
@@ -203,13 +205,13 @@ const Login: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loading01 className="w-5 h-5 animate-spin" />
                     <span>Signing in...</span>
                   </>
                 ) : (
                   <>
                     Sign In
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight01 className="w-5 h-5" />
                   </>
                 )}
               </button>

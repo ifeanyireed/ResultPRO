@@ -182,13 +182,13 @@ const VerifyEmail: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loading01 className="w-5 h-5 animate-spin" />
                     <span>Verifying...</span>
                   </>
                 ) : (
                   <>
                     Verify Email
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight01 className="w-5 h-5" />
                   </>
                 )}
               </button>
@@ -204,7 +204,7 @@ const VerifyEmail: React.FC = () => {
                 >
                   {resendLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loading01 className="w-4 h-4 animate-spin" />
                       Sending...
                     </>
                   ) : resendCountdown > 0 ? (

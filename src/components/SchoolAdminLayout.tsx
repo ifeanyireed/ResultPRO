@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Calendar,
@@ -29,6 +29,22 @@ interface NavItem {
 const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Check if user is a super admin and redirect them
+  useEffect(() => {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        if (user.role === 'SUPER_ADMIN' || user.role?.toUpperCase() === 'SUPER_ADMIN') {
+          console.log('🔐 Super admin detected in SchoolAdminLayout, redirecting to super-admin dashboard');
+          navigate('/super-admin/verifications', { replace: true });
+        }
+      } catch (error) {
+        console.error('Error checking user role:', error);
+      }
+    }
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');

@@ -29,6 +29,8 @@ import SubscriptionsManagement from "./pages/super-admin/Subscriptions";
 import Analytics from "./pages/super-admin/Analytics";
 import SupportTickets from "./pages/super-admin/Support";
 import SystemSettings from "./pages/super-admin/Settings";
+import SuperAdminProfile from "./pages/super-admin/Profile";
+import SuperAdminNotifications from "./pages/super-admin/Notifications";
 import SchoolAdminLayout from "./components/SchoolAdminLayout";
 import {
   Overview as SchoolOverview,
@@ -49,6 +51,8 @@ import {
   ReportCardDesigner,
   SchoolSettings,
   BillingSubscription,
+  Profile as SchoolAdminProfile,
+  Notifications as SchoolAdminNotifications,
 } from "./pages/school-admin";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -87,6 +91,8 @@ const App = () => (
           <Route path="/super-admin/analytics" element={<ProtectedSuperAdminRoute><Analytics /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/support" element={<ProtectedSuperAdminRoute><SupportTickets /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/settings" element={<ProtectedSuperAdminRoute><SystemSettings /></ProtectedSuperAdminRoute>} />
+          <Route path="/super-admin/profile" element={<ProtectedSuperAdminRoute><SuperAdminProfile /></ProtectedSuperAdminRoute>} />
+          <Route path="/super-admin/notifications" element={<ProtectedSuperAdminRoute><SuperAdminNotifications /></ProtectedSuperAdminRoute>} />
           
           {/* School Admin Routes */}
           <Route path="/school-admin/overview" element={<SchoolAdminLayout><SchoolOverview /></SchoolAdminLayout>} />
@@ -107,6 +113,8 @@ const App = () => (
           <Route path="/school-admin/report-cards" element={<SchoolAdminLayout><ReportCardDesigner /></SchoolAdminLayout>} />
           <Route path="/school-admin/settings" element={<SchoolAdminLayout><SchoolSettings /></SchoolAdminLayout>} />
           <Route path="/school-admin/billing" element={<SchoolAdminLayout><BillingSubscription /></SchoolAdminLayout>} />
+          <Route path="/school-admin/profile" element={<SchoolAdminLayout><SchoolAdminProfile /></SchoolAdminLayout>} />
+          <Route path="/school-admin/notifications" element={<SchoolAdminLayout><SchoolAdminNotifications /></SchoolAdminLayout>} />
           
           <Route path="/:schoolSlug/result-checker" element={<ResultChecker />} />
           <Route path="/original" element={<Index />} />

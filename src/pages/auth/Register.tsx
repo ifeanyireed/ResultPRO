@@ -286,13 +286,13 @@ const Register: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loading01 className="w-5 h-5 animate-spin" />
                     <span>Creating account...</span>
                   </>
                 ) : (
                   <>
                     Create Account
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight01 className="w-5 h-5" />
                   </>
                 )}
               </button>

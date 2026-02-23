@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight01, CheckSquare, Loading01 } from '@hugeicons/react';
+import { ArrowRight01, CheckSquare, Loading01, Check } from '@hugeicons/react';
 import Navigation from '@/components/Navigation';
 
 const ScratchCardValidation: React.FC = () => {
@@ -104,7 +104,7 @@ const ScratchCardValidation: React.FC = () => {
                 className="w-full py-4 rounded-[15px] font-bold text-lg transition-all duration-200 flex items-center justify-center gap-2 border shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] border-solid border-[rgba(255,255,255,0.07)] hover:bg-white/5 text-white"
               >
                 Verify Another Card
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight01 className="w-5 h-5" />
               </button>
             </div>
 
@@ -213,13 +213,13 @@ const ScratchCardValidation: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <Loading01 className="w-5 h-5 animate-spin" />
                     <span>Verifying...</span>
                   </>
                 ) : (
                   <>
                     Verify Code
-                    <ArrowRight className="w-5 h-5" />
+                    <ArrowRight01 className="w-5 h-5" />
                   </>
                 )}
               </button>

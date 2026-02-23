@@ -298,7 +298,7 @@ const SchoolVerification: React.FC = () => {
                   >
                     {loading ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
+                        <Loading01 className="w-5 h-5 animate-spin" />
                         <span>Submitting...</span>
                       </>
                     ) : (

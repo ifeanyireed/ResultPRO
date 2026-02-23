@@ -6,6 +6,7 @@ import { getTemplate, getEnabledSections } from '@/lib/gradebookTemplates';
 import { CompactGradebook } from '@/components/gradebook';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { ArrowRight01 } from '@hugeicons/react';
 
 const ResultChecker: React.FC = () => {
   const { schoolSlug } = useParams<{ schoolSlug: string }>();
@@ -247,7 +248,7 @@ const ResultChecker: React.FC = () => {
                     ) : (
                       <>
                         View Results
-                        <ArrowRight className="w-5 h-5" />
+                        <ArrowRight01 className="w-5 h-5" />
                       </>
                     )}
                   </button>

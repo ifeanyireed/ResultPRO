@@ -16,3 +16,5 @@ export { default as ParentAccountsManagement } from './ParentAccountsManagement'
 export { default as ReportCardDesigner } from './ReportCardDesigner';
 export { default as SchoolSettings } from './SchoolSettings';
 export { default as BillingSubscription } from './BillingSubscription';
+export { default as Profile } from './Profile';
+export { default as Notifications } from './Notifications';
