@@ -13,12 +13,13 @@ export class EmailTemplateService {
 
   private static getLogoHtml(): string {
     return this.logoUrl 
-      ? `<img src="${this.logoUrl}" alt="Results Pro Logo" style="max-width: 50px; height: auto; margin-bottom: 0;" />`
-      : '<h1 style="color: #3b82f6; margin: 0;">Results Pro</h1>';
+      ? `<div style="display: inline-block; background: white; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px;">
+           <img src="${this.logoUrl}" alt="Results Pro Logo" style="max-width: 40px; height: auto; display: block;" />
+         </div>`
+      : '<h1 style="color: #3b82f6; margin: 0 0 16px 0; font-size: 24px; font-weight: 700;">Results Pro</h1>';
   }
 
-  private static getTemplateContent(title: string, content: string, useGradient: boolean = false): string {
-    const backgroundColor = useGradient ? '#f9fafb' : '#ffffff';
+  private static getTemplateContent(title: string, content: string): string {
     return `
 <!DOCTYPE html>
 <html>
@@ -27,34 +28,40 @@ export class EmailTemplateService {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%); min-height: 100vh;">
-    <div style="max-width: 600px; margin: 40px auto; background: ${backgroundColor}; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1); overflow: hidden;">
-        <!-- Header -->
-        <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); padding: 40px 30px; text-align: center; border-bottom: 1px solid rgba(0, 0, 0, 0.1);">
-            ${this.getLogoHtml()}
-            <h1 style="color: white; font-size: 28px; margin: 20px 0 0 0; font-weight: 600; letter-spacing: -0.5px;">${title}</h1>
-        </div>
-
-        <!-- Content -->
-        <div style="padding: 40px 30px; color: #1f2937; line-height: 1.6;">
-            ${content}
-        </div>
-
-        <!-- Footer -->
-        <div style="background: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-            <p style="margin: 0 0 15px 0; color: #6b7280; font-size: 12px;">
-                Results Pro - School Management System
-            </p>
-            <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 15px;">
-                <a href="https://scholars.ng" style="color: #3b82f6; text-decoration: none; font-size: 12px;">Website</a>
-                <span style="color: #d1d5db;">•</span>
-                <a href="https://scholars.ng/support" style="color: #3b82f6; text-decoration: none; font-size: 12px;">Support</a>
-                <span style="color: #d1d5db;">•</span>
-                <a href="https://scholars.ng/contact" style="color: #3b82f6; text-decoration: none; font-size: 12px;">Contact</a>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif; background: #000000; min-height: 100vh;">
+    <div style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+        <!-- Dark Glass-morphism Card -->
+        <div style="background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 30px; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(199, 220, 255, 0.35) inset, 0 0 20px 0 rgba(198, 204, 255, 0.20) inset, 0 1px 22px 0 rgba(255, 255, 255, 0.10), 0 4px 4px 0 rgba(0, 0, 0, 0.05), 0 10px 10px 0 rgba(0, 0, 0, 0.10);">
+            <!-- Header with Logo & Gradient Background -->
+            <div style="position: relative; padding: 40px 30px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.07); background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(26, 26, 26, 0.4) 100%); overflow: hidden;">
+                <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 64, 175, 0.05) 100%); pointer-events: none;"></div>
+                <div style="position: relative; z-index: 1;">
+                    ${this.getLogoHtml()}
+                    <h1 style="color: white; font-size: 28px; margin: 0; font-weight: 600; letter-spacing: -0.5px;">${title}</h1>
+                </div>
             </div>
-            <p style="margin: 0; color: #9ca3af; font-size: 11px;">
-                © 2026 Results Pro. All rights reserved.
-            </p>
+
+            <!-- Content -->
+            <div style="padding: 40px 30px; color: #e5e7eb; line-height: 1.6;">
+                ${content}
+            </div>
+
+            <!-- Footer -->
+            <div style="background: rgba(255, 255, 255, 0.01); padding: 30px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.07);">
+                <p style="margin: 0 0 15px 0; color: #9ca3af; font-size: 12px;">
+                    Results Pro - School Management System
+                </p>
+                <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 15px;">
+                    <a href="https://scholars.ng" style="color: #60a5fa; text-decoration: none; font-size: 12px; transition: color 0.2s;">Website</a>
+                    <span style="color: rgba(255, 255, 255, 0.2);">•</span>
+                    <a href="https://scholars.ng/support" style="color: #60a5fa; text-decoration: none; font-size: 12px; transition: color 0.2s;">Support</a>
+                    <span style="color: rgba(255, 255, 255, 0.2);">•</span>
+                    <a href="https://scholars.ng/contact" style="color: #60a5fa; text-decoration: none; font-size: 12px; transition: color 0.2s;">Contact</a>
+                </div>
+                <p style="margin: 0; color: #6b7280; font-size: 11px;">
+                    © 2026 Results Pro. All rights reserved.
+                </p>
+            </div>
         </div>
     </div>
 </body>
@@ -64,24 +71,24 @@ export class EmailTemplateService {
 
   static generateVerificationEmail(otp: string): string {
     const content = `
-        <p style="margin: 0 0 20px 0; font-size: 16px;">
-            Thank you for registering with <strong>Results Pro</strong>!
+        <p style="margin: 0 0 20px 0; font-size: 16px; color: #e5e7eb;">
+            Thank you for registering with <strong style="color: #60a5fa;">Results Pro</strong>!
         </p>
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             Please use the verification code below to confirm your email address.
         </p>
         
         <!-- OTP Display -->
-        <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0;">
-            <p style="margin: 0 0 10px 0; color: rgba(255, 255, 255, 0.8); font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">
+        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(30, 64, 175, 0.2) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 15px; padding: 30px; text-align: center; margin: 30px 0;">
+            <p style="margin: 0 0 10px 0; color: #9ca3af; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">
                 Verification Code
             </p>
-            <p style="margin: 0; color: white; font-size: 48px; font-weight: 700; letter-spacing: 8px; font-family: 'Courier New', monospace;">
+            <p style="margin: 0; color: #60a5fa; font-size: 48px; font-weight: 700; letter-spacing: 8px; font-family: 'Courier New', monospace;">
                 ${otp}
             </p>
         </div>
         
-        <p style="margin: 0 0 20px 0; font-size: 13px; color: #6b7280;">
+        <p style="margin: 0 0 20px 0; font-size: 13px; color: #d1d5db;">
             ⏱️ This code expires in <strong>10 minutes</strong>. Do not share this code with anyone.
         </p>
         
@@ -94,31 +101,31 @@ export class EmailTemplateService {
 
   static generateApprovalEmail(schoolName: string, loginUrl: string): string {
     const content = `
-        <p style="margin: 0 0 20px 0; font-size: 16px;">
+        <p style="margin: 0 0 20px 0; font-size: 16px; color: #e5e7eb;">
             🎉 <strong>Great news!</strong> Your school account has been verified and approved.
         </p>
         
-        <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 20px; border-radius: 8px; margin: 30px 0;">
-            <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #166534;">
+        <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 20px; border-radius: 12px; margin: 30px 0;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #86efac;">
                 ✓ Account Approved
             </p>
-            <p style="margin: 0; font-size: 13px; color: #15803d;">
+            <p style="margin: 0; font-size: 13px; color: #86efac;">
                 <strong>School Name:</strong> ${schoolName}
             </p>
         </div>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #1f2937;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             You can now access your dashboard and set up your school profile, academic sessions, classes, and more.
         </p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${loginUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2); transition: transform 0.2s;">
+            <a href="${loginUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 15px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3); transition: transform 0.2s;">
                 Access Dashboard →
             </a>
         </div>
         
-        <p style="margin: 0; color: #6b7280; font-size: 13px;">
-            If you have any questions, please <a href="mailto:support@scholars.ng" style="color: #3b82f6; text-decoration: none;">contact our support team</a>.
+        <p style="margin: 0; color: #9ca3af; font-size: 13px;">
+            If you have any questions, please <a href="mailto:support@scholars.ng" style="color: #60a5fa; text-decoration: none;">contact our support team</a>.
         </p>
     `;
     return this.getTemplateContent('Account Approved! 🎉', content);
@@ -126,27 +133,27 @@ export class EmailTemplateService {
 
   static generatePasswordResetEmail(resetLink: string): string {
     const content = `
-        <p style="margin: 0 0 20px 0; font-size: 16px;">
+        <p style="margin: 0 0 20px 0; font-size: 16px; color: #e5e7eb;">
             We received a request to reset your password for Results Pro.
         </p>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             Click the button below to reset your password. This link is valid for <strong>1 hour</strong>.
         </p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetLink}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2); transition: transform 0.2s;">
+            <a href="${resetLink}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 15px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3); transition: transform 0.2s;">
                 Reset Password →
             </a>
         </div>
         
-        <p style="margin: 0 0 15px 0; font-size: 13px; color: #6b7280;">
+        <p style="margin: 0 0 15px 0; font-size: 13px; color: #9ca3af;">
             Or copy this link: <br>
-            <code style="background: #f3f4f6; padding: 8px 12px; border-radius: 4px; font-size: 11px; word-break: break-all;">${resetLink}</code>
+            <code style="background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; font-size: 11px; word-break: break-all; border: 1px solid rgba(255, 255, 255, 0.1);">${resetLink}</code>
         </p>
         
-        <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin: 30px 0;">
-            <p style="margin: 0; font-size: 13px; color: #7f1d1d;">
+        <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 20px; border-radius: 12px; margin: 30px 0;">
+            <p style="margin: 0; font-size: 13px; color: #fca5a5;">
                 <strong>⚠️ Security:</strong> If you didn't request this reset, please ignore this email or contact us immediately.
             </p>
         </div>
@@ -156,78 +163,78 @@ export class EmailTemplateService {
 
   static generateWelcomeEmail(schoolName: string): string {
     const content = `
-        <p style="margin: 0 0 20px 0; font-size: 16px;">
+        <p style="margin: 0 0 20px 0; font-size: 16px; color: #e5e7eb;">
             👋 Welcome to Results Pro!
         </p>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #1f2937;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             Your registration for <strong>${schoolName}</strong> has been submitted successfully. Our admin team will review your information and verify your school.
         </p>
         
-        <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
-            <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #1e40af;">
+        <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #60a5fa; padding: 20px; border-radius: 12px; margin: 30px 0;">
+            <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #60a5fa;">
                 ℹ️ What happens next?
             </p>
-            <ol style="margin: 0; padding-left: 20px; color: #1f2937; font-size: 13px;">
+            <ol style="margin: 0; padding-left: 20px; color: #d1d5db; font-size: 13px;">
                 <li style="margin-bottom: 8px;">Our team will verify your school details and documents</li>
                 <li style="margin-bottom: 8px;">You'll receive an approval email within 24-48 hours</li>
                 <li>You can then log in to your dashboard and set up your school</li>
             </ol>
         </div>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">
-            In the meantime, you can explore our features and documentation at <a href="https://scholars.ng" style="color: #3b82f6; text-decoration: none;">scholars.ng</a>
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
+            In the meantime, you can explore our features and documentation at <a href="https://scholars.ng" style="color: #60a5fa; text-decoration: none;">scholars.ng</a>
         </p>
         
-        <p style="margin: 0; font-size: 13px; color: #6b7280;">
-            Questions? Check out our <a href="https://scholars.ng/help" style="color: #3b82f6; text-decoration: none;">Help Center</a> or <a href="https://scholars.ng/contact" style="color: #3b82f6; text-decoration: none;">contact support</a>.
+        <p style="margin: 0; font-size: 13px; color: #9ca3af;">
+            Questions? Check out our <a href="https://scholars.ng/help" style="color: #60a5fa; text-decoration: none;">Help Center</a> or <a href="https://scholars.ng/contact" style="color: #60a5fa; text-decoration: none;">contact support</a>.
         </p>
     `;
     return this.getTemplateContent('Welcome to Results Pro! 👋', content);
   }
 
-  static generateSchoolApprovalEmail(adminName: string, tempPassword: string, loginUrl: string): string {
+  static generateSchoolApprovalEmail(email: string, adminName: string, tempPassword: string, loginUrl: string): string {
     const content = `
-        <p style="margin: 0 0 20px 0; font-size: 16px;">
+        <p style="margin: 0 0 20px 0; font-size: 16px; color: #e5e7eb;">
             👉 Hello <strong>${adminName}</strong>,
         </p>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #1f2937;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             🎉 Your school registration has been verified and approved by our admin team! You can now log in to your dashboard and begin setting up your school.
         </p>
         
-        <div style="background: #f0fdf4; border-radius: 12px; padding: 20px; margin: 30px 0;">
-            <p style="margin: 0 0 15px 0; font-size: 12px; text-transform: uppercase; color: #166534; font-weight: 600; letter-spacing: 1px;">
+        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(30, 64, 175, 0.15) 100%); border-radius: 15px; padding: 20px; margin: 30px 0; border: 1px solid rgba(59, 130, 246, 0.3);">
+            <p style="margin: 0 0 15px 0; font-size: 12px; text-transform: uppercase; color: #60a5fa; font-weight: 600; letter-spacing: 1px;">
                 Your Login Credentials
             </p>
-            <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 10px;">
-                <p style="margin: 0 0 10px 0; font-size: 13px; color: #6b7280;">
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <p style="margin: 0 0 10px 0; font-size: 13px; color: #9ca3af;">
                     <strong>Email:</strong>
                 </p>
-                <code style="background: #f3f4f6; padding: 8px 12px; border-radius: 4px; font-size: 13px; word-break: break-all;">${adminName}</code>
+                <code style="background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 6px; font-size: 13px; word-break: break-all; display: block; border: 1px solid rgba(255, 255, 255, 0.1); color: #e5e7eb;">${email}</code>
             </div>
-            <div style="background: white; border-radius: 8px; padding: 15px;">
-                <p style="margin: 0 0 10px 0; font-size: 13px; color: #6b7280;">
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                <p style="margin: 0 0 10px 0; font-size: 13px; color: #9ca3af;">
                     <strong>Temporary Password:</strong>
                 </p>
-                <code style="background: #f3f4f6; padding: 8px 12px; border-radius: 4px; font-size: 13px; word-break: break-all;">${tempPassword}</code>
+                <code style="background: rgba(255, 255, 255, 0.02); padding: 8px 12px; border-radius: 6px; font-size: 13px; word-break: break-all; display: block; border: 1px solid rgba(255, 255, 255, 0.1); color: #e5e7eb;">${tempPassword}</code>
             </div>
         </div>
         
-        <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 30px 0;">
-            <p style="margin: 0; font-size: 13px; color: #92400e;">
+        <div style="background: rgba(245, 158, 11, 0.1); border-left: 4px solid #fbbf24; padding: 20px; border-radius: 12px; margin: 30px 0;">
+            <p style="margin: 0; font-size: 13px; color: #fcd34d;">
                 <strong>⚠️ Important:</strong> Please change this password immediately after your first login for security.
             </p>
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${loginUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);">
+            <a href="${loginUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 15px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);">
                 Login to Dashboard →
             </a>
         </div>
         
-        <p style="margin: 0; color: #6b7280; font-size: 13px;">
-            If you have any questions, <a href="mailto:support@scholars.ng" style="color: #3b82f6; text-decoration: none;">contact our support team</a>.
+        <p style="margin: 0; color: #9ca3af; font-size: 13px;">
+            If you have any questions, <a href="mailto:support@scholars.ng" style="color: #60a5fa; text-decoration: none;">contact our support team</a>.
         </p>
     `;
     return this.getTemplateContent('School Approved! 🎉', content);
@@ -235,35 +242,35 @@ export class EmailTemplateService {
 
   static generateRejectionEmail(schoolName: string, reason: string): string {
     const content = `
-        <p style="margin: 0 0 20px 0; font-size: 16px;">
+        <p style="margin: 0 0 20px 0; font-size: 16px; color: #e5e7eb;">
             Thank you for your interest in Results Pro.
         </p>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #1f2937;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             We have reviewed your school registration for <strong>${schoolName}</strong>.
         </p>
         
-        <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px; margin: 30px 0;">
-            <p style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; color: #7f1d1d; font-weight: 600; letter-spacing: 1px;">
+        <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 20px; border-radius: 12px; margin: 30px 0;">
+            <p style="margin: 0 0 10px 0; font-size: 12px; text-transform: uppercase; color: #fca5a5; font-weight: 600; letter-spacing: 1px;">
                 Review Status
             </p>
-            <p style="margin: 0; font-size: 14px; color: #1f2937; line-height: 1.6;">
+            <p style="margin: 0; font-size: 14px; color: #d1d5db; line-height: 1.6;">
                 ${reason}
             </p>
         </div>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #1f2937;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             You are welcome to resubmit your application with updated information.
         </p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="https://scholars.ng/register" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);">
+            <a href="https://scholars.ng/register" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 15px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);">
                 Resubmit Application →
             </a>
         </div>
         
-        <p style="margin: 0; color: #6b7280; font-size: 13px;">
-            If you believe this is in error, please <a href="mailto:support@scholars.ng" style="color: #3b82f6; text-decoration: none;">contact our support team</a>.
+        <p style="margin: 0; color: #9ca3af; font-size: 13px;">
+            If you believe this is in error, please <a href="mailto:support@scholars.ng" style="color: #60a5fa; text-decoration: none;">contact our support team</a>.
         </p>
     `;
     return this.getTemplateContent('Registration Status Update', content);
@@ -277,40 +284,40 @@ export class EmailTemplateService {
   ): string {
     const documentTypeLabel = documentType === 'CAC' ? 'Corporate Affairs Commission (CAC)' : 'Utility Bill';
     const content = `
-        <p style="margin: 0 0 20px 0; font-size: 16px; font-weight: 600; color: #1f2937;">
+        <p style="margin: 0 0 20px 0; font-size: 16px; font-weight: 600; color: #e5e7eb;">
             New Verification Documents Received 📄
         </p>
         
-        <p style="margin: 0 0 20px 0; font-size: 14px; color: #6b7280;">
+        <p style="margin: 0 0 20px 0; font-size: 14px; color: #d1d5db;">
             A school has submitted verification documents for review.
         </p>
         
-        <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 8px; margin: 30px 0;">
+        <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #60a5fa; padding: 20px; border-radius: 12px; margin: 30px 0;">
             <p style="margin: 0 0 12px 0; font-size: 13px;">
-                <strong style="color: #1f2937;">School Name:</strong>
-                <span style="color: #374151;">${schoolName}</span>
+                <strong style="color: #d1d5db;">School Name:</strong>
+                <span style="color: #9ca3af;">${schoolName}</span>
             </p>
             <p style="margin: 0 0 12px 0; font-size: 13px;">
-                <strong style="color: #1f2937;">Contact Email:</strong>
-                <span style="color: #374151;">${contactEmail}</span>
+                <strong style="color: #d1d5db;">Contact Email:</strong>
+                <span style="color: #9ca3af;">${contactEmail}</span>
             </p>
             <p style="margin: 0 0 12px 0; font-size: 13px;">
-                <strong style="color: #1f2937;">Document Type:</strong>
-                <span style="color: #374151;">${documentTypeLabel}</span>
+                <strong style="color: #d1d5db;">Document Type:</strong>
+                <span style="color: #9ca3af;">${documentTypeLabel}</span>
             </p>
             <p style="margin: 0; font-size: 13px;">
-                <strong style="color: #1f2937;">Submitted At:</strong>
-                <span style="color: #374151;">${new Date().toLocaleString()}</span>
+                <strong style="color: #d1d5db;">Submitted At:</strong>
+                <span style="color: #9ca3af;">${new Date().toLocaleString()}</span>
             </p>
         </div>
         
         <div style="text-align: center; margin: 30px 0;">
-            <a href="${documentUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);">
+            <a href="${documentUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 15px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);">
                 Review Documents →
             </a>
         </div>
         
-        <p style="margin: 0; color: #6b7280; font-size: 13px;">
+        <p style="margin: 0; color: #9ca3af; font-size: 13px;">
             Please review the submitted documents and take appropriate action to approve or request additional information.
         </p>
     `;

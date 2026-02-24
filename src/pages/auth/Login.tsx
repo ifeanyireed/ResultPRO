@@ -96,14 +96,17 @@ const Login: React.FC = () => {
         }
       }
       
-      if (user && user.isOnboardingComplete === false) {
+      // Check if school onboarding is not complete
+      if (school && school.onboardingStatus !== 'COMPLETE') {
         // If onboarding is not complete, redirect to onboarding
+        console.log('📋 Onboarding not complete, redirecting to onboarding flow:', school.onboardingStatus);
         setLoading(false);
         navigate('/onboarding');
         return;
       }
       
       // Otherwise redirect to school admin dashboard
+      console.log('✅ All checks passed, redirecting to dashboard');
       setLoading(false);
       navigate('/school-admin/overview');
     } catch (err: any) {

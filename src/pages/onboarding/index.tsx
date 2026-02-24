@@ -17,6 +17,7 @@ export const OnboardingWizard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [apiStatus, setApiStatus] = useState<'checking' | 'ready' | 'error'>('checking');
+  const [schoolName, setSchoolName] = useState<string>('');
 
   const {
     currentStep,
@@ -31,6 +32,7 @@ export const OnboardingWizard = () => {
     setStep6Data,
     nextStep,
     previousStep,
+    goToStep,
     markStepComplete,
     setIsLoading,
     setError,
@@ -69,9 +71,43 @@ export const OnboardingWizard = () => {
             headers: { Authorization: `Bearer ${token}` },
           });
 
-          if (statusRes.data.data?.currentStep) {
-            // TODO: Load progress from server if resuming
-            console.log('✅ Current server step:', statusRes.data.data.currentStep);
+          const statusData = statusRes.data.data;
+          console.log('✅ Current server step:', statusData.currentStep);
+          console.log('✅ Completed steps:', statusData.completedSteps);
+
+          // Extract school name
+          if (statusData?.schoolName) {
+            setSchoolName(statusData.schoolName);
+            console.log('✅ School name:', statusData.schoolName);
+          }
+
+          // Navigate to current step
+          const currentStep = statusData.currentStep || 1;
+          const completedSteps = statusData.completedSteps || [];
+          
+          // Mark completed steps in the store
+          completedSteps.forEach((step: number) => {
+            markStepComplete(step);
+          });
+          
+          // Navigate to the current step that needs to be filled (not completed ones)
+          goToStep(currentStep);
+          console.log('📍 Navigating to step:', currentStep);
+
+          // Only load data for Step 1 if it's completed, otherwise keep form empty
+          if (completedSteps.includes(1) && currentStep > 1) {
+            const step1Data: any = {
+              motto: statusData.motto || '',
+              logoUrl: statusData.logoUrl || '',
+              primaryColor: statusData.primaryColor || '#1e40af',
+              secondaryColor: statusData.secondaryColor || '#0ea5e9',
+              accentColor: statusData.accentColor || '#f59e0b',
+              contactPersonName: statusData.contactPersonName || '',
+              contactPhone: statusData.contactPhone || '',
+              altContactEmail: statusData.altContactEmail || '',
+            };
+            setStep1Data(step1Data);
+            console.log('✅ Loaded completed Step 1 data');
           }
         }
       } catch (error: any) {
@@ -396,96 +432,123 @@ export const OnboardingWizard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white">
-            Welcome to Results Pro
-          </h1>
-          <p className="text-gray-400 mt-3 text-lg">
-            Let's set up your school in just a few minutes
-          </p>
-        </div>
-
-        {/* Step Indicator */}
-        <StepIndicator
-          currentStep={currentStep}
-          completedSteps={completedSteps}
-          totalSteps={6}
+    <div className="w-full text-white min-h-screen flex flex-col">
+      {/* Fixed Background Image */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <img
+          src="/Hero.png"
+          className="w-full h-full object-cover object-center"
+          alt="Background"
         />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      </div>
 
-        {/* Steps */}
-        <div className="mt-12">
-          {currentStep === 1 && (
-            <Step1SchoolProfile
-              onNext={handleStep1Next}
-              onPrevious={handlePrevious}
-              initialData={step1Data || undefined}
-              isLoading={isLoading}
-            />
-          )}
-
-          {currentStep === 2 && (
-            <Step2AcademicSession
-              onNext={handleStep2Next}
-              onPrevious={handlePrevious}
-              initialData={step2Data || undefined}
-              isLoading={isLoading}
-            />
-          )}
-
-          {currentStep === 3 && (
-            <Step3Classes
-              onNext={handleStep3Next}
-              onPrevious={handlePrevious}
-              initialData={step3Data || undefined}
-              isLoading={isLoading}
-            />
-          )}
-
-          {currentStep === 4 && (
-            <Step4Subjects
-              onNext={handleStep4Next}
-              onPrevious={handlePrevious}
-              initialData={step4Data || undefined}
-              isLoading={isLoading}
-            />
-          )}
-
-          {currentStep === 5 && (
-            <Step5GradingSystem
-              onNext={handleStep5Next}
-              onPrevious={handlePrevious}
-              initialData={step5Data || undefined}
-              isLoading={isLoading}
-            />
-          )}
-
-          {currentStep === 6 && (
-            <Step6CsvUpload
-              onNext={handleStep6Next}
-              onPrevious={handlePrevious}
-              initialData={step6Data || undefined}
-              isLoading={isLoading}
-            />
-          )}
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="mt-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-            {error}
+      {/* Sticky Header & Step Indicator */}
+      <div className="sticky top-0 z-40 px-4 md:px-12 lg:px-20 pt-4 pb-1 bg-gradient-to-b from-black via-black/60 to-transparent backdrop-blur-lg">
+        <div className="w-full max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="mb-4 pb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
+              School Setup Wizard
+            </h1>
+            <div className="flex items-center justify-between">
+              <p className="text-gray-400 text-sm">
+                Configure your school settings to get started with Results Pro
+              </p>
+              {schoolName && (
+                <p className="text-gray-400 text-sm">
+                  {schoolName}
+                </p>
+              )}
+            </div>
           </div>
-        )}
 
-        {/* Footer */}
-        <div className="mt-12 text-center text-sm text-gray-400">
-          <p>
-            Questions? Contact support@resultspro.io
-          </p>
+          {/* Step Indicator */}
+          <StepIndicator
+            currentStep={currentStep}
+            completedSteps={completedSteps}
+            totalSteps={6}
+          />
         </div>
       </div>
+
+      {/* Scrolling Section */}
+      <section className="relative w-full flex flex-col px-4 md:px-12 lg:px-20 pb-12">
+        {/* Content Container */}
+        <div className="w-full max-w-5xl mx-auto pt-4">
+
+          {/* Steps - Glass Morphism Card - Visible Before Scroll */}
+          <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] border border-[rgba(255,255,255,0.07)] backdrop-blur-xl shadow-2xl p-8 mb-8">
+            {currentStep === 1 && (
+              <Step1SchoolProfile
+                onNext={handleStep1Next}
+                onPrevious={handlePrevious}
+                initialData={step1Data || undefined}
+                isLoading={isLoading}
+              />
+            )}
+
+            {currentStep === 2 && (
+              <Step2AcademicSession
+                onNext={handleStep2Next}
+                onPrevious={handlePrevious}
+                initialData={step2Data || undefined}
+                isLoading={isLoading}
+              />
+            )}
+
+            {currentStep === 3 && (
+              <Step3Classes
+                onNext={handleStep3Next}
+                onPrevious={handlePrevious}
+                initialData={step3Data || undefined}
+                isLoading={isLoading}
+              />
+            )}
+
+            {currentStep === 4 && (
+              <Step4Subjects
+                onNext={handleStep4Next}
+                onPrevious={handlePrevious}
+                initialData={step4Data || undefined}
+                isLoading={isLoading}
+              />
+            )}
+
+            {currentStep === 5 && (
+              <Step5GradingSystem
+                onNext={handleStep5Next}
+                onPrevious={handlePrevious}
+                initialData={step5Data || undefined}
+                isLoading={isLoading}
+              />
+            )}
+
+            {currentStep === 6 && (
+              <Step6CsvUpload
+                onNext={handleStep6Next}
+                onPrevious={handlePrevious}
+                initialData={step6Data || undefined}
+                isLoading={isLoading}
+              />
+            )}
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-[15px] text-red-400 text-sm mb-8">
+              {error}
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="text-center text-sm text-gray-500 py-8">
+            <p>
+              Questions? Contact support@resultspro.ng
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

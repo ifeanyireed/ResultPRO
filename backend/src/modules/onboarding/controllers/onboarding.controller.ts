@@ -69,6 +69,38 @@ export class OnboardingController {
   }
 
   /**
+   * PATCH /api/onboarding/school-profile
+   * Partial update school profile (real-time database writes)
+   */
+  static async partialUpdateSchoolProfile(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      if (!schoolId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+        });
+      }
+
+      const school = await onboardingService.partialUpdateSchoolProfile(schoolId, req.body);
+
+      res.json({
+        success: true,
+        message: 'School profile field updated',
+        data: school,
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
    * POST /api/onboarding/step/2
    * Create academic session and terms
    */

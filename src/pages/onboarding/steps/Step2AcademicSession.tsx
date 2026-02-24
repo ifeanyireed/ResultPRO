@@ -13,8 +13,25 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { AlertCircle } from '@hugeicons/react';
+import { AlertCircle, Trash2 } from '@hugeicons/react';
 import { useOnboardingStore, Step2Data } from '@/stores/onboardingStore';
+
+const termSchema = z.object({
+  name: z.string().min(1, 'Term name is required'),
+  startDate: z.string().min(1, 'Start date is required'),
+  endDate: z.string().min(1, 'End date is required'),
+}).refine(
+  (data) => {
+    if (data.startDate && data.endDate) {
+      return new Date(data.startDate) < new Date(data.endDate);
+    }
+    return true;
+  },
+  {
+    message: 'End date must be after start date',
+    path: ['endDate'],
+  }
+);
 
 const step2Schema = z.object({
   academicSessionName: z
@@ -29,6 +46,7 @@ const step2Schema = z.object({
     .string()
     .min(1, 'End date is required')
     .default(''),
+  terms: z.array(termSchema).min(1, 'At least one term is required').default([]),
 }).refine(
   (data) => {
     if (data.startDate && data.endDate) {
@@ -70,8 +88,15 @@ export const Step2AcademicSession = ({
       academicSessionName: defaultSessionName,
       startDate: '',
       endDate: '',
+      terms: [
+        { name: '1st Term', startDate: '', endDate: '' },
+        { name: '2nd Term', startDate: '', endDate: '' },
+        { name: '3rd Term', startDate: '', endDate: '' },
+      ],
     },
   });
+
+  const termFields = form.watch('terms') || [];
 
   const onSubmit = async (data: Step2FormData) => {
     try {

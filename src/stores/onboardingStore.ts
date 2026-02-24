@@ -2,7 +2,6 @@ import { create } from 'zustand';
 
 export interface Step1Data {
   motto?: string;
-  logoEmoji?: string;
   logoUrl?: string;
   primaryColor?: string;
   secondaryColor?: string;
@@ -16,6 +15,11 @@ export interface Step2Data {
   academicSessionName?: string;
   startDate?: string;
   endDate?: string;
+  terms?: Array<{
+    name: string;
+    startDate: string;
+    endDate: string;
+  }>;
 }
 
 export interface Step3Data {
@@ -115,15 +119,15 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   isLoading: false,
 
   setStep1Data: (data) =>
-    set({ step1Data: data, currentStep: 2 }),
+    set({ step1Data: data }),
   setStep2Data: (data) =>
-    set({ step2Data: data, currentStep: 3 }),
+    set({ step2Data: data }),
   setStep3Data: (data) =>
-    set({ step3Data: data, currentStep: 4 }),
+    set({ step3Data: data }),
   setStep4Data: (data) =>
-    set({ step4Data: data, currentStep: 5 }),
+    set({ step4Data: data }),
   setStep5Data: (data) =>
-    set({ step5Data: data, currentStep: 6 }),
+    set({ step5Data: data }),
   setStep6Data: (data) =>
     set({ step6Data: data }),
 

@@ -1,0 +1,481 @@
+{
+  "user": [
+    {
+      "id": "cmm0d6kl80000lo85rb9zygio",
+      "email": "superadmin@resultspro.ng",
+      "firstName": "Super",
+      "lastName": "Admin",
+      "fullName": null,
+      "passwordHash": "$2b$10$mbA.wmb7IJeXWts4IQNMVuwuCNoR7JYftfS8i48z00LdWTokFjhzi",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "SUPER_ADMIN",
+      "status": "ACTIVE",
+      "firstLogin": false,
+      "lastLoginAt": "2026-02-24T08:51:35.161Z",
+      "createdAt": "2026-02-24T08:49:23.132Z",
+      "updatedAt": "2026-02-24T08:51:35.168Z",
+      "deletedAt": null
+    }
+  ],
+  "school": [
+    {
+      "id": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Demo School",
+      "slug": "demo-school",
+      "motto": null,
+      "logoUrl": null,
+      "logoEmoji": null,
+      "primaryColor": "#3b82f6",
+      "secondaryColor": "#1e40af",
+      "accentColor": "#FCD34D",
+      "contactEmail": "admin@demoschool.test",
+      "contactPhone": "08000000000",
+      "contactPersonName": null,
+      "altContactEmail": null,
+      "altContactPhone": null,
+      "fullAddress": "123 Main Street",
+      "state": "Lagos",
+      "lga": null,
+      "status": "ACTIVE",
+      "verificationStatus": "EMAIL_VERIFIED",
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "rejectionReason": null,
+      "documentVerificationType": null,
+      "documentVerificationUrl": null,
+      "documentVerificationSubmittedAt": null,
+      "onboardingStatus": "ACTIVE",
+      "onboardingCompletedAt": null,
+      "currentOnboardingStep": 0,
+      "subscriptionTier": "BASIC",
+      "subscriptionStartDate": null,
+      "subscriptionEndDate": null,
+      "maxStudents": 500,
+      "maxTeachers": 50,
+      "createdAt": "2026-02-24T08:49:23.165Z",
+      "updatedAt": "2026-02-24T08:49:23.165Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmm0d6kq20004lo85yhq55zhc",
+      "name": "Test School A",
+      "slug": "test-school-a",
+      "motto": null,
+      "logoUrl": null,
+      "logoEmoji": null,
+      "primaryColor": null,
+      "secondaryColor": null,
+      "accentColor": null,
+      "contactEmail": "principal@testschoola.ng",
+      "contactPhone": "+2348012345001",
+      "contactPersonName": null,
+      "altContactEmail": null,
+      "altContactPhone": null,
+      "fullAddress": "123 Test Avenue, Lagos",
+      "state": "Lagos",
+      "lga": "Ikoyi",
+      "status": "PENDING_VERIFICATION",
+      "verificationStatus": "EMAIL_VERIFIED",
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "rejectionReason": null,
+      "documentVerificationType": "CAC",
+      "documentVerificationUrl": null,
+      "documentVerificationSubmittedAt": "2026-02-24T08:49:23.305Z",
+      "onboardingStatus": "NOT_STARTED",
+      "onboardingCompletedAt": null,
+      "currentOnboardingStep": 0,
+      "subscriptionTier": null,
+      "subscriptionStartDate": null,
+      "subscriptionEndDate": null,
+      "maxStudents": null,
+      "maxTeachers": null,
+      "createdAt": "2026-02-24T08:49:23.306Z",
+      "updatedAt": "2026-02-24T08:49:23.306Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmm0d6kqu0005lo85er69gzew",
+      "name": "Test School B",
+      "slug": "test-school-b",
+      "motto": null,
+      "logoUrl": null,
+      "logoEmoji": null,
+      "primaryColor": null,
+      "secondaryColor": null,
+      "accentColor": null,
+      "contactEmail": "admin@testschoolb.ng",
+      "contactPhone": "+2348012345002",
+      "contactPersonName": null,
+      "altContactEmail": null,
+      "altContactPhone": null,
+      "fullAddress": "456 Education Street, Abuja",
+      "state": "FCT",
+      "lga": "Garki",
+      "status": "PENDING_VERIFICATION",
+      "verificationStatus": "EMAIL_VERIFIED",
+      "verifiedAt": null,
+      "verifiedBy": null,
+      "rejectionReason": null,
+      "documentVerificationType": "UTILITY_BILL",
+      "documentVerificationUrl": null,
+      "documentVerificationSubmittedAt": "2026-02-24T08:49:23.333Z",
+      "onboardingStatus": "NOT_STARTED",
+      "onboardingCompletedAt": null,
+      "currentOnboardingStep": 0,
+      "subscriptionTier": null,
+      "subscriptionStartDate": null,
+      "subscriptionEndDate": null,
+      "maxStudents": null,
+      "maxTeachers": null,
+      "createdAt": "2026-02-24T08:49:23.335Z",
+      "updatedAt": "2026-02-24T08:49:23.335Z",
+      "deletedAt": null
+    }
+  ],
+  "schoolAdminUser": [
+    {
+      "id": "cmm0d6kp80003lo85utj1xfj0",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "email": "admin@demoschool.test",
+      "firstName": "Demo",
+      "lastName": "Admin",
+      "fullName": null,
+      "passwordHash": "$2b$10$qp..OSq2nSCWtCu08WenQu4ol4elq4MvX.ubuFfuNuOmdqpFRZ1C6",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "SCHOOL_ADMIN",
+      "status": "ACTIVE",
+      "firstLogin": true,
+      "lastLoginAt": null,
+      "createdAt": "2026-02-24T08:49:23.277Z",
+      "updatedAt": "2026-02-24T08:49:23.277Z",
+      "deletedAt": null
+    }
+  ],
+  "academicSession": [
+    {
+      "id": "cmm0d6kro0007lo859yn81cp1",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "2024/2025",
+      "startDate": "2024-09-01T00:00:00.000Z",
+      "endDate": "2025-07-31T00:00:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-02-24T08:49:23.365Z",
+      "updatedAt": "2026-02-24T08:49:23.365Z"
+    }
+  ],
+  "term": [
+    {
+      "id": "cmm0d6ksj0008lo850oakgcn3",
+      "sessionId": "cmm0d6kro0007lo859yn81cp1",
+      "name": "First Term",
+      "startDate": "2024-09-01T00:00:00.000Z",
+      "endDate": "2024-11-30T00:00:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-02-24T08:49:23.396Z",
+      "updatedAt": "2026-02-24T08:49:23.396Z"
+    },
+    {
+      "id": "cmm0d6ksj0009lo85kggs4zwd",
+      "sessionId": "cmm0d6kro0007lo859yn81cp1",
+      "name": "Second Term",
+      "startDate": "2025-01-11T00:00:00.000Z",
+      "endDate": "2025-03-31T00:00:00.000Z",
+      "isActive": false,
+      "createdAt": "2026-02-24T08:49:23.396Z",
+      "updatedAt": "2026-02-24T08:49:23.396Z"
+    },
+    {
+      "id": "cmm0d6ksj000alo8541p996yx",
+      "sessionId": "cmm0d6kro0007lo859yn81cp1",
+      "name": "Third Term",
+      "startDate": "2025-04-15T00:00:00.000Z",
+      "endDate": "2025-07-31T00:00:00.000Z",
+      "isActive": false,
+      "createdAt": "2026-02-24T08:49:23.396Z",
+      "updatedAt": "2026-02-24T08:49:23.396Z"
+    }
+  ],
+  "class": [
+    {
+      "id": "cmm0d6ktf000blo85qm2lvrmf",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Senior Secondary 1A",
+      "level": "SS1",
+      "maxCapacity": 40,
+      "classTeacher": null,
+      "createdAt": "2026-02-24T08:49:23.427Z",
+      "updatedAt": "2026-02-24T08:49:23.427Z"
+    },
+    {
+      "id": "cmm0d6ktf000clo85ynrycdvn",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Senior Secondary 1B",
+      "level": "SS1",
+      "maxCapacity": 40,
+      "classTeacher": null,
+      "createdAt": "2026-02-24T08:49:23.427Z",
+      "updatedAt": "2026-02-24T08:49:23.427Z"
+    },
+    {
+      "id": "cmm0d6ktf000dlo85xfwf4jkd",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Senior Secondary 2A",
+      "level": "SS2",
+      "maxCapacity": 38,
+      "classTeacher": null,
+      "createdAt": "2026-02-24T08:49:23.427Z",
+      "updatedAt": "2026-02-24T08:49:23.427Z"
+    }
+  ],
+  "subject": [
+    {
+      "id": "cmm0d6ku9000elo857qxz98y1",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "English",
+      "code": "Senior Secondary 1A_1",
+      "description": "English",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000flo85n3a6vni9",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Mathematics",
+      "code": "Senior Secondary 1A_2",
+      "description": "Mathematics",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000glo85njli4zpu",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Physics",
+      "code": "Senior Secondary 1A_3",
+      "description": "Physics",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000hlo85uyla508h",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Chemistry",
+      "code": "Senior Secondary 1A_4",
+      "description": "Chemistry",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000ilo85pa5f3ge4",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Biology",
+      "code": "Senior Secondary 1A_5",
+      "description": "Biology",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000jlo85f0kroyaa",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "History",
+      "code": "Senior Secondary 1A_6",
+      "description": "History",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000klo8570wlekzt",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "English",
+      "code": "Senior Secondary 1B_1",
+      "description": "English",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000llo858t0z7573",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Mathematics",
+      "code": "Senior Secondary 1B_2",
+      "description": "Mathematics",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000mlo85s5x864tt",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Physics",
+      "code": "Senior Secondary 1B_3",
+      "description": "Physics",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000nlo85470q2vw7",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Chemistry",
+      "code": "Senior Secondary 1B_4",
+      "description": "Chemistry",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000olo858k92comj",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Biology",
+      "code": "Senior Secondary 1B_5",
+      "description": "Biology",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000plo858ivmg4ug",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "History",
+      "code": "Senior Secondary 1B_6",
+      "description": "History",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000qlo85r48ek4er",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "English",
+      "code": "Senior Secondary 2A_1",
+      "description": "English",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000rlo85ysnlpkg3",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Mathematics",
+      "code": "Senior Secondary 2A_2",
+      "description": "Mathematics",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000slo851bckpvz4",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Physics",
+      "code": "Senior Secondary 2A_3",
+      "description": "Physics",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000tlo85xglump8f",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Chemistry",
+      "code": "Senior Secondary 2A_4",
+      "description": "Chemistry",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000ulo856s063z6q",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Biology",
+      "code": "Senior Secondary 2A_5",
+      "description": "Biology",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    },
+    {
+      "id": "cmm0d6ku9000vlo85wdiabm9f",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "History",
+      "code": "Senior Secondary 2A_6",
+      "description": "History",
+      "createdAt": "2026-02-24T08:49:23.458Z",
+      "updatedAt": "2026-02-24T08:49:23.458Z"
+    }
+  ],
+  "gradingSystem": [
+    {
+      "id": "cmm0d6kv2000xlo855ac3uvwy",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "name": "Standard 5-Point Grading",
+      "description": "Standard 5-point grading system (A-F)",
+      "isDefault": true,
+      "createdAt": "2026-02-24T08:49:23.486Z",
+      "updatedAt": "2026-02-24T08:49:23.486Z"
+    }
+  ],
+  "grade": [
+    {
+      "id": "cmm0d6kw5000ylo855tr6yf5q",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "subjectId": "cmm0d6ku9000elo857qxz98y1",
+      "gradingSystemId": "cmm0d6kv2000xlo855ac3uvwy",
+      "gradeName": "Excellent",
+      "minScore": 80,
+      "maxScore": 100,
+      "description": "Grade A",
+      "createdAt": "2026-02-24T08:49:23.526Z",
+      "updatedAt": "2026-02-24T08:49:23.526Z"
+    },
+    {
+      "id": "cmm0d6kw6000zlo852m1h1szn",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "subjectId": "cmm0d6ku9000elo857qxz98y1",
+      "gradingSystemId": "cmm0d6kv2000xlo855ac3uvwy",
+      "gradeName": "Good",
+      "minScore": 70,
+      "maxScore": 79,
+      "description": "Grade B",
+      "createdAt": "2026-02-24T08:49:23.526Z",
+      "updatedAt": "2026-02-24T08:49:23.526Z"
+    },
+    {
+      "id": "cmm0d6kw60010lo85sispy0zo",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "subjectId": "cmm0d6ku9000elo857qxz98y1",
+      "gradingSystemId": "cmm0d6kv2000xlo855ac3uvwy",
+      "gradeName": "Satisfactory",
+      "minScore": 60,
+      "maxScore": 69,
+      "description": "Grade C",
+      "createdAt": "2026-02-24T08:49:23.526Z",
+      "updatedAt": "2026-02-24T08:49:23.526Z"
+    },
+    {
+      "id": "cmm0d6kw60011lo85zq8gv28o",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "subjectId": "cmm0d6ku9000elo857qxz98y1",
+      "gradingSystemId": "cmm0d6kv2000xlo855ac3uvwy",
+      "gradeName": "Fair",
+      "minScore": 50,
+      "maxScore": 59,
+      "description": "Grade D",
+      "createdAt": "2026-02-24T08:49:23.526Z",
+      "updatedAt": "2026-02-24T08:49:23.526Z"
+    },
+    {
+      "id": "cmm0d6kw60012lo85zehudg4b",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "subjectId": "cmm0d6ku9000elo857qxz98y1",
+      "gradingSystemId": "cmm0d6kv2000xlo855ac3uvwy",
+      "gradeName": "Poor",
+      "minScore": 0,
+      "maxScore": 49,
+      "description": "Grade F",
+      "createdAt": "2026-02-24T08:49:23.526Z",
+      "updatedAt": "2026-02-24T08:49:23.526Z"
+    }
+  ],
+  "onboardingState": [
+    {
+      "id": "cmm0d6kx00014lo85itui0isb",
+      "schoolId": "cmm0d6km50001lo85jgc0kknz",
+      "completedSteps": "[1,2,3,4,5,6]",
+      "currentStep": 7,
+      "isComplete": true,
+      "createdAt": "2026-02-24T08:49:23.556Z",
+      "updatedAt": "2026-02-24T08:49:23.556Z"
+    }
+  ]
+}

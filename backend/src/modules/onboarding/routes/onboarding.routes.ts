@@ -1,30 +1,37 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { OnboardingController } from '../controllers/onboarding.controller';
+import { uploadLogo } from '../controllers/logo-upload.controller';
 
 const router = Router();
 
-// Configure multer for school logo uploads
-const uploadLogo = multer({
+// Configure multer for logo uploads
+const uploadLogoMiddleware = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
   fileFilter: (req, file, cb) => {
-    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
     if (allowedMimes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only JPEG, PNG, WebP, and SVG images are allowed'));
+      cb(new Error('Only JPEG, PNG, WebP, GIF, and SVG images are allowed'));
     }
   },
 });
 
 // All onboarding routes require authentication (enforced at app level)
 
+// Upload logo file to S3
+router.post('/logo-upload', uploadLogoMiddleware.single('file'), uploadLogo);
+
 // Get current onboarding status
 router.get('/status', OnboardingController.getStatus);
 
 // Step 1: Update school profile
 router.post('/step/1', OnboardingController.updateSchoolProfile);
+
+// Partial update school profile (real-time database writes)
+router.patch('/school-profile', OnboardingController.partialUpdateSchoolProfile);
 
 // Step 2: Create academic session and terms
 router.post('/step/2', OnboardingController.createAcademicSession);

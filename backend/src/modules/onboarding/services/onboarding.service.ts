@@ -33,31 +33,61 @@ export class OnboardingService {
   }
 
   /**
-   * Step 1: Update school profile
+   * Step 1: Update school profile (full update)
    */
   async updateSchoolProfile(schoolId: string, data: any) {
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
     if (!school) throw new NotFoundException('School not found');
 
+    const updateData: any = {};
+    if (data.motto !== undefined) updateData.motto = data.motto;
+    if (data.logoUrl !== undefined) updateData.logoUrl = data.logoUrl;
+    if (data.primaryColor !== undefined) updateData.primaryColor = data.primaryColor;
+    if (data.secondaryColor !== undefined) updateData.secondaryColor = data.secondaryColor;
+    if (data.accentColor !== undefined) updateData.accentColor = data.accentColor;
+    if (data.contactPersonName !== undefined) updateData.contactPersonName = data.contactPersonName;
+    if (data.contactPhone !== undefined) updateData.contactPhone = data.contactPhone;
+    if (data.altContactEmail !== undefined) updateData.altContactEmail = data.altContactEmail;
+    if (data.altContactPhone !== undefined) updateData.altContactPhone = data.altContactPhone;
+
     await prisma.school.update({
       where: { id: schoolId },
-      data: {
-        motto: data.motto,
-        logoUrl: data.logoUrl,
-        logoEmoji: data.logoEmoji,
-        primaryColor: data.primaryColor,
-        secondaryColor: data.secondaryColor,
-        accentColor: data.accentColor,
-        contactPersonName: data.contactPersonName,
-        contactPhone: data.contactPhone,
-        altContactEmail: data.altContactEmail,
-        altContactPhone: data.altContactPhone,
-      },
+      data: updateData,
     });
 
     await this.onboardingRepo.updateStep(schoolId, 1, data);
 
     return school;
+  }
+
+  /**
+   * Step 1: Partial update school profile (real-time database write)
+   */
+  async partialUpdateSchoolProfile(schoolId: string, data: any) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) throw new NotFoundException('School not found');
+
+    const updateData: any = {};
+    if (data.motto !== undefined) updateData.motto = data.motto;
+    if (data.logoUrl !== undefined) updateData.logoUrl = data.logoUrl;
+    if (data.primaryColor !== undefined) updateData.primaryColor = data.primaryColor;
+    if (data.secondaryColor !== undefined) updateData.secondaryColor = data.secondaryColor;
+    if (data.accentColor !== undefined) updateData.accentColor = data.accentColor;
+    if (data.contactPersonName !== undefined) updateData.contactPersonName = data.contactPersonName;
+    if (data.contactPhone !== undefined) updateData.contactPhone = data.contactPhone;
+    if (data.altContactEmail !== undefined) updateData.altContactEmail = data.altContactEmail;
+    if (data.altContactPhone !== undefined) updateData.altContactPhone = data.altContactPhone;
+
+    if (Object.keys(updateData).length === 0) {
+      return school;
+    }
+
+    const updated = await prisma.school.update({
+      where: { id: schoolId },
+      data: updateData,
+    });
+
+    return updated;
   }
 
   /**

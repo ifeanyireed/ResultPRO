@@ -205,7 +205,7 @@ export class SuperAdminService {
           where: { id: schoolId },
           data: {
             status: 'APPROVED',
-            onboardingStatus: 'ACTIVE',
+            onboardingStatus: 'NOT_STARTED',
             verifiedAt: new Date(),
             verifiedBy: 'super-admin',
             rejectionReason: null,

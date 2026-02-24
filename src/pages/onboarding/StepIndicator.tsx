@@ -1,4 +1,4 @@
-import { CheckCircle, Circle } from '@hugeicons/react';
+import { CheckCircle, Building2, Calendar, Users, BookOpen, Zap, Upload01 } from '@hugeicons/react';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -15,6 +15,15 @@ const stepLabels = [
   'CSV Upload',
 ];
 
+const stepIcons = [
+  Building2,
+  Calendar,
+  Users,
+  BookOpen,
+  Zap,
+  Upload01,
+];
+
 export const StepIndicator = ({
   currentStep,
   completedSteps,
@@ -22,49 +31,43 @@ export const StepIndicator = ({
 }: StepIndicatorProps) => {
   return (
     <div className="w-full py-8 px-4">
-      <div className="flex items-center justify-between">
-        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step, index) => (
-          <div key={step} className="flex items-center flex-1">
-            {/* Step Circle */}
-            <div className="flex flex-col items-center">
-              {completedSteps.includes(step) ? (
-                <CheckCircle
-                  className="w-10 h-10 text-emerald-400 flex-shrink-0"
-                  strokeWidth={2}
-                />
-              ) : step === currentStep ? (
-                <div className="w-10 h-10 rounded-full border-2 border-blue-400 bg-blue-400/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-400 font-bold text-sm">{step}</span>
-                </div>
-              ) : (
-                <Circle
-                  className="w-10 h-10 text-gray-600 flex-shrink-0"
-                  strokeWidth={2}
-                />
-              )}
-              <p className="text-xs md:text-sm font-medium text-gray-400 mt-2 text-center">
+      <div className="flex items-start justify-center gap-8">
+        {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step, index) => {
+          const IconComponent = stepIcons[index];
+          
+          return (
+            <div key={step} className="flex flex-col items-center">
+              {/* Step Circle with Icon */}
+              <div className="relative">
+                {completedSteps.includes(step) ? (
+                  // Completed state
+                  <div className="w-16 h-16 rounded-full bg-[rgba(34, 197, 94, 0.1)] border border-emerald-400 flex items-center justify-center shadow-lg">
+                    <CheckCircle className="w-8 h-8 text-emerald-400" strokeWidth={1} />
+                  </div>
+                ) : step === currentStep ? (
+                  // Current step state
+                  <div className="w-16 h-16 rounded-full bg-[rgba(59, 130, 246, 0.15)] border border-blue-400 flex items-center justify-center shadow-lg">
+                    <IconComponent className="w-8 h-8 text-blue-400" strokeWidth={2} />
+                  </div>
+                ) : (
+                  // Pending state
+                  <div className="w-16 h-16 rounded-full bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.1)] flex items-center justify-center">
+                    <IconComponent className="w-8 h-8 text-gray-600" strokeWidth={1} />
+                  </div>
+                )}
+              </div>
+
+              {/* Step Label */}
+              <p className="text-xs md:text-sm font-medium text-gray-400 mt-3 text-center max-w-[100px]">
                 {stepLabels[index]}
               </p>
             </div>
-
-            {/* Connector Line */}
-            {index < totalSteps - 1 && (
-              <div className="flex-1 h-1 mx-2">
-                <div
-                  className={`h-full transition-colors ${
-                    completedSteps.includes(step)
-                      ? 'bg-emerald-400'
-                      : 'bg-gray-700'
-                  }`}
-                />
-              </div>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Progress Text */}
-      <div className="text-center mt-6">
+      <div className="text-center mt-4">
         <p className="text-sm text-gray-400">
           Step <span className="font-bold text-blue-400">{currentStep}</span> of{' '}
           <span className="font-bold text-gray-300">{totalSteps}</span>

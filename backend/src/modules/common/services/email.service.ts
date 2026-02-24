@@ -33,7 +33,7 @@ export class EmailService {
   ): Promise<void> {
     const subject = 'Results Pro - Your School Has Been Approved!';
     const loginUrl = 'https://app.scholars.ng/auth/login';
-    const html = EmailTemplateService.generateSchoolApprovalEmail(adminName, tempPassword, loginUrl);
+    const html = EmailTemplateService.generateSchoolApprovalEmail(email, adminName, tempPassword, loginUrl);
     await sendMail(email, subject, html);
   }
 

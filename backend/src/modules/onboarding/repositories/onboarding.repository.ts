@@ -77,9 +77,20 @@ export class OnboardingRepository {
 
     return {
       schoolId,
+      schoolName: school.name,
       onboardingStatus: school.onboardingStatus,
       currentStep: state?.currentStep || 1,
       completedSteps: JSON.parse(state?.completedSteps || '[]'),
+      // Step 1: School Profile
+      motto: school.motto,
+      logoUrl: school.logoUrl,
+      primaryColor: school.primaryColor,
+      secondaryColor: school.secondaryColor,
+      accentColor: school.accentColor,
+      contactPersonName: school.contactPersonName,
+      contactPhone: school.contactPhone,
+      altContactEmail: school.altContactEmail,
+      altContactPhone: school.altContactPhone,
       stepData: {},
     };
   }

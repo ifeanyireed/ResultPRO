@@ -12,6 +12,8 @@
     "db:migrate": "tsx src/database/migrate.ts",
     "db:seed": "tsx src/database/seed.ts",
     "db:reset": "tsx src/database/reset.ts",
+    "db:backup": "tsx src/database/backup.ts",
+    "db:restore": "tsx src/database/restore-from-backup.ts",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "test": "jest --detectOpenHandles",

@@ -68,6 +68,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   Trash01: LucideIcons.Trash2,
   Upload: LucideIcons.Upload,
   Upload01: LucideIcons.Upload,
+  Upload02: LucideIcons.Upload,
   Users: LucideIcons.Users,
   X: LucideIcons.X,
   XClose: LucideIcons.X,
@@ -153,6 +154,7 @@ export const Trophy = iconMap.Trophy || LucideIcons.Trophy;
 export const Trash01 = iconMap.Trash01 || LucideIcons.Trash2;
 export const Upload = iconMap.Upload || LucideIcons.Upload;
 export const Upload01 = iconMap.Upload01 || LucideIcons.Upload;
+export const Upload02 = iconMap.Upload02 || LucideIcons.Upload;
 export const Users = iconMap.Users || LucideIcons.Users;
 export const X = iconMap.X || LucideIcons.X;
 export const XClose = iconMap.XClose || LucideIcons.X;
