@@ -66,6 +66,18 @@ const WEIGHTED_GRADES = [
   { grade: 'F', minScore: 0, maxScore: 49 },
 ];
 
+const WAEC_GRADES = [
+  { grade: 'A1', minScore: 75, maxScore: 100, description: 'Excellent' },
+  { grade: 'B2', minScore: 70, maxScore: 74, description: 'Very Good' },
+  { grade: 'B3', minScore: 65, maxScore: 69, description: 'Good' },
+  { grade: 'C4', minScore: 60, maxScore: 64, description: 'Credit' },
+  { grade: 'C5', minScore: 55, maxScore: 59, description: 'Credit' },
+  { grade: 'C6', minScore: 50, maxScore: 54, description: 'Credit' },
+  { grade: 'D7', minScore: 45, maxScore: 49, description: 'Pass' },
+  { grade: 'E8', minScore: 40, maxScore: 44, description: 'Pass' },
+  { grade: 'F9', minScore: 0, maxScore: 39, description: 'Fail' },
+];
+
 export const Step5GradingSystem = ({
   onNext,
   onPrevious,
@@ -106,13 +118,8 @@ export const Step5GradingSystem = ({
   };
 
   const loadPreset = (preset: typeof STANDARD_GRADES) => {
-    // Clear existing and add new
-    while (fields.length > 0) {
-      remove(0);
-    }
-    preset.forEach(p => {
-      append({ grade: p.grade, minScore: p.minScore, maxScore: p.maxScore });
-    });
+    // Replace the entire gradeScale array with the preset
+    form.setValue('gradingSystem.gradeScale', preset);
   };
 
   const addGrade = () => {
@@ -144,14 +151,14 @@ export const Step5GradingSystem = ({
                 Grading Template
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   type="button"
                   onClick={() => {
                     form.setValue('gradingSystem.template', 'standard');
                     loadPreset(STANDARD_GRADES);
                   }}
-                  className={`p-4 rounded-lg border-2 transition ${
+                  className={`p-4 rounded-lg border-2 transition cursor-pointer ${
                     form.watch('gradingSystem.template') === 'standard'
                       ? 'border-blue-400 bg-blue-500/10'
                       : 'border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.02)]'
@@ -169,15 +176,33 @@ export const Step5GradingSystem = ({
                     form.setValue('gradingSystem.template', 'weighted');
                     loadPreset(WEIGHTED_GRADES);
                   }}
-                  className={`p-4 rounded-lg border-2 transition ${
+                  className={`p-4 rounded-lg border-2 transition cursor-pointer pointer-events-auto select-none active:scale-95 ${
                     form.watch('gradingSystem.template') === 'weighted'
                       ? 'border-blue-400 bg-blue-500/10'
-                      : 'border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] bg-[rgba(255,255,255,0.02)]'
+                      : 'border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.03)] bg-[rgba(255,255,255,0.02)]'
                   }`}
                 >
                   <h4 className="font-semibold text-white">Weighted</h4>
                   <p className="text-sm text-gray-400 mt-1">
                     A+ to F (9 grades, more granular)
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    form.setValue('gradingSystem.template', 'waec');
+                    loadPreset(WAEC_GRADES);
+                  }}
+                  className={`p-4 rounded-lg border-2 transition cursor-pointer pointer-events-auto select-none active:scale-95 ${
+                    form.watch('gradingSystem.template') === 'waec'
+                      ? 'border-blue-400 bg-blue-500/10'
+                      : 'border-[rgba(255,255,255,0.1)] hover:border-[rgba(255,255,255,0.2)] hover:bg-[rgba(255,255,255,0.03)] bg-[rgba(255,255,255,0.02)]'
+                  }`}
+                >
+                  <h4 className="font-semibold text-white">WAEC</h4>
+                  <p className="text-sm text-gray-400 mt-1">
+                    A1 to F9 (9 grades, West African standard)
                   </p>
                 </button>
               </div>

@@ -472,23 +472,31 @@ export class OnboardingService {
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
     if (!school) throw new NotFoundException('School not found');
 
+    // Extract grades from the correct location in the request
+    // Frontend sends: { gradingSystem: { template, gradeScale: [...] } }
+    const gradeScaleData = data?.gradingSystem?.gradeScale || data?.grades || [];
+    
+    if (!Array.isArray(gradeScaleData) || gradeScaleData.length === 0) {
+      throw new Error('Grade scale is required and must contain at least one grade');
+    }
+
     // Create grading system
     const gradingSystem = await this.gradingRepo.createSystem({
       schoolId,
-      name: data.name || 'Grading System',
-      description: data.description,
+      name: data?.gradingSystem?.template || data?.name || 'Grading System',
+      description: data?.gradingSystem?.template ? `${data.gradingSystem.template} grading system` : data?.description,
       isDefault: true,
     });
 
-    // Create grades
-    const gradeData = data.grades.map((grade: any, index: number) => ({
+    // Create grades (no specific subject required for grading system templates)
+    const gradeData = gradeScaleData.map((grade: any, index: number) => ({
       schoolId,
       gradingSystemId: gradingSystem.id,
-      subjectId: grade.subjectId || 'default',
-      gradeName: grade.gradeName || grade.gradeLetter || 'Grade',
+      subjectId: null, // Grades are tied to the grading system, not specific subjects
+      gradeName: grade.grade || grade.gradeName || grade.gradeLetter || 'Grade',
       minScore: grade.minScore || 0,
       maxScore: grade.maxScore || 100,
-      description: grade.description,
+      description: grade.description || '',
     }));
 
     const grades = await this.gradingRepo.bulkCreateGrades(gradeData);

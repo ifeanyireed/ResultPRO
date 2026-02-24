@@ -1,4 +1,4 @@
-import { CheckCircle, Building2, Calendar, Users, BookOpen, Zap, Upload01 } from '@hugeicons/react';
+import { CheckCircle, Building2, Calendar, Users, BookOpen, Zap, ShoppingCart } from '@hugeicons/react';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -12,7 +12,7 @@ const stepLabels = [
   'Classes',
   'Subjects',
   'Grading System',
-  'CSV Upload',
+  'Select Plan',
 ];
 
 const stepIcons = [
@@ -21,7 +21,7 @@ const stepIcons = [
   Users,
   BookOpen,
   Zap,
-  Upload01,
+  ShoppingCart,
 ];
 
 export const StepIndicator = ({

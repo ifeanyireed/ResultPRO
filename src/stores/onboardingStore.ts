@@ -48,8 +48,8 @@ export interface Step5Data {
 }
 
 export interface Step6Data {
-  csvFile?: File;
-  csvPreview?: Array<Record<string, string>>;
+  selectedPlanId?: string;
+  paymentMethod?: 'paystack'; // Can add more payment methods later
 }
 
 interface OnboardingState {

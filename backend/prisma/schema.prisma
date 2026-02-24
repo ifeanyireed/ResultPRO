@@ -213,7 +213,7 @@ model GradingSystem {
 model Grade {
   id            String   @id @default(cuid())
   schoolId      String   @map("school_id")
-  subjectId     String   @map("subject_id")
+  subjectId     String?  @map("subject_id")
   gradingSystemId String  @map("grading_system_id")
   gradeName     String   @map("grade_name")
   minScore      Float    @map("min_score")
@@ -223,10 +223,10 @@ model Grade {
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject Subject? @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   gradingSystem GradingSystem @relation(fields: [gradingSystemId], references: [id], onDelete: Cascade)
 
-  @@unique([subjectId, gradeName])
+  @@unique([gradingSystemId, gradeName])
   @@index([schoolId])
   @@index([subjectId])
   @@index([gradingSystemId])

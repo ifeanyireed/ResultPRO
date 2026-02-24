@@ -8,7 +8,7 @@ import { Step2AcademicSession } from './steps/Step2AcademicSession';
 import { Step3Classes } from './steps/Step3Classes';
 import { Step4Subjects } from './steps/Step4Subjects';
 import { Step5GradingSystem } from './steps/Step5GradingSystem';
-import { Step6CsvUpload } from './steps/Step6CsvUpload';
+import { Step6PaymentPlans } from './steps/Step6PaymentPlans';
 import { useToast } from '@/hooks/use-toast';
 
 const API_BASE = 'http://localhost:5000/api';
@@ -362,37 +362,49 @@ export const OnboardingWizard = () => {
     try {
       const token = localStorage.getItem('authToken');
       
-      // Prepare form data for file upload if file exists
-      let requestData: any = data;
+      // Check if selected plan is free
+      const isFreeplan = data.selectedPlanId === 'free';
       
-      if (data.csvFile instanceof File) {
-        const formData = new FormData();
-        formData.append('csvFile', data.csvFile);
+      if (isFreeplan) {
+        // For free plan, just save and complete onboarding
+        setStep6Data(data);
+        markStepComplete(6);
         
-        const response = await axios.post(
-          `${API_BASE}/onboarding/step/6`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          }
+        // Complete the onboarding
+        const completeRes = await axios.post(
+          `${API_BASE}/onboarding/complete`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
         );
-
-        if (response.data.success) {
-          setStep6Data(data);
-          markStepComplete(6);
-          handleCompleteOnboarding();
-        }
+        
+        setIsLoading(false);
+        
+        // Redirect to dashboard
+        navigate('/school-admin/dashboard', { replace: true });
+        toast({
+          title: 'Success',
+          description: 'Onboarding completed! Welcome to Results Pro',
+        });
       } else {
-        // No file, just complete
-        handleCompleteOnboarding();
+        // For paid plans, show message that payment is being set up
+        setStep6Data(data);
+        markStepComplete(6);
+        
+        toast({
+          title: 'Payment Plan Selected',
+          description: `${data.selectedPlanId === 'pro' ? 'Pro' : 'Enterprise'} plan selected. Payment setup coming soon.`,
+        });
+        
+        setIsLoading(false);
+        
+        // For now, redirect to dashboard (payment will be implemented later)
+        navigate('/school-admin/dashboard', { replace: true });
       }
     } catch (err: any) {
       const msg =
         err?.response?.data?.error ||
-        'Failed to upload CSV';
+        err?.message ||
+        'Failed to complete onboarding';
       setError(msg);
       toast({
         title: 'Error',
@@ -570,7 +582,7 @@ export const OnboardingWizard = () => {
             )}
 
             {currentStep === 6 && (
-              <Step6CsvUpload
+              <Step6PaymentPlans
                 onNext={handleStep6Next}
                 onPrevious={handlePrevious}
                 initialData={step6Data || undefined}
