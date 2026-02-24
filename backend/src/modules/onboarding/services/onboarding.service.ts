@@ -287,11 +287,40 @@ export class OnboardingService {
     const subjectData = (data.subjects as any[]).map((subj: any, index: number) => ({
       schoolId,
       name: subj.name || subj.subjectName,
-      code: subj.code || subj.subjectCode,
+      code: subj.code || subj.subjectCode || (subj.name || subj.subjectName)?.toUpperCase().substring(0, 3) || 'SUB',
       description: subj.description,
     }));
 
     const subjects = await this.subjectRepo.bulkCreate(subjectData);
+
+    // Link subjects to classes if classId is provided
+    for (const subject of subjects) {
+      const originalSubject = data.subjects.find((s: any) => (s.name || s.subjectName) === subject.name);
+      if (originalSubject?.classId) {
+        // Validate that the class exists and belongs to this school
+        const cls = await prisma.class.findFirst({
+          where: {
+            id: originalSubject.classId,
+            schoolId,
+          },
+        });
+        if (cls) {
+          await prisma.classSubject.upsert({
+            where: {
+              classId_subjectId: {
+                classId: cls.id,
+                subjectId: subject.id,
+              },
+            },
+            create: {
+              classId: cls.id,
+              subjectId: subject.id,
+            },
+            update: {},
+          });
+        }
+      }
+    }
 
     await this.onboardingRepo.updateStep(schoolId, 4, {
       subjectCount: subjects.length,
@@ -307,6 +336,112 @@ export class OnboardingService {
       name: s.name,
       code: s.code,
     }));
+  }
+
+  /**
+   * Step 3: Partial update classes (real-time database write)
+   */
+  async partialUpdateClasses(schoolId: string, data: any) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) throw new NotFoundException('School not found');
+
+    if (!data.classes || !Array.isArray(data.classes)) {
+      return { classes: [] };
+    }
+
+    // Delete existing classes and recreate
+    await prisma.class.deleteMany({
+      where: { schoolId },
+    });
+
+    // Create new classes
+    const classData = data.classes.map((cls: any) => ({
+      schoolId,
+      name: cls.name || cls.className,
+      level: cls.level || cls.classLevel || 'SS1',
+      maxCapacity: cls.maxCapacity,
+      classTeacher: cls.classTeacher,
+    }));
+
+    const classes = await Promise.all(
+      classData.map((c: any) =>
+        prisma.class.create({
+          data: c,
+        })
+      )
+    );
+
+    return {
+      classes: classes.map((c) => ({
+        id: c.id,
+        name: c.name,
+        level: c.level,
+      })),
+    };
+  }
+
+  /**
+   * Step 4: Partial update subjects with class associations (real-time database write)
+   */
+  async partialUpdateSubjects(schoolId: string, data: any) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) throw new NotFoundException('School not found');
+
+    if (!data.subjects || !Array.isArray(data.subjects)) {
+      return { subjects: [] };
+    }
+
+    // Delete existing subjects and recreate
+    await prisma.subject.deleteMany({
+      where: { schoolId },
+    });
+
+    // Create new subjects
+    const subjects = await Promise.all(
+      data.subjects.map((subj: any) =>
+        prisma.subject.create({
+          data: {
+            schoolId,
+            name: subj.name || subj.subjectName,
+            code: subj.code || subj.subjectCode || subj.name?.toUpperCase().substring(0, 3) || 'SUB',
+            description: subj.description,
+          },
+        })
+      )
+    );
+
+    // Link subjects to classes if classId is provided
+    const classSubjectLinks: any[] = [];
+    for (const subject of subjects) {
+      const originalSubject = data.subjects.find((s: any) => (s.name || s.subjectName) === subject.name);
+      if (originalSubject?.classId) {
+        // Validate that the class exists and belongs to this school
+        const cls = await prisma.class.findFirst({
+          where: {
+            id: originalSubject.classId,
+            schoolId,
+          },
+        });
+        if (cls) {
+          const link = await prisma.classSubject.create({
+            data: {
+              classId: cls.id,
+              subjectId: subject.id,
+            },
+          });
+          classSubjectLinks.push(link);
+        }
+      }
+    }
+
+    return {
+      subjects: subjects.map((s) => ({
+        id: s.id,
+        name: s.name,
+        code: s.code,
+      })),
+      classSubjectLinks,
+    };
   }
 
   /**

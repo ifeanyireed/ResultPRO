@@ -42,8 +42,14 @@ router.post('/step/2', OnboardingController.createAcademicSession);
 // Step 3: Create classes
 router.post('/step/3', OnboardingController.createClasses);
 
+// Partial update classes (real-time database writes)
+router.patch('/classes', OnboardingController.partialUpdateClasses);
+
 // Step 4: Create subjects
 router.post('/step/4', OnboardingController.createSubjects);
+
+// Partial update subjects (real-time database writes)
+router.patch('/subjects', OnboardingController.partialUpdateSubjects);
 
 // Step 5: Configure grading system
 router.post('/step/5', OnboardingController.configureGradingSystem);

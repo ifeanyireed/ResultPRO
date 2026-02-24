@@ -18,6 +18,7 @@ export const OnboardingWizard = () => {
   const { toast } = useToast();
   const [apiStatus, setApiStatus] = useState<'checking' | 'ready' | 'error'>('checking');
   const [schoolName, setSchoolName] = useState<string>('');
+  const [classes, setClasses] = useState<any[]>([]);
 
   const {
     currentStep,
@@ -124,6 +125,33 @@ export const OnboardingWizard = () => {
             };
             setStep2Data(step2Data);
             console.log('✅ Loaded completed Step 2 data');
+          }
+
+          // Load classes for Step 3/4 (always available if they exist)
+          if (statusData.classes && Array.isArray(statusData.classes)) {
+            setClasses(statusData.classes);
+            console.log('✅ Loaded classes:', statusData.classes.length);
+          }
+
+          // Only load data for Step 3 if it's completed, otherwise keep form empty
+          if (completedSteps.includes(3) && currentStep > 3) {
+            const step3Data: any = {
+              classes: statusData.classes || [],
+            };
+            setStep3Data(step3Data);
+            console.log('✅ Loaded completed Step 3 data');
+          }
+
+          // Only load data for Step 4 if it's completed, otherwise keep form empty
+          if (completedSteps.includes(4) && currentStep > 4) {
+            const step4Data: any = {
+              subjects: (statusData.subjects || []).map((subject: any) => ({
+                name: subject.name || '',
+                classId: subject.classIds?.[0] || '', // Use first class association
+              })),
+            };
+            setStep4Data(step4Data);
+            console.log('✅ Loaded completed Step 4 data');
           }
         }
       } catch (error: any) {
@@ -527,6 +555,7 @@ export const OnboardingWizard = () => {
                 onNext={handleStep4Next}
                 onPrevious={handlePrevious}
                 initialData={step4Data || undefined}
+                classes={classes}
                 isLoading={isLoading}
               />
             )}

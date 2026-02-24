@@ -85,6 +85,27 @@ export class OnboardingRepository {
       },
     });
 
+    // Fetch classes
+    const classes = await prisma.class.findMany({
+      where: { schoolId },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    // Fetch subjects with their class associations
+    const subjects = await prisma.subject.findMany({
+      where: { schoolId },
+      include: {
+        classes: {
+          include: {
+            class: {
+              select: { id: true, name: true },
+            },
+          },
+        },
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
     return {
       schoolId,
       schoolName: school.name,
@@ -110,6 +131,22 @@ export class OnboardingRepository {
         startDate: t.startDate,
         endDate: t.endDate,
       })) || [],
+      // Step 3: Classes
+      classes: classes.map(c => ({
+        id: c.id,
+        name: c.name,
+        level: c.level,
+        maxCapacity: c.maxCapacity,
+        classTeacher: c.classTeacher,
+      })),
+      // Step 4: Subjects
+      subjects: subjects.map(s => ({
+        id: s.id,
+        name: s.name,
+        code: s.code,
+        description: s.description,
+        classIds: s.classes.map(cs => cs.class.id),
+      })),
       stepData: {},
     };
   }

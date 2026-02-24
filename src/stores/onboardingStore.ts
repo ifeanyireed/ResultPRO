@@ -32,7 +32,6 @@ export interface Step3Data {
 export interface Step4Data {
   subjects?: Array<{
     name: string;
-    code?: string;
     classId?: string;
   }>;
 }

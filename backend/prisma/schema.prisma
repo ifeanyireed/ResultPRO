@@ -153,6 +153,7 @@ model Class {
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  subjects ClassSubject[]
 
   @@unique([schoolId, name])
   @@index([schoolId])
@@ -169,11 +170,27 @@ model Subject {
   updatedAt     DateTime @updatedAt @map("updated_at")
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  classes ClassSubject[]
   grades Grade[]
 
   @@unique([schoolId, code])
   @@index([schoolId])
   @@map("subjects")
+}
+
+model ClassSubject {
+  id            String   @id @default(cuid())
+  classId       String   @map("class_id")
+  subjectId     String   @map("subject_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, subjectId])
+  @@index([classId])
+  @@index([subjectId])
+  @@map("class_subjects")
 }
 
 model GradingSystem {

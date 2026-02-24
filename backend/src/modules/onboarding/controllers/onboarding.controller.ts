@@ -241,6 +241,70 @@ export class OnboardingController {
   }
 
   /**
+   * PATCH /api/onboarding/classes
+   * Partial update classes (real-time database writes)
+   */
+  static async partialUpdateClasses(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      if (!schoolId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+        });
+      }
+
+      const result = await onboardingService.partialUpdateClasses(schoolId, req.body);
+
+      res.json({
+        success: true,
+        message: 'Classes updated',
+        data: result,
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
+   * PATCH /api/onboarding/subjects
+   * Partial update subjects with class associations (real-time database writes)
+   */
+  static async partialUpdateSubjects(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      if (!schoolId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+        });
+      }
+
+      const result = await onboardingService.partialUpdateSubjects(schoolId, req.body);
+
+      res.json({
+        success: true,
+        message: 'Subjects updated',
+        data: result,
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
    * POST /api/onboarding/step/5
    * Configure grading system
    */
