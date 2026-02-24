@@ -101,6 +101,38 @@ export class OnboardingController {
   }
 
   /**
+   * PATCH /api/onboarding/academic-session
+   * Partial update academic session with terms (real-time database writes)
+   */
+  static async partialUpdateAcademicSession(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      if (!schoolId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+        });
+      }
+
+      const result = await onboardingService.partialUpdateAcademicSession(schoolId, req.body);
+
+      res.json({
+        success: true,
+        message: 'Academic session updated',
+        data: result,
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
    * POST /api/onboarding/step/2
    * Create academic session and terms
    */

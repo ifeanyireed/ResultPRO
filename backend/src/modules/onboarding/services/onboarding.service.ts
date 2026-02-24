@@ -91,31 +91,135 @@ export class OnboardingService {
   }
 
   /**
+   * Step 2: Partial update academic session with terms (real-time database write)
+   */
+  async partialUpdateAcademicSession(schoolId: string, data: any) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) throw new NotFoundException('School not found');
+
+    const sessionName = data.academicSessionName || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`;
+
+    // Upsert the academic session (handles unique constraint on schoolId + name)
+    const session = await prisma.academicSession.upsert({
+      where: {
+        schoolId_name: {
+          schoolId,
+          name: sessionName,
+        },
+      },
+      create: {
+        schoolId,
+        name: sessionName,
+        startDate: data.startDate ? new Date(data.startDate) : new Date(),
+        endDate: data.endDate ? new Date(data.endDate) : new Date(),
+        isActive: true,
+      },
+      update: {
+        ...(data.startDate && { startDate: new Date(data.startDate) }),
+        ...(data.endDate && { endDate: new Date(data.endDate) }),
+      },
+    });
+
+    // If updating terms data with valid dates
+    if (data.terms && Array.isArray(data.terms)) {
+      // Filter terms that have valid dates (not empty strings)
+      const validTerms = data.terms.filter((term: any) => 
+        term.startDate && term.endDate && term.startDate.trim() && term.endDate.trim()
+      );
+
+      // Only create terms if there are valid ones
+      if (validTerms.length > 0) {
+        // Delete existing terms
+        await prisma.term.deleteMany({
+          where: { sessionId: session.id },
+        });
+
+        // Create new terms
+        const newTerms = await Promise.all(
+          validTerms.map((term: any) =>
+            prisma.term.create({
+              data: {
+                sessionId: session.id,
+                name: term.name,
+                startDate: new Date(term.startDate),
+                endDate: new Date(term.endDate),
+                isActive: false,
+              },
+            })
+          )
+        );
+
+        return {
+          session: {
+            id: session.id,
+            name: session.name,
+            startDate: session.startDate,
+            endDate: session.endDate,
+          },
+          terms: newTerms.map(t => ({
+            id: t.id,
+            name: t.name,
+            startDate: t.startDate,
+            endDate: t.endDate,
+          })),
+        };
+      }
+    }
+
+    return session;
+  }
+
+  /**
    * Step 2: Create academic session and terms
    */
   async createAcademicSession(schoolId: string, data: any) {
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
     if (!school) throw new NotFoundException('School not found');
 
-    // Create session
-    const session = await this.sessionRepo.create({
-      schoolId,
-      name: data.name,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      isActive: true,
+    // Create session (use academicSessionName if provided, fallback to name)
+    const sessionName = data.academicSessionName || data.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`;
+    
+    // Upsert session - if exists for this school with same name, update it
+    const session = await prisma.academicSession.upsert({
+      where: {
+        schoolId_name: {
+          schoolId,
+          name: sessionName,
+        },
+      },
+      create: {
+        schoolId,
+        name: sessionName,
+        startDate: data.startDate ? new Date(data.startDate) : new Date(),
+        endDate: data.endDate ? new Date(data.endDate) : new Date(),
+        isActive: true,
+      },
+      update: {
+        startDate: data.startDate ? new Date(data.startDate) : new Date(),
+        endDate: data.endDate ? new Date(data.endDate) : new Date(),
+        isActive: true,
+      },
     });
 
-    // Create terms
-    const termData = data.terms.map((term: any, index: number) => ({
-      sessionId: session.id,
-      name: term.name,
-      startDate: term.startDate,
-      endDate: term.endDate,
-      isActive: index === 0,
-    }));
+    // Create terms (filter valid ones with dates)
+    const validTerms = (data.terms || []).filter((term: any) => 
+      term.startDate && term.endDate && 
+      typeof term.startDate === 'string' && term.startDate.trim() &&
+      typeof term.endDate === 'string' && term.endDate.trim()
+    );
 
-    const terms = await this.termRepo.bulkCreate(termData);
+    let terms: any[] = [];
+    if (validTerms.length > 0) {
+      const termData = validTerms.map((term: any, index: number) => ({
+        sessionId: session.id,
+        name: term.name || `Term ${index + 1}`,
+        startDate: new Date(term.startDate),
+        endDate: new Date(term.endDate),
+        isActive: index === 0,
+      }));
+
+      terms = await this.termRepo.bulkCreate(termData);
+    }
 
     // Update onboarding state
     await this.onboardingRepo.updateStep(schoolId, 2, {

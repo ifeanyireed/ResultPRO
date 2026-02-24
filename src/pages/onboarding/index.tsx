@@ -109,6 +109,22 @@ export const OnboardingWizard = () => {
             setStep1Data(step1Data);
             console.log('✅ Loaded completed Step 1 data');
           }
+
+          // Only load data for Step 2 if it's completed, otherwise keep form empty
+          if (completedSteps.includes(2) && currentStep > 2) {
+            const step2Data: any = {
+              academicSessionName: statusData.academicSessionName || '',
+              startDate: statusData.startDate ? statusData.startDate.split('T')[0] : '',
+              endDate: statusData.endDate ? statusData.endDate.split('T')[0] : '',
+              terms: (statusData.terms || []).map((term: any) => ({
+                name: term.name || '',
+                startDate: term.startDate ? term.startDate.split('T')[0] : '',
+                endDate: term.endDate ? term.endDate.split('T')[0] : '',
+              })),
+            };
+            setStep2Data(step2Data);
+            console.log('✅ Loaded completed Step 2 data');
+          }
         }
       } catch (error: any) {
         console.error('❌ API check failed:', {

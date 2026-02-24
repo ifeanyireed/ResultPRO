@@ -33,6 +33,9 @@ router.post('/step/1', OnboardingController.updateSchoolProfile);
 // Partial update school profile (real-time database writes)
 router.patch('/school-profile', OnboardingController.partialUpdateSchoolProfile);
 
+// Partial update academic session with terms (real-time database writes)
+router.patch('/academic-session', OnboardingController.partialUpdateAcademicSession);
+
 // Step 2: Create academic session and terms
 router.post('/step/2', OnboardingController.createAcademicSession);
 

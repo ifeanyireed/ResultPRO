@@ -75,6 +75,16 @@ export class OnboardingRepository {
 
     if (!school) throw new NotFoundException('School not found');
 
+    // Fetch academic session and terms
+    const session = await prisma.academicSession.findFirst({
+      where: { schoolId },
+      include: {
+        terms: {
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
+
     return {
       schoolId,
       schoolName: school.name,
@@ -91,6 +101,15 @@ export class OnboardingRepository {
       contactPhone: school.contactPhone,
       altContactEmail: school.altContactEmail,
       altContactPhone: school.altContactPhone,
+      // Step 2: Academic Session
+      academicSessionName: session?.name,
+      startDate: session?.startDate,
+      endDate: session?.endDate,
+      terms: session?.terms?.map(t => ({
+        name: t.name,
+        startDate: t.startDate,
+        endDate: t.endDate,
+      })) || [],
       stepData: {},
     };
   }
