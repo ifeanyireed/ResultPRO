@@ -4,7 +4,7 @@ import Navigation from '@/components/Navigation';
 import { ArrowRight01, Check, X } from '@hugeicons/react';
 
 const Pricing: React.FC = () => {
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'termly' | 'annually'>('annually');
+  const [billingPeriod, setBillingPeriod] = useState<'termly' | 'annually'>('annually');
   const [isToggleStickyNeeded, setIsToggleStickyNeeded] = useState(false);
   const heroToggleRef = useRef<HTMLDivElement>(null);
   const comparisonSectionRef = useRef<HTMLDivElement>(null);
@@ -53,18 +53,17 @@ const Pricing: React.FC = () => {
   // Reusable toggle component
   const BillingPeriodToggle = ({ sticky = false }) => (
     <div className={`inline-flex items-center rounded-full p-1 bg-gradient-to-b from-gray-700 to-gray-800 border border-gray-600/50 shadow-[0_2px_4px_rgba(0,0,0,0.2)] ${sticky ? 'fixed top-20 left-1/2 transform -translate-x-1/2 z-40' : ''}`}>
-      {['monthly', 'termly', 'annually'].map((period, idx) => (
+      {['termly', 'annually'].map((period, idx) => (
         <button
           key={period}
-          onClick={() => setBillingPeriod(period as 'monthly' | 'termly' | 'annually')}
+          onClick={() => setBillingPeriod(period as 'termly' | 'annually')}
           className={`px-6 py-2 text-sm font-medium transition-all duration-200 whitespace-nowrap ${
             billingPeriod === period
               ? 'rounded-full bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-[0_4px_12px_rgba(59,130,246,0.4),inset_0_1px_0_rgba(255,255,255,0.2)]'
               : 'text-gray-300 hover:text-white'
           } ${idx !== 0 ? 'ml-1' : ''}`}
         >
-          {period === 'monthly' && 'Monthly'}
-          {period === 'termly' && 'Termly'}
+          {period === 'termly' && 'Per Term'}
           {period === 'annually' && (
             <span>
               Annually
@@ -110,7 +109,7 @@ const Pricing: React.FC = () => {
     {
       name: 'Pro',
       studentCount: '201-2,000',
-      monthlyPrice: 15000,
+      monthlyPrice: 50000,
       annualPrice: 150000,
       description: 'For growing schools',
       highlighted: true,
@@ -140,7 +139,7 @@ const Pricing: React.FC = () => {
     {
       name: 'Enterprise',
       studentCount: 'Unlimited',
-      monthlyPrice: 50000,
+      monthlyPrice: 200000,
       annualPrice: 600000,
       description: 'For large school networks',
       highlighted: false,
@@ -249,23 +248,23 @@ const Pricing: React.FC = () => {
                       <>
                         <div className="flex items-baseline gap-2">
                           <span className="text-4xl font-bold text-white">
-                            ₦{billingPeriod === 'termly' ? (plan.monthlyPrice * 4).toLocaleString() : billingPeriod === 'annually' ? Math.floor(plan.annualPrice / 12).toLocaleString() : plan.monthlyPrice.toLocaleString()}
+                            ₦{billingPeriod === 'termly' ? plan.monthlyPrice.toLocaleString() : plan.annualPrice.toLocaleString()}
                           </span>
-                          <span className="text-gray-400">{billingPeriod === 'termly' ? '/term' : '/month'}</span>
+                          <span className="text-gray-400">{billingPeriod === 'termly' ? '/term' : '/year'}</span>
                         </div>
                         {billingPeriod === 'termly' && (
                           <p className="text-xs text-gray-500 mt-2">
-                            Billed ₦{(plan.monthlyPrice * 4).toLocaleString()} per term
+                            Billed ₦{plan.monthlyPrice.toLocaleString()} per academic term
                           </p>
                         )}
                         {billingPeriod === 'annually' && plan.annualPrice && (
                           <p className="text-xs text-gray-500 mt-2">
-                            Billed ₦{plan.annualPrice.toLocaleString()} annually
+                            Billed ₦{plan.annualPrice.toLocaleString()} per year (3 months free)
                           </p>
                         )}
                         {plan.monthlyPrice > 0 && (
                           <p className="text-xs text-gray-600 mt-1">
-                            (~${(plan.monthlyPrice / 1500).toFixed(0)}/month USD)
+                            (~${(plan.monthlyPrice / 1500).toFixed(0)} per term USD)
                           </p>
                         )}
                       </>

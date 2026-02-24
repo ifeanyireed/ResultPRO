@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Mail, ArrowRight, Info, CheckCircle } from '@hugeicons/react';
+import { AlertCircle, Mail, ArrowRight, Info, CheckCircle } from 'lucide-react';
 
 const SchoolRejected: React.FC = () => {
   const navigate = useNavigate();

@@ -19,6 +19,7 @@ import PendingVerification from "./pages/auth/PendingVerification";
 import PasswordReset from "./pages/auth/PasswordReset";
 import PasswordResetConfirm from "./pages/auth/PasswordResetConfirm";
 import { OnboardingWizard } from "./pages/onboarding";
+import { PaymentComplete } from "./pages/PaymentComplete";
 import ProtectedSuperAdminRoute from "./components/ProtectedSuperAdminRoute";
 import SuperAdminOverview from "./pages/super-admin/Overview";
 import SchoolVerifications from "./pages/super-admin/SchoolVerifications";
@@ -82,6 +83,7 @@ const App = () => (
           <Route path="/auth/password-reset" element={<PasswordReset />} />
           <Route path="/auth/password-reset-confirm" element={<PasswordResetConfirm />} />
           <Route path="/onboarding" element={<OnboardingWizard />} />
+          <Route path="/payment-complete" element={<PaymentComplete />} />
           {/* Super Admin Routes - Protected */}
           <Route path="/super-admin/verifications" element={<ProtectedSuperAdminRoute><SchoolVerifications /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/overview" element={<ProtectedSuperAdminRoute><SuperAdminOverview /></ProtectedSuperAdminRoute>} />

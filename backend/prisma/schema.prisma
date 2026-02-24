@@ -56,6 +56,8 @@ model School {
   gradingSystems GradingSystem[]
   grades Grade[]
   onboardingState OnboardingState[]
+  payments Payment[]
+  subscriptions Subscription[]
 
   @@index([status])
   @@index([verificationStatus])
@@ -246,4 +248,72 @@ model OnboardingState {
 
   @@index([schoolId])
   @@map("onboarding_states")
+}
+
+model Plan {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  priceNGN          Float    @map("price_ngn")
+  priceUSD          Float    @map("price_usd")
+  maxStudents       Int      @map("max_students")
+  maxTeachers       Int      @map("max_teachers")
+  storageGB         Int      @map("storage_gb")
+  features          String   @map("features") // JSON string of features array
+  isPopular         Boolean  @default(false) @map("is_popular")
+  isActive          Boolean  @default(true) @map("is_active")
+  displayOrder      Int      @default(0) @map("display_order")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  payments Payment[]
+  subscriptions Subscription[]
+
+  @@index([name])
+  @@map("plans")
+}
+
+model Subscription {
+  id            String   @id @default(cuid())
+  schoolId      String   @map("school_id")
+  planId        String   @map("plan_id")
+  status        String   @default("ACTIVE") @map("status") // ACTIVE, EXPIRED, CANCELLED
+  startDate     DateTime @default(now()) @map("start_date")
+  endDate       DateTime? @map("end_date")
+  isAutoRenew   Boolean  @default(true) @map("is_auto_renew")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@unique([schoolId, planId])
+  @@index([schoolId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                  String   @id @default(cuid())
+  schoolId            String   @map("school_id")
+  planId              String   @map("plan_id")
+  amount              Float    @map("amount")
+  currency            String   @default("NGN") @map("currency")
+  status              String   @default("PENDING") @map("status") // PENDING, PROCESSING, COMPLETED, FAILED
+  paystackReference   String?  @unique @map("paystack_reference")
+  paystackAccessCode  String?  @map("paystack_access_code")
+  paystackAuthUrl     String?  @map("paystack_auth_url")
+  transactionId       String?  @unique @map("transaction_id")
+  paidAt              DateTime? @map("paid_at")
+  expiresAt           DateTime? @map("expires_at")
+  errorMessage        String?  @map("error_message")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@index([schoolId])
+  @@index([status])
+  @@index([paystackReference])
+  @@map("payments")
 }

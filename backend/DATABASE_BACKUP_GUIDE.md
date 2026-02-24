@@ -77,7 +77,7 @@ npm run db:restore db-backup-2026-02-24T08-30-45-123Z.json  # Restore from backu
 
 ```typescript
 // In seed.ts, add specific test data from your backup
-const school = await prisma.school.create({
+const school = await prisma.school.create({"School Setup Wizard step 4 - Subjects"
   data: {
     name: 'Lekki Secondary School',
     slug: 'lekki-secondary',

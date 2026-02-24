@@ -10,7 +10,7 @@ export const config = {
   // Server
   PORT: parseInt(process.env.PORT || '5000', 10),
   API_URL: process.env.API_URL || 'http://localhost:5000',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:8080',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
 
   // Database
   database: {
@@ -70,6 +70,13 @@ export const config = {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
     s3Bucket: process.env.AWS_S3_BUCKET || '',
+  },
+
+  // Paystack
+  paystack: {
+    publicKey: process.env.PAYSTACK_PUBLIC_KEY || '',
+    secretKey: process.env.PAYSTACK_SECRET_KEY || '',
+    apiUrl: process.env.PAYSTACK_API_URL || 'https://api.paystack.co',
   },
 
   // Logging

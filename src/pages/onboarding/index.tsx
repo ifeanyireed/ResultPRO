@@ -379,40 +379,62 @@ export const OnboardingWizard = () => {
         
         setIsLoading(false);
         
-        // Redirect to dashboard
-        navigate('/school-admin/dashboard', { replace: true });
+        // Redirect to overview
+        navigate('/school-admin/overview', { replace: true });
         toast({
           title: 'Success',
           description: 'Onboarding completed! Welcome to Results Pro',
         });
       } else {
-        // For paid plans, show message that payment is being set up
+        // For paid plans, initialize payment with Paystack
         setStep6Data(data);
         markStepComplete(6);
         
-        toast({
-          title: 'Payment Plan Selected',
-          description: `${data.selectedPlanId === 'pro' ? 'Pro' : 'Enterprise'} plan selected. Payment setup coming soon.`,
-        });
+        // Get plan details
+        const planName = data.selectedPlanId.includes('pro-term') || data.selectedPlanId === 'pro-term' 
+          ? 'Pro' 
+          : data.selectedPlanId.includes('pro-year') 
+          ? 'Pro' 
+          : 'Enterprise';
         
-        setIsLoading(false);
-        
-        // For now, redirect to dashboard (payment will be implemented later)
-        navigate('/school-admin/dashboard', { replace: true });
+        const amount = data.selectedPlanId.includes('pro-term') || data.selectedPlanId === 'pro-term'
+          ? 50000
+          : data.selectedPlanId.includes('pro-year')
+          ? 150000
+          : data.selectedPlanId.includes('enterprise-term') || data.selectedPlanId === 'enterprise-term'
+          ? 200000
+          : 600000; // enterprise-year
+
+        // Initialize payment with backend (tax will be added server-side)
+        const initPaymentRes = await axios.post(
+          `${API_BASE}/payment/initialize`,
+          {
+            planId: data.selectedPlanId,
+            planName,
+            amount, // Base amount, tax will be added by backend
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        if (initPaymentRes.data?.success && initPaymentRes.data?.data?.authorizationUrl) {
+          // Redirect to Paystack payment page
+          window.location.href = initPaymentRes.data.data.authorizationUrl;
+        } else {
+          throw new Error(initPaymentRes.data?.error || 'Failed to initialize payment');
+        }
       }
     } catch (err: any) {
+      setIsLoading(false);
       const msg =
         err?.response?.data?.error ||
         err?.message ||
-        'Failed to complete onboarding';
+        'Failed to process payment';
       setError(msg);
       toast({
         title: 'Error',
         description: msg,
         variant: 'destructive',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, Check } from '@hugeicons/react';
+import { AlertCircle, Check } from 'lucide-react';
 import { useOnboardingStore, Step6Data } from '@/stores/onboardingStore';
 
 interface Plan {
@@ -10,10 +10,11 @@ interface Plan {
   description: string;
   price: number; // in NGN
   currency: string;
-  duration: string; // e.g., 'per year', 'forever'
+  duration: string; // e.g., 'per term', 'per year', 'forever'
   studentCount: string; // e.g., '0-200', 'Unlimited'
   features: string[];
   isPopular?: boolean;
+  billingType?: 'term' | 'year'; // to differentiate plans
 }
 
 const AVAILABLE_PLANS: Plan[] = [
@@ -36,10 +37,32 @@ const AVAILABLE_PLANS: Plan[] = [
     isPopular: false,
   },
   {
-    id: 'pro',
+    id: 'pro-term',
     name: 'Pro',
     description: 'For growing schools',
-    price: 150000, // annual price
+    price: 50000,
+    currency: 'NGN',
+    duration: 'per term',
+    studentCount: '201-2,000',
+    features: [
+      'All Free features',
+      'Result checker with scratch cards',
+      'Parent mobile app access',
+      'Advanced analytics',
+      'SMS notifications',
+      'Priority email support',
+      'Custom branding',
+      'Batch processing',
+      'CSV data export',
+    ],
+    isPopular: true,
+    billingType: 'term',
+  },
+  {
+    id: 'pro-year',
+    name: 'Pro',
+    description: 'For growing schools (Save 17%)',
+    price: 150000,
     currency: 'NGN',
     duration: 'per year',
     studentCount: '201-2,000',
@@ -54,13 +77,36 @@ const AVAILABLE_PLANS: Plan[] = [
       'Batch processing',
       'CSV data export',
     ],
-    isPopular: true,
+    isPopular: false,
+    billingType: 'year',
   },
   {
-    id: 'enterprise',
+    id: 'enterprise-term',
     name: 'Enterprise',
     description: 'For large school networks',
-    price: 600000, // annual price
+    price: 200000,
+    currency: 'NGN',
+    duration: 'per term',
+    studentCount: 'Unlimited',
+    features: [
+      'All Pro features',
+      'Multiple schools management',
+      'White-label platform',
+      'Dedicated account manager',
+      '24/7 phone & email support',
+      'API access',
+      'Custom integrations',
+      'Advanced security features',
+      'Custom SLA agreement',
+    ],
+    isPopular: false,
+    billingType: 'term',
+  },
+  {
+    id: 'enterprise-year',
+    name: 'Enterprise',
+    description: 'For large school networks (Save 17%)',
+    price: 600000,
     currency: 'NGN',
     duration: 'per year',
     studentCount: 'Unlimited',
@@ -76,6 +122,7 @@ const AVAILABLE_PLANS: Plan[] = [
       'Custom SLA agreement',
     ],
     isPopular: false,
+    billingType: 'year',
   },
 ];
 
@@ -94,7 +141,7 @@ export const Step6PaymentPlans = ({
   initialData,
   isLoading = false,
 }: Step6Props) => {
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [billingPeriod, setBillingPeriod] = useState<'term' | 'year'>('year');
   const [selectedPlanId, setSelectedPlanId] = useState<string>(initialData?.selectedPlanId || '');
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loadingPlans, setLoadingPlans] = useState(true);
@@ -103,9 +150,13 @@ export const Step6PaymentPlans = ({
 
   // Load available plans on mount
   useEffect(() => {
-    setPlans(AVAILABLE_PLANS);
     setLoadingPlans(false);
   }, []);
+
+  // Filter plans by billing period (Free is always shown)
+  const filteredPlans = AVAILABLE_PLANS.filter(plan => 
+    plan.id === 'free' || plan.billingType === billingPeriod
+  );
 
   const handleSelectPlan = async (planId: string) => {
     setSelectedPlanId(planId);
@@ -122,7 +173,7 @@ export const Step6PaymentPlans = ({
       setSubmitError(null);
       setError(null);
 
-      const selectedPlan = plans.find(p => p.id === selectedPlanId);
+      const selectedPlan = AVAILABLE_PLANS.find(p => p.id === selectedPlanId);
       if (!selectedPlan) {
         throw new Error('Selected plan not found');
       }
@@ -173,9 +224,29 @@ export const Step6PaymentPlans = ({
           </div>
         )}
 
+        {/* Billing Period Toggle */}
+        <div className="mb-8 flex justify-center">
+          <div className="inline-flex rounded-lg border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] p-1">
+            {(['term', 'year'] as const).map((period) => (
+              <button
+                key={period}
+                onClick={() => setBillingPeriod(period)}
+                className={`px-6 py-2 rounded-md transition-all font-medium text-sm ${
+                  billingPeriod === period
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'text-gray-400 hover:text-gray-300'
+                }`}
+              >
+                {period === 'term' && 'Per Term'}
+                {period === 'year' && 'Annually (Save 17%)'}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {plans.map((plan) => (
+          {filteredPlans.map((plan) => (
             <div
               key={plan.id}
               onClick={() => handleSelectPlan(plan.id)}
@@ -203,6 +274,22 @@ export const Step6PaymentPlans = ({
                     {plan.price === 0 ? 'Free' : `₦${plan.price.toLocaleString()}`}
                   </div>
                   <div className="text-sm text-gray-400">{plan.duration}</div>
+                  {plan.price > 0 && (
+                    <div className="mt-3 pt-3 border-t border-[rgba(255,255,255,0.1)] space-y-1">
+                      <div className="flex justify-between text-xs text-gray-400">
+                        <span>Base price:</span>
+                        <span>₦{plan.price.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-400">
+                        <span>Tax (7.5%):</span>
+                        <span>₦{Math.round(plan.price * 0.075).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm font-semibold text-white pt-1">
+                        <span>Total:</span>
+                        <span>₦{(plan.price + Math.round(plan.price * 0.075)).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Features */}

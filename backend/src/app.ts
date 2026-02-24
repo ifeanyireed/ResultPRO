@@ -57,6 +57,10 @@ export async function createApp(): Promise<Express> {
   const csvRoutes = await import('@modules/onboarding/routes/csv.routes');
   app.use('/api/csv', authMiddleware, csvRoutes.default);
 
+  // Payment routes
+  const paymentRoutes = await import('@modules/payment/routes/payment.routes');
+  app.use('/api/payment', paymentRoutes.default);
+
   // Super Admin routes (auth protection handled within routes)
   const superAdminRoutes = await import('@modules/super-admin/routes/super-admin.routes');
   app.use('/api/super-admin', superAdminRoutes.default);
