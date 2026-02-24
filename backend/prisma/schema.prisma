@@ -299,6 +299,7 @@ model Payment {
   amount              Float    @map("amount")
   currency            String   @default("NGN") @map("currency")
   status              String   @default("PENDING") @map("status") // PENDING, PROCESSING, COMPLETED, FAILED
+  billingPeriod       String   @default("term") @map("billing_period") // term or year
   paystackReference   String?  @unique @map("paystack_reference")
   paystackAccessCode  String?  @map("paystack_access_code")
   paystackAuthUrl     String?  @map("paystack_auth_url")

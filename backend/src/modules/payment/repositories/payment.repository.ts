@@ -9,6 +9,7 @@ export class PaymentRepository {
     planId: string;
     amount: number;
     currency: string;
+    billingPeriod?: string;
     paystackReference?: string;
   }) {
     return await prisma.payment.create({
@@ -17,6 +18,7 @@ export class PaymentRepository {
         planId: data.planId,
         amount: data.amount,
         currency: data.currency,
+        billingPeriod: data.billingPeriod || 'term',
         status: 'PENDING',
         paystackReference: data.paystackReference,
       },

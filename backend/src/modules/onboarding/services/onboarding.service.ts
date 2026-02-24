@@ -26,6 +26,40 @@ export class OnboardingService {
   }
 
   /**
+   * Get school profile
+   */
+  async getSchoolProfile(schoolId: string) {
+    const school = await prisma.school.findUnique({
+      where: { id: schoolId },
+      select: {
+        id: true,
+        name: true,
+        motto: true,
+        logoUrl: true,
+        logoEmoji: true,
+        primaryColor: true,
+        secondaryColor: true,
+        accentColor: true,
+        contactEmail: true,
+        contactPhone: true,
+        contactPersonName: true,
+        altContactEmail: true,
+        altContactPhone: true,
+        fullAddress: true,
+        state: true,
+        lga: true,
+        subscriptionTier: true,
+        subscriptionStartDate: true,
+        subscriptionEndDate: true,
+        maxStudents: true,
+        maxTeachers: true,
+      },
+    });
+    if (!school) throw new NotFoundException('School not found');
+    return school;
+  }
+
+  /**
    * Get onboarding status
    */
   async getStatus(schoolId: string) {

@@ -13,6 +13,7 @@ export class PaymentService {
     planName: string;
     amount: number;
     email: string;
+    billingPeriod: 'term' | 'year';
   }) {
     try {
       // Ensure plans are initialized
@@ -39,6 +40,7 @@ export class PaymentService {
         planId: plan.id,
         amount: totalAmount,
         currency: 'NGN',
+        billingPeriod: data.billingPeriod,
       });
 
       // Initialize with Paystack
@@ -101,6 +103,40 @@ export class PaymentService {
       const updatedPayment = await paymentRepository.completePayment(paystackReference, {
         status: verification.status,
         verifiedAt: new Date(verification.paidAt),
+      });
+
+      // Calculate subscription end date based on billing period
+      const now = new Date();
+      let endDate = new Date(now);
+      if (payment.billingPeriod === 'year') {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+      } else {
+        // term = 4 months (academic term)
+        endDate.setMonth(endDate.getMonth() + 4);
+      }
+
+      // Create or update subscription
+      await prisma.subscription.upsert({
+        where: {
+          schoolId_planId: {
+            schoolId: payment.schoolId,
+            planId: payment.planId,
+          },
+        },
+        create: {
+          schoolId: payment.schoolId,
+          planId: payment.planId,
+          status: 'ACTIVE',
+          startDate: now,
+          endDate: endDate,
+          isAutoRenew: true,
+        },
+        update: {
+          status: 'ACTIVE',
+          startDate: now,
+          endDate: endDate,
+          isAutoRenew: true,
+        },
       });
 
       // Update school with subscription info

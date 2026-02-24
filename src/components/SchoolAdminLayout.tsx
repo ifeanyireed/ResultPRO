@@ -28,7 +28,25 @@ interface NavItem {
 
 const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [schoolName, setSchoolName] = useState<string>('');
+  const [schoolMotto, setSchoolMotto] = useState<string>('');
   const navigate = useNavigate();
+
+  // Load school info
+  useEffect(() => {
+    const userJson = localStorage.getItem('user');
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        if (user.school?.name) {
+          setSchoolName(user.school.name);
+          setSchoolMotto(user.school.motto || '');
+        }
+      } catch (error) {
+        console.error('Error loading school info:', error);
+      }
+    }
+  }, []);
 
   // Check if user is a super admin or if school is rejected
   useEffect(() => {
@@ -119,16 +137,28 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
         background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0) 100%)'
       }}>
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center gap-3">
+          <div className="flex items-center justify-between py-4 relative">
+            {/* Left Section - Logo */}
+            <div className="flex items-center gap-3 flex-shrink-0">
               <img src="/logo.png" alt="Results Pro" className="h-10 w-auto" />
               <div>
                 <div className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Results Pro</div>
                 <div className="text-sm font-semibold text-white">School Admin</div>
               </div>
             </div>
-            {/* User Actions in Top Right */}
-            <div className="flex items-center gap-3">
+
+            {/* Center Section - School Name and Motto */}
+            <div className="flex-1 flex flex-col items-center justify-center px-4">
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">{schoolName}</div>
+                {schoolMotto && (
+                  <div className="text-xs text-gray-400 italic mt-1">{schoolMotto}</div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Section - User Actions */}
+            <div className="flex items-center gap-3 flex-shrink-0">
               <button
                 onClick={() => navigate('/school-admin/profile')}
                 className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 border border-transparent hover:border-white/20 transition-all duration-200 text-gray-400 hover:text-white"

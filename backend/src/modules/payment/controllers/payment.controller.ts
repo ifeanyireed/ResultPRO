@@ -46,12 +46,16 @@ export class PaymentController {
         });
       }
 
+      // Extract billing period from planId
+      const billingPeriod = planId.includes('year') ? 'year' : 'term';
+
       const result = await paymentService.initializePayment({
         schoolId,
         planId,
         planName,
         amount,
         email,
+        billingPeriod,
       });
 
       res.json({

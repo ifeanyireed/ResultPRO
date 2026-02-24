@@ -3,6 +3,45 @@ import { onboardingService } from '../services/onboarding.service';
 
 export class OnboardingController {
   /**
+   * GET /api/onboarding/school/:schoolId
+   * Get school profile
+   */
+  static async getSchoolProfile(req: Request, res: Response) {
+    try {
+      const schoolId = req.params.schoolId;
+      if (!schoolId) {
+        return res.status(400).json({
+          success: false,
+          error: 'School ID is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const school = await onboardingService.getSchoolProfile(schoolId);
+
+      if (!school) {
+        return res.status(404).json({
+          success: false,
+          error: 'School not found',
+          code: 'NOT_FOUND',
+        });
+      }
+
+      res.json({
+        success: true,
+        data: school,
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
    * GET /api/onboarding/status
    * Get onboarding status
    */

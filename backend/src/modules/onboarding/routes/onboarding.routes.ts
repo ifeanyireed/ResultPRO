@@ -24,6 +24,9 @@ const uploadLogoMiddleware = multer({
 // Upload logo file to S3
 router.post('/logo-upload', uploadLogoMiddleware.single('file'), uploadLogo);
 
+// Get school profile
+router.get('/school/:schoolId', OnboardingController.getSchoolProfile);
+
 // Get current onboarding status
 router.get('/status', OnboardingController.getStatus);
 

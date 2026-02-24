@@ -711,6 +711,51 @@ export class AuthService {
       isApproved: school.status === 'APPROVED',
     };
   }
+
+  /**
+   * Change password for authenticated user
+   */
+  async changePassword(userId: string, oldPassword: string, newPassword: string) {
+    // Validate passwords
+    if (!oldPassword || !newPassword) {
+      throw new ConflictException('Old and new passwords are required', 'MISSING_PASSWORDS');
+    }
+
+    if (newPassword.length < 8) {
+      throw new ConflictException('New password must be at least 8 characters long', 'INVALID_PASSWORD');
+    }
+
+    if (oldPassword === newPassword) {
+      throw new ConflictException('New password must be different from old password', 'SAME_PASSWORD');
+    }
+
+    // Find admin user
+    let adminUser = await this.repository.findAdminUserById(userId);
+    
+    if (!adminUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Verify old password
+    const isPasswordValid = await PasswordHelper.comparePasswords(oldPassword, adminUser.passwordHash);
+    if (!isPasswordValid) {
+      throw new ConflictException('Current password is incorrect', 'INVALID_PASSWORD');
+    }
+
+    // Hash new password and update
+    const passwordHash = await PasswordHelper.hashPassword(newPassword);
+    
+    await this.repository.updateAdminPassword(adminUser.id, {
+      passwordHash,
+      passwordResetToken: null,
+      passwordResetTokenExpiry: null,
+    });
+
+    console.log(`✓ Password changed successfully for user: ${adminUser.email}`);
+    return {
+      message: 'Password changed successfully',
+    };
+  }
 }
 
 export const authService = new AuthService();

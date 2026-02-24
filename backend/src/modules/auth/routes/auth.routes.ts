@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { AuthController } from '../controllers/auth.controller';
+import { authMiddleware } from '@middleware/auth.middleware';
 
 // Configure multer for file uploads
 const upload = multer({
@@ -31,5 +32,8 @@ router.post('/upload-document', upload.single('document'), AuthController.upload
 router.post('/submit-verification-documents', AuthController.submitVerificationDocuments);
 router.get('/document-url', AuthController.getDocumentPresignedUrl);
 router.get('/school-status/:schoolId', AuthController.getSchoolStatus);
+
+// Protected routes (require authentication)
+router.post('/change-password', authMiddleware, AuthController.changePassword);
 
 export default router;

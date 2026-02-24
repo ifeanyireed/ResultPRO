@@ -464,4 +464,46 @@ export class AuthController {
       });
     }
   }
+
+  /**
+   * POST /api/auth/change-password
+   * Change password for authenticated user
+   */
+  static async changePassword(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+        });
+      }
+
+      const { oldPassword, newPassword } = req.body;
+
+      if (!oldPassword || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Old password and new password are required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const result = await authService.changePassword(userId, oldPassword, newPassword);
+
+      res.json({
+        success: true,
+        message: result.message,
+      });
+    } catch (error: any) {
+      console.error('❌ Change password error:', error);
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        message: error.message || 'Failed to change password',
+        code: error.code || 'CHANGE_PASSWORD_ERROR',
+      });
+    }
+  }
 }
