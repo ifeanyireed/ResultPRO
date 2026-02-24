@@ -284,12 +284,33 @@ export class OnboardingService {
     const school = await prisma.school.findUnique({ where: { id: schoolId } });
     if (!school) throw new NotFoundException('School not found');
 
-    const subjectData = (data.subjects as any[]).map((subj: any, index: number) => ({
-      schoolId,
-      name: subj.name || subj.subjectName,
-      code: subj.code || subj.subjectCode || (subj.name || subj.subjectName)?.toUpperCase().substring(0, 3) || 'SUB',
-      description: subj.description,
-    }));
+    // Generate unique codes with collision handling
+    const codeTracker = new Map<string, string[]>(); // baseCode -> list of generated codes
+    const subjectData = (data.subjects as any[]).map((subj: any, index: number) => {
+      let baseCode = subj.code || subj.subjectCode || (subj.name || subj.subjectName)?.toUpperCase().substring(0, 3) || 'SUB';
+      
+      // Ensure code is unique within this batch
+      let code = baseCode;
+      let suffix = 1;
+      while ((codeTracker.get(baseCode) || []).includes(code)) {
+        // If this code is already taken, append a number to make it unique
+        code = `${baseCode}${suffix}`;
+        suffix++;
+      }
+
+      // Track this code
+      if (!codeTracker.has(baseCode)) {
+        codeTracker.set(baseCode, []);
+      }
+      codeTracker.get(baseCode)!.push(code);
+
+      return {
+        schoolId,
+        name: subj.name || subj.subjectName,
+        code: code,
+        description: subj.description,
+      };
+    });
 
     const subjects = await this.subjectRepo.bulkCreate(subjectData);
 

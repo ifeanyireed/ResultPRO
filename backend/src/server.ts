@@ -17,16 +17,17 @@ async function startServer() {
     console.log('📧 Initializing mail service...');
     initializeMailer();
 
-    // Upload logo to S3 and set it in email templates
-    console.log('☁️ Uploading logo to S3...');
-    try {
-      const logoUrl = await uploadLogoToS3();
-      EmailTemplateService.setLogoUrl(logoUrl);
-      console.log('✅ Logo uploaded to S3:', logoUrl);
-    } catch (logoError) {
-      console.warn('⚠️ Failed to upload logo to S3:', logoError instanceof Error ? logoError.message : logoError);
-      console.log('📧 Email templates will display as text fallback');
-    }
+    // Upload logo to S3 and set it in email templates (non-blocking, runs in background)
+    console.log('☁️ Starting S3 logo upload (background task)...');
+    uploadLogoToS3()
+      .then((logoUrl) => {
+        EmailTemplateService.setLogoUrl(logoUrl);
+        console.log('✅ Logo uploaded to S3:', logoUrl);
+      })
+      .catch((logoError) => {
+        console.warn('⚠️ Failed to upload logo to S3:', logoError instanceof Error ? logoError.message : logoError);
+        console.log('📧 Email templates will display as text fallback');
+      });
 
     // Create Express app
     const app = await createApp();

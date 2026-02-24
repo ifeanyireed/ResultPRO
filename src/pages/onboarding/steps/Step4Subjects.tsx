@@ -83,9 +83,7 @@ export const Step4Subjects = ({
   const form = useForm<Step4FormData>({
     resolver: zodResolver(step4Schema),
     defaultValues: {
-      subjects: initialData?.subjects || [
-        { name: '', code: '', classId: '' },
-      ],
+      subjects: initialData?.subjects && initialData.subjects.length > 0 ? initialData.subjects : [],
     },
   });
 
@@ -198,6 +196,15 @@ export const Step4Subjects = ({
                   </SelectContent>
                 </Select>
               </div>
+
+              {fields.length === 0 && (
+                <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/30 flex gap-3">
+                  <AlertCircle className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-blue-300 text-sm">
+                    Select a class above, then use the quick-add buttons or "Add Another Subject" to start adding subjects.
+                  </p>
+                </div>
+              )}
 
               {selectedClass && (
                 <>
@@ -331,7 +338,7 @@ export const Step4Subjects = ({
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isLoading || classes.length === 0}
+                  disabled={isLoading || classes.length === 0 || fields.length === 0}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   {isLoading ? 'Saving...' : 'Next: Grading System'}
