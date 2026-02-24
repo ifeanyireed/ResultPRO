@@ -19,7 +19,7 @@ const FinancialDashboard: React.FC = () => {
             <p className="text-gray-400">Revenue, transactions, and subscription analytics</p>
           </div>
           <button className="flex items-center gap-2 px-6 py-3 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors font-medium">
-            <Download className="w-5 h-5" />
+            <Download01 className="w-5 h-5" />
             Export Report
           </button>
         </div>

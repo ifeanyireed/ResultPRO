@@ -164,7 +164,7 @@ const BillingSubscription: React.FC = () => {
                   </td>
                   <td className="py-4 px-6 text-right">
                     <button className="text-blue-400 hover:text-blue-300">
-                      <Download className="w-4 h-4" />
+                      <Download01 className="w-4 h-4" />
                     </button>
                   </td>
                 </tr>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Upload01, CheckCircle, Loading01 } from '@hugeicons/react';
-import { Upload } from '@/lib/hugeicons-compat';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
 
@@ -265,7 +264,7 @@ const SchoolVerification: React.FC = () => {
                             </>
                           ) : (
                             <>
-                              <Upload className="w-8 h-8 mx-auto mb-3 text-gray-400" />
+                              <Upload01 className="w-8 h-8 mx-auto mb-3 text-gray-400" />
                               <p className="text-sm text-gray-300 font-medium">
                                 Click to upload or drag and drop
                               </p>
@@ -305,7 +304,7 @@ const SchoolVerification: React.FC = () => {
                     ) : (
                       <>
                         <span>Submit Documents</span>
-                        <Upload className="w-5 h-5" />
+                        <Upload01 className="w-5 h-5" />
                       </>
                     )}
                   </button>

@@ -6,7 +6,7 @@ import { getTemplate, getEnabledSections } from '@/lib/gradebookTemplates';
 import { CompactGradebook } from '@/components/gradebook';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { ArrowRight01 } from '@hugeicons/react';
+import { ArrowRight01, Download01, Share01 } from '@hugeicons/react';
 
 const ResultChecker: React.FC = () => {
   const { schoolSlug } = useParams<{ schoolSlug: string }>();
@@ -460,7 +460,7 @@ const ResultChecker: React.FC = () => {
                   className="relative rounded-[12px] border backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] hover:bg-white/5 transition-all duration-300 border-solid border-[rgba(255,255,255,0.07)] p-4 shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset] group overflow-hidden"
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <Download className="w-5 h-5 text-blue-300 group-hover:scale-110 transition-transform" />
+                    <Download01 className="w-5 h-5 text-blue-300 group-hover:scale-110 transition-transform" />
                     <span className="text-xs text-gray-300 text-center">Download</span>
                   </div>
                 </button>
@@ -470,7 +470,7 @@ const ResultChecker: React.FC = () => {
                   className="relative rounded-[12px] border backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] hover:bg-white/5 transition-all duration-300 border-solid border-[rgba(255,255,255,0.07)] p-4 shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset] group overflow-hidden"
                 >
                   <div className="flex flex-col items-center gap-2">
-                    <Share2 className="w-5 h-5 text-sky-400 group-hover:scale-110 transition-transform" />
+                    <Share01 className="w-5 h-5 text-sky-400 group-hover:scale-110 transition-transform" />
                     <span className="text-xs text-gray-300 text-center">Share</span>
                   </div>
                 </button>
@@ -750,7 +750,7 @@ const ResultChecker: React.FC = () => {
                     onClick={handleDownloadPDF}
                     className="flex-1 px-4 py-3 rounded-[12px] bg-blue-600 hover:bg-blue-700 text-white transition-colors font-medium flex items-center justify-center gap-2"
                   >
-                    <Download className="w-5 h-5" />
+                    <Download01 className="w-5 h-5" />
                     Download PDF
                   </button>
                 </div>
@@ -835,7 +835,7 @@ const ResultChecker: React.FC = () => {
                     }}
                     className="w-full px-4 py-3 rounded-[12px] border border-white/20 text-gray-300 hover:text-white hover:border-white/40 transition-colors font-medium flex items-center justify-center gap-2"
                   >
-                    <Download className="w-5 h-5" />
+                    <Download01 className="w-5 h-5" />
                     Download Image
                   </button>
                 </div>

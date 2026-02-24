@@ -14,7 +14,7 @@ const AnalyticsDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
           <div className="flex items-center gap-2 mb-2">
-            <BarChart3 className="w-4 h-4 text-blue-400" />
+            <BarChart01 className="w-4 h-4 text-blue-400" />
             <p className="text-gray-400 text-xs uppercase tracking-wider">Avg Score</p>
           </div>
           <p className="text-3xl font-bold text-white">78.4</p>

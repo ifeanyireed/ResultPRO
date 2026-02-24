@@ -22,11 +22,11 @@ const LeaderboardManagement: React.FC = () => {
         </div>
         <div className="flex items-center gap-2">
           <button className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 rounded-lg text-purple-400 font-medium transition-colors">
-            <Share2 className="w-4 h-4" />
+            <Share01 className="w-4 h-4" />
             Share
           </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 rounded-lg text-blue-400 font-medium transition-colors">
-            <Download className="w-4 h-4" />
+            <Download01 className="w-4 h-4" />
             Export
           </button>
         </div>

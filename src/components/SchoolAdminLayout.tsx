@@ -34,18 +34,33 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
 
   // Load school info
   useEffect(() => {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
+    const loadSchoolInfo = async () => {
       try {
-        const user = JSON.parse(userJson);
-        if (user.school?.name) {
-          setSchoolName(user.school.name);
-          setSchoolMotto(user.school.motto || '');
+        const name = localStorage.getItem('schoolName') || '';
+        const token = localStorage.getItem('authToken');
+        const schoolId = localStorage.getItem('schoolId');
+
+        setSchoolName(name);
+
+        // Fetch school motto from the server
+        if (schoolId && token) {
+          const response = await fetch(`http://localhost:5000/api/onboarding/school/${schoolId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.data?.motto) {
+              setSchoolMotto(data.data.motto);
+              localStorage.setItem('schoolMotto', data.data.motto);
+            }
+          }
         }
       } catch (error) {
-        console.error('Error loading school info:', error);
+        console.error('Error loading school motto:', error);
       }
-    }
+    };
+
+    loadSchoolInfo();
   }, []);
 
   // Check if user is a super admin or if school is rejected

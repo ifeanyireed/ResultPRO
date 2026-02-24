@@ -518,6 +518,7 @@ export class AuthService {
         school: {
           id: school.id,
           name: school.name,
+          motto: school.motto,
           slug: school.slug,
           onboardingStatus: school.onboardingStatus,
           status: school.status,
@@ -561,6 +562,7 @@ export class AuthService {
         school: {
           id: school.id,
           name: school.name,
+          motto: school.motto,
           slug: school.slug,
           onboardingStatus: school.onboardingStatus,
           status: school.status,
@@ -614,6 +616,7 @@ export class AuthService {
       school: {
         id: school.id,
         name: school.name,
+        motto: school.motto,
         slug: school.slug,
         onboardingStatus: school.onboardingStatus,
         status: school.status,

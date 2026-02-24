@@ -125,7 +125,7 @@ const SchoolsManagement: React.FC = () => {
                           onClick={() => handleDelete(school.id)}
                           className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-red-400"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash01 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

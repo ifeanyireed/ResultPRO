@@ -71,8 +71,8 @@ const BulkResultsManagement: React.FC = () => {
                   </td>
                   <td className="py-4 px-6 text-right">
                     <div className="flex items-center justify-end gap-3">
-                      <button className="text-blue-400 hover:text-blue-300"><Edit2 className="w-4 h-4" /></button>
-                      <button className="text-purple-400 hover:text-purple-300"><Download className="w-4 h-4" /></button>
+                      <button className="text-blue-400 hover:text-blue-300"><Edit02 className="w-4 h-4" /></button>
+                      <button className="text-purple-400 hover:text-purple-300"><Download01 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>

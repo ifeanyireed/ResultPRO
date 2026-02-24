@@ -45,6 +45,8 @@ const Login: React.FC = () => {
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('schoolId', school?.id);
       localStorage.setItem('schoolName', school?.name);
+      localStorage.setItem('schoolMotto', school?.motto || '');
+      localStorage.setItem('schoolData', JSON.stringify(school));
 
       console.log('✅ Login successful for user:', user.email, 'Role:', user.role, 'Type:', typeof user.role);
 

@@ -45,7 +45,7 @@ const CSVUpload: React.FC = () => {
         } p-12`}
       >
         <div className="flex flex-col items-center justify-center text-center">
-          <Upload className="w-12 h-12 text-blue-400 mb-4" />
+          <Upload01 className="w-12 h-12 text-blue-400 mb-4" />
           <h3 className="text-lg font-semibold text-white mb-2">Drag & Drop Your CSV File</h3>
           <p className="text-gray-400 text-sm mb-6">or click to browse</p>
           <button className="px-6 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 rounded-lg text-blue-400 font-medium transition-colors">

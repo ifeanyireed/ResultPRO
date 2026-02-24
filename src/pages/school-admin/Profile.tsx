@@ -118,6 +118,7 @@ const Profile: React.FC = () => {
 
         // Update localStorage
         localStorage.setItem('schoolName', formData?.name || '');
+        localStorage.setItem('schoolMotto', formData?.motto || '');
       }
     } catch (error: any) {
       console.error('Error saving school data:', error);
