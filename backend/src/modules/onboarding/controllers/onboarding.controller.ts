@@ -450,4 +450,43 @@ export class OnboardingController {
       });
     }
   }
+
+  static async markResultsSetupComplete(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      if (!schoolId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+        });
+      }
+
+      // Update school to mark results setup as complete
+      const updatedSchool = await prisma.school.update({
+        where: { id: schoolId },
+        data: {
+          resultsSetupStatus: 'COMPLETE',
+          resultsSetupCompletedAt: new Date(),
+        },
+      });
+
+      res.json({
+        success: true,
+        message: 'Results setup marked as complete!',
+        data: {
+          schoolId,
+          resultsSetupStatus: 'COMPLETE',
+          completedAt: new Date().toISOString(),
+        },
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
 }

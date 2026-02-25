@@ -119,11 +119,30 @@ export const ResultsSetupWizard = () => {
       updateState({ step6Data: data });
     } else if (state.currentStep === 7) {
       updateState({ step7Data: data });
-      // All steps complete
-      toast({
-        title: 'Success',
-        description: 'Results setup completed successfully!',
-      });
+      // All steps complete - mark results setup as complete
+      try {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+        
+        await axios.post(
+          `${API_BASE}/onboarding/mark-results-setup-complete`,
+          {},
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        toast({
+          title: 'Success',
+          description: 'Results setup completed successfully!',
+        });
+      } catch (error) {
+        console.error('Failed to mark results setup complete:', error);
+        toast({
+          title: 'Warning',
+          description: 'Setup complete but failed to sync. Proceeding anyway.',
+        });
+      }
+      
       navigate('/school-admin/overview', { replace: true });
       return;
     }

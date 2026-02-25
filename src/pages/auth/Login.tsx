@@ -106,6 +106,14 @@ const Login: React.FC = () => {
         navigate('/onboarding');
         return;
       }
+
+      // Check if results setup is not complete - redirect to results setup wizard
+      if (school && school.resultsSetupStatus !== 'COMPLETE') {
+        console.log('📊 Results setup not complete, redirecting to results setup wizard');
+        setLoading(false);
+        navigate('/school-admin/results-setup');
+        return;
+      }
       
       // Otherwise redirect to school admin dashboard
       console.log('✅ All checks passed, redirecting to dashboard');

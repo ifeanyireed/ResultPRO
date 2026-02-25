@@ -63,4 +63,7 @@ router.post('/step/6', OnboardingController.recordCsvUpload);
 // Complete onboarding
 router.post('/complete', OnboardingController.completeOnboarding);
 
+// Mark results setup as complete
+router.post('/mark-results-setup-complete', OnboardingController.markResultsSetupComplete);
+
 export default router;

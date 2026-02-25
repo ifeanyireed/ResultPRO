@@ -40,6 +40,8 @@ model School {
   onboardingStatus                  String   @default("NOT_STARTED") @map("onboarding_status")
   onboardingCompletedAt             DateTime? @map("onboarding_completed_at")
   currentOnboardingStep             Int      @default(0) @map("current_onboarding_step")
+  resultsSetupStatus                String   @default("NOT_STARTED") @map("results_setup_status")
+  resultsSetupCompletedAt           DateTime? @map("results_setup_completed_at")
   subscriptionTier                  String?  @map("subscription_tier")
   subscriptionStartDate             DateTime? @map("subscription_start_date")
   subscriptionEndDate               DateTime? @map("subscription_end_date")
