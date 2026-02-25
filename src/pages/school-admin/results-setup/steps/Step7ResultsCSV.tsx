@@ -331,11 +331,17 @@ export const Step7ResultsCSV = ({
         return;
       }
 
+      if (!selectedClass) {
+        setSubmitError('Please select a class before uploading');
+        return;
+      }
+
       setUploading(true);
       const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
 
       const formData = new FormData();
       formData.append('csvFile', csvFile);
+      formData.append('classId', selectedClass);
 
       const response = await axios.post(
         'http://localhost:5000/api/results-setup/process-csv',

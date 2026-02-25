@@ -62,6 +62,7 @@ model School {
   subscriptions Subscription[]
   resultsSetupSession ResultsSetupSession?
   students Student[]
+  studentResults StudentResult[] @relation("StudentResultsToSchool")
 
   @@index([status])
   @@index([verificationStatus])
@@ -203,6 +204,7 @@ model Class {
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   subjects ClassSubject[]
   students Student[]
+  studentResults StudentResult[] @relation("StudentResults")
 
   @@unique([schoolId, name])
   @@index([schoolId])
@@ -221,6 +223,7 @@ model Student {
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  results StudentResult[]
 
   @@unique([classId, admissionNumber])
   @@index([schoolId])
@@ -299,6 +302,52 @@ model Grade {
   @@index([subjectId])
   @@index([gradingSystemId])
   @@map("grades")
+}
+
+model StudentResult {
+  id                    String   @id @default(cuid())
+  schoolId              String   @map("school_id")
+  classId               String   @map("class_id")
+  sessionId             String   @map("session_id")
+  termId                String   @map("term_id")
+  studentId             String   @map("student_id")
+  studentName           String   @map("student_name")
+
+  // Subject results - stored as JSON string: { "English": { ca1, ca2, project, exam, total, grade, classAverage, positionInClass, remark } }
+  subjectResults        String   @map("subject_results")
+
+  // Attendance
+  daysPresent           Int      @map("days_present")
+  daysSchoolOpen        Int      @map("days_school_open")
+
+  // Affective domain - stored as JSON string: { "Attentiveness": 4, "Honesty": 5, ... }
+  affectiveDomain       String?  @map("affective_domain")
+
+  // Psychomotor domain - stored as JSON string: { "Handling of Tools": 4, "Drawing": 3, ... }
+  psychomotorDomain     String?  @map("psychomotor_domain")
+
+  // Comments
+  principalComments     String?  @map("principal_comments")
+  classTeacherComments  String?  @map("class_teacher_comments")
+
+  // Overall metrics
+  overallAverage        Float?   @map("overall_average")
+  overallPosition       Int?     @map("overall_position")
+  overallRemark         String?  @map("overall_remark")
+
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  school School @relation("StudentResultsToSchool", fields: [schoolId], references: [id], onDelete: Cascade)
+  class Class @relation("StudentResults", fields: [classId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, classId, sessionId, termId, studentId])
+  @@index([schoolId])
+  @@index([classId])
+  @@index([sessionId])
+  @@index([studentId])
+  @@map("student_results")
 }
 
 model OnboardingState {

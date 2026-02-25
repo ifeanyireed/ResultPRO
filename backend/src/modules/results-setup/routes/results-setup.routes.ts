@@ -6,6 +6,7 @@ import { handleStep3 } from '../controllers/step3.controller';
 import { handleStep4 } from '../controllers/step4.controller';
 import { handleStep5, updateStaffData } from '../controllers/step5.controller';
 import { uploadSignature } from '../controllers/signature-upload.controller';
+import { processCSV } from '../controllers/csv-processor.controller';
 import { getResultsSetupSession, initializeResultsSetup, getClassSubjects } from '../controllers/results-setup.controller';
 import { createSampleClasses } from '../controllers/debug.controller';
 import { addStudent, getStudents, deleteStudent, updateStudent } from '../controllers/student.controller';
@@ -22,6 +23,20 @@ const uploadSignatureMiddleware = multer({
       cb(null, true);
     } else {
       cb(new Error('Only JPEG, PNG, WebP, and GIF images are allowed for signatures'));
+    }
+  },
+});
+
+// Configure multer for CSV uploads
+const uploadCSVMiddleware = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['text/csv', 'application/vnd.ms-excel'];
+    if (allowedMimes.includes(file.mimetype) || file.originalname.endsWith('.csv')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only CSV files are allowed'));
     }
   },
 });
@@ -68,6 +83,9 @@ router.delete('/students/:studentId', deleteStudent);
 
 // PATCH /api/results-setup/students/:studentId - Update student information
 router.patch('/students/:studentId', updateStudent);
+
+// POST /api/results-setup/process-csv - Process uploaded results CSV
+router.post('/process-csv', uploadCSVMiddleware.single('csvFile'), processCSV);
 
 // Placeholder for remaining steps - to be implemented
 router.post('/step/6', (req, res) => {
