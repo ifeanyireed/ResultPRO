@@ -6,8 +6,9 @@ import { handleStep3 } from '../controllers/step3.controller';
 import { handleStep4 } from '../controllers/step4.controller';
 import { handleStep5, updateStaffData } from '../controllers/step5.controller';
 import { uploadSignature } from '../controllers/signature-upload.controller';
-import { getResultsSetupSession, initializeResultsSetup } from '../controllers/results-setup.controller';
+import { getResultsSetupSession, initializeResultsSetup, getClassSubjects } from '../controllers/results-setup.controller';
 import { createSampleClasses } from '../controllers/debug.controller';
+import { addStudent, getStudents, deleteStudent, updateStudent } from '../controllers/student.controller';
 
 const router = Router();
 
@@ -27,6 +28,9 @@ const uploadSignatureMiddleware = multer({
 
 // GET /api/results-setup/session - Fetch current setup session
 router.get('/session', getResultsSetupSession);
+
+// GET /api/results-setup/class-subjects - Get subjects for a specific class
+router.get('/class-subjects', getClassSubjects);
 
 // POST /api/results-setup/initialize - Initialize new setup session
 router.post('/initialize', initializeResultsSetup);
@@ -51,6 +55,19 @@ router.patch('/staff-data', updateStaffData);
 
 // POST /api/results-setup/step/5 - Handle step 5 (Staff Uploads)
 router.post('/step/5', handleStep5);
+
+// Student Management Endpoints
+// POST /api/results-setup/students/add - Add a new student
+router.post('/students/add', addStudent);
+
+// GET /api/results-setup/students - Get students (optionally filtered by classId query param)
+router.get('/students', getStudents);
+
+// DELETE /api/results-setup/students/:studentId - Delete a student
+router.delete('/students/:studentId', deleteStudent);
+
+// PATCH /api/results-setup/students/:studentId - Update student information
+router.patch('/students/:studentId', updateStudent);
 
 // Placeholder for remaining steps - to be implemented
 router.post('/step/6', (req, res) => {

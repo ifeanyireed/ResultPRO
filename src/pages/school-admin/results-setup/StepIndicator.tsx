@@ -1,4 +1,4 @@
-import { CheckCircle, Calendar, Settings, Heart, Zap, Users, Upload02, FileText } from '@hugeicons/react';
+import { CheckCircle, Calendar, Settings, Heart, Zap, Users, Upload, FileText } from 'lucide-react';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -12,7 +12,7 @@ const stepLabels = [
   'Affective Domain',
   'Psychomotor Domain',
   'Staff Uploads',
-  'Assign Students',
+  'Add Students',
   'Results CSV',
 ];
 
@@ -21,7 +21,7 @@ const stepIcons = [
   Settings,
   Heart,
   Zap,
-  Upload02,
+  Upload,
   Users,
   FileText,
 ];

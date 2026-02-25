@@ -2,7 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
-import { Upload02, Download01, AlertCircle } from '@hugeicons/react';
+import { Upload, Download, AlertCircle, Eye } from 'lucide-react';
+import { CompactGradebook } from '@/components/gradebook/CompactGradebook';
+import { getTemplate } from '@/lib/gradebookTemplates';
 
 interface Step7Props {
   onNext: (data: any) => Promise<void>;
@@ -10,6 +12,19 @@ interface Step7Props {
   initialData?: any;
   isLoading?: boolean;
   sessionTermData?: any;
+}
+
+interface StudentResult {
+  studentName: string;
+  admissionNumber: string;
+  classLevel: string;
+  sex?: string;
+  age?: string;
+  dateOfBirth?: string;
+  height?: string;
+  weight?: string;
+  favouriteColor?: string;
+  [key: string]: any; // Subject scores, affective domain, psychomotor domain
 }
 
 export const Step7ResultsCSV = ({
@@ -20,38 +35,256 @@ export const Step7ResultsCSV = ({
   sessionTermData,
 }: Step7Props) => {
   const { toast } = useToast();
+  const [classes, setClasses] = useState<any[]>([]);
+  const [selectedClass, setSelectedClass] = useState('');
+  const [students, setStudents] = useState<any[]>([]);
+  const [subjects, setSubjects] = useState<any[]>([]);
+  const [affectiveTraits, setAffectiveTraits] = useState<string[]>([]);
+  const [psychomotorSkills, setPsychomotorSkills] = useState<string[]>([]);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<any[]>([]);
+  const [preview, setPreview] = useState<{ headers: string[]; rows: string[][] } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [showGradebookPreview, setShowGradebookPreview] = useState(false);
+  const [selectedStudentResult, setSelectedStudentResult] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Update CSV file when initialData changes (e.g., on page refresh when data loads from DB)
+  // Load classes, students, subjects, affective traits, and psychomotor skills on mount
   useEffect(() => {
-    if (initialData?.resultsFileUrl) {
-      // Just restore the URL - the actual file isn't stored, just the path
-      // You may want to fetch preview data here if needed
-    }
-  }, [initialData?.resultsFileUrl]);
+    const loadData = async () => {
+      try {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
 
-  const downloadTemplate = async () => {
-    try {
-      const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
-      const response = await axios.get(
-        'http://localhost:5000/api/results-setup/csv-template',
-        {
+        // Fetch classes
+        const classesResponse = await axios.get('http://localhost:5000/api/onboarding/classes', {
           headers: { Authorization: `Bearer ${token}` },
-          responseType: 'blob',
-        }
-      );
+        });
+        const allClasses = classesResponse.data.data?.classes || [];
+        setClasses(allClasses);
 
-      const url = window.URL.createObjectURL(response.data);
+        // Fetch all students
+        const studentsResponse = await axios.get('http://localhost:5000/api/results-setup/students', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const allStudents = studentsResponse.data.data?.students || [];
+        setStudents(allStudents);
+
+        // Get affective traits - with better error handling
+        if (sessionTermData?.affectiveTraits) {
+          try {
+            const traits = typeof sessionTermData.affectiveTraits === 'string' 
+              ? JSON.parse(sessionTermData.affectiveTraits)
+              : sessionTermData.affectiveTraits;
+            const traitsArray = Array.isArray(traits) ? traits : [];
+            setAffectiveTraits(traitsArray);
+            console.log('Affective traits loaded:', traitsArray);
+          } catch (e) {
+            console.error('Failed to parse affective traits:', e);
+          }
+        }
+
+        // Get psychomotor skills - with better error handling
+        if (sessionTermData?.psychomotorSkills) {
+          try {
+            const skills = typeof sessionTermData.psychomotorSkills === 'string'
+              ? JSON.parse(sessionTermData.psychomotorSkills)
+              : sessionTermData.psychomotorSkills;
+            const skillsArray = Array.isArray(skills) ? skills : [];
+            setPsychomotorSkills(skillsArray);
+            console.log('Psychomotor skills loaded:', skillsArray);
+          } catch (e) {
+            console.error('Failed to parse psychomotor skills:', e);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load data:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to load student and curriculum data',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    loadData();
+  }, [sessionTermData, toast]);
+
+  // Load subjects when class is selected
+  useEffect(() => {
+    const loadSubjects = async () => {
+      if (!selectedClass) {
+        setSubjects([]);
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+        const response = await axios.get(
+          `http://localhost:5000/api/results-setup/class-subjects?classId=${selectedClass}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const subjectList = response.data.data?.subjects || [];
+        const subjectNames = subjectList.map((s: any) => s.name);
+        setSubjects(subjectNames);
+        console.log('Subjects loaded for class:', subjectNames);
+      } catch (error) {
+        console.error('Failed to load subjects for class:', error);
+        setSubjects([]);
+        toast({
+          title: 'Error',
+          description: 'Failed to load subjects for selected class',
+          variant: 'destructive',
+        });
+      }
+    };
+
+    loadSubjects();
+  }, [selectedClass, toast]);
+
+  // Generate CSV template with example row and filtered students
+  const generateCsvTemplate = () => {
+    // Filter students by selected class
+    const filteredStudents = selectedClass
+      ? students.filter(student => student.classId === selectedClass)
+      : [];
+
+    // Affective traits with defaults
+    const affectiveTraitsArray = affectiveTraits.length > 0 
+      ? affectiveTraits 
+      : ['Attentiveness', 'Honesty', 'Neatness', 'Politeness', 'Punctuality/Assembly', 'Self Control/Calmness', 'Obedience', 'Reliability'];
+
+    // Psychomotor skills with defaults
+    const psychomotorSkillsArray = psychomotorSkills.length > 0 
+      ? psychomotorSkills 
+      : ['Handling of Tools', 'Drawing/Painting', 'Handwriting', 'Public Speaking', 'Speech Fluency'];
+
+    // Create main headers (row 1) - subject names span multiple columns
+    const mainHeaders = [
+      'Student ID',
+      'Name',
+      'Attendance',
+      'Sex',
+      'DOB',
+      'Age',
+      'Height',
+      'Weight',
+      'Favourite Color',
+      ...subjects.flatMap(s => [s, '', '', '']), // Subject name spans 4 columns
+      'Affective Domains',
+      ...Array(Math.max(0, affectiveTraitsArray.length - 1)).fill(''), // Span remaining affective columns
+      'Psychomotor Domains',
+      ...Array(Math.max(0, psychomotorSkillsArray.length - 1)).fill(''), // Span remaining psychomotor columns
+      'Comments',
+      '',
+    ];
+
+    // Create sub-headers (row 2) with format hints and score ranges
+    const subHeaders = [
+      '', // Student ID
+      '', // Name
+      '(days / 70 available)', // Attendance format
+      '(M/F)', // Sex format
+      '(YYYY-MM-DD)', // DOB format
+      '(years)', // Age format
+      '', // Height
+      '', // Weight
+      '', // Favourite Color
+      ...subjects.flatMap(() => ['CAT 1 (20)', 'CAT 2 (20)', 'Project (10)', 'Final Exam (50)']),
+      ...affectiveTraitsArray, // Affective traits as sub-headers
+      ...psychomotorSkillsArray, // Psychomotor skills as sub-headers
+      'Principal Comments', // Comments sub-header 1
+      'Form Tutor Comments', // Comments sub-header 2
+    ];
+
+    // Create example row with sample data for teacher guidance
+    const exampleRow = [
+      'EX-001',
+      'Example Student',
+      '67',
+      'M',
+      '2008-01-15',
+      '16',
+      '165cm',
+      '58kg',
+      'Blue',
+      ...subjects.flatMap(() => ['14', '14', '7', '35']), // Sample scores
+      ...affectiveTraitsArray.map(() => '4'), // Sample affective score (1-5)
+      ...psychomotorSkillsArray.map(() => '4'), // Sample psychomotor score (1-5)
+      'Excellent performance',
+      'Very good progress',
+    ];
+
+    // Create data rows for all students
+    const rows = filteredStudents.map((student, index) => {
+      const admissionForId = student.admissionNumber || `STU-${String(index + 1).padStart(4, '0')}`;
+      const row: any[] = [
+        admissionForId, // Student ID
+        student.name,
+        '', // Attendance (days)
+        '', // Sex
+        '', // DOB
+        '', // Age
+        '', // Height
+        '', // Weight
+        '', // Favourite Color
+        ...subjects.flatMap(() => ['', '', '', '']), // 4 empty cells per subject
+        ...affectiveTraitsArray.map(() => ''), // Empty affective cells
+        ...psychomotorSkillsArray.map(() => ''), // Empty psychomotor cells
+        '', // Principal Comments
+        '', // Form Tutor Comments
+      ];
+      return row;
+    });
+
+    // Convert to CSV format with 2 header rows, example row, then data rows
+    const csvContent = [
+      mainHeaders.map(h => `"${h}"`).join(','),
+      subHeaders.map(h => `"${h}"`).join(','),
+      exampleRow.map(cell => `"${cell}"`).join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(',')),
+    ].join('\n');
+
+    return csvContent;
+  };
+
+  const downloadTemplate = () => {
+    try {
+      if (!selectedClass) {
+        toast({
+          title: 'Error',
+          description: 'Please select a class before downloading the template',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const filteredStudents = students.filter(student => student.classId === selectedClass);
+      if (filteredStudents.length === 0) {
+        toast({
+          title: 'Error',
+          description: 'No students in the selected class. Please add students in Step 6.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const csvContent = generateCsvTemplate();
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
-      link.href = url;
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
       link.setAttribute('download', 'results-template.csv');
+      link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
-      link.parentElement?.removeChild(link);
+      document.body.removeChild(link);
+
+      toast({
+        title: 'Success',
+        description: 'CSV template downloaded successfully',
+      });
     } catch (error) {
       console.error('Failed to download template:', error);
       toast({
@@ -65,17 +298,21 @@ export const Step7ResultsCSV = ({
   const handleFileSelect = async (file: File) => {
     try {
       setCsvFile(file);
-      
+
       // Parse CSV for preview
       const text = await file.text();
-      const lines = text.split('\n');
-      const headers = lines[0].split(',');
-      const rows = lines.slice(1, 6).map(line => line.split(','));
-      
+      const lines = text.split('\n').filter(l => l.trim());
+      const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+      const rows = lines.slice(1, 6).map(line => 
+        line.split(',').map(cell => cell.replace(/"/g, ''))
+      );
+
       setPreview({
         headers,
         rows: rows.filter(r => r.some(cell => cell.trim())),
       });
+
+      setSubmitError(null);
     } catch (error) {
       console.error('Failed to read file:', error);
       toast({
@@ -99,11 +336,9 @@ export const Step7ResultsCSV = ({
 
       const formData = new FormData();
       formData.append('csvFile', csvFile);
-      formData.append('sessionId', sessionTermData?.sessionId);
-      formData.append('termId', sessionTermData?.termId);
 
       const response = await axios.post(
-        'http://localhost:5000/api/results-setup/step/7',
+        'http://localhost:5000/api/results-setup/process-csv',
         formData,
         {
           headers: {
@@ -114,14 +349,22 @@ export const Step7ResultsCSV = ({
       );
 
       if (response.data.success) {
+        // Store generated gradebook data
+        const generatedData = response.data.data;
+        
         toast({
           title: 'Success',
           description: 'Results CSV uploaded and processed successfully',
         });
-        await onNext(response.data.data);
+
+        await onNext({
+          ...sessionTermData,
+          resultsFileUrl: csvFile.name,
+          processingResult: generatedData,
+        });
       }
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to upload results CSV';
+      const message = error.response?.data?.error || 'Failed to process CSV';
       setSubmitError(message);
       toast({
         title: 'Error',
@@ -140,7 +383,7 @@ export const Step7ResultsCSV = ({
           Results CSV Upload
         </h2>
         <p className="text-gray-400 text-sm">
-          Upload a CSV file containing student results and scores
+          Download the template, fill in student results with scores and comments, then upload to generate gradebooks
         </p>
       </div>
 
@@ -152,18 +395,50 @@ export const Step7ResultsCSV = ({
       )}
 
       <div className="space-y-6">
+        {/* Class Selection */}
+        <div>
+          <label className="text-gray-300 text-sm font-medium mb-2 block">Select Class *</label>
+          <select
+            value={selectedClass}
+            onChange={(e) => setSelectedClass(e.target.value)}
+            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors"
+          >
+            <option value="">-- Choose a class --</option>
+            {classes.map((classItem) => (
+              <option key={classItem.id} value={classItem.id}>
+                {classItem.name}
+              </option>
+            ))}
+          </select>
+          {selectedClass && (
+            <p className="text-gray-400 text-xs mt-1">
+              {students.filter(s => s.classId === selectedClass).length} student(s) in this class
+            </p>
+          )}
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-blue-500/10 border border-blue-400/20 rounded-lg p-4">
+          <p className="text-blue-300 text-sm">
+            <strong>Template includes:</strong> {selectedClass ? students.filter(s => s.classId === selectedClass).length : 0} students • {subjects.length} subjects • {affectiveTraits.length > 0 ? affectiveTraits.length : 8} affective traits • {psychomotorSkills.length > 0 ? psychomotorSkills.length : 5} psychomotor skills
+          </p>
+          <p className="text-blue-300 text-xs mt-2">
+            <strong>Note:</strong> The first row (Example Student) is provided as a guide for entering data. Remove it before uploading. Default affective traits and psychomotor skills are used if not configured.
+          </p>
+        </div>
+
         {/* Download Template */}
-        <div className="bg-blue-500/10 border border-blue-400/20 rounded-lg p-6">
+        <div className="bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-400/20 rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-white font-semibold mb-1">CSV Template</h3>
-              <p className="text-gray-400 text-sm">Download the template to see the required format</p>
+              <p className="text-gray-400 text-sm">Pre-populated with student names and admission numbers</p>
             </div>
             <button
               onClick={downloadTemplate}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
             >
-              <Download01 className="w-4 h-4" />
+              <Download className="w-4 h-4" />
               Download Template
             </button>
           </div>
@@ -171,7 +446,7 @@ export const Step7ResultsCSV = ({
 
         {/* File Upload */}
         <div>
-          <label className="text-gray-300 text-sm font-medium mb-3 block">Upload Results CSV *</label>
+          <label className="text-gray-300 text-sm font-medium mb-3 block">Upload Completed CSV *</label>
           <div
             className="border-2 border-dashed border-[rgba(255,255,255,0.2)] rounded-lg p-8 text-center hover:border-blue-400 transition-colors"
             onDrop={(e) => {
@@ -191,7 +466,7 @@ export const Step7ResultsCSV = ({
           >
             {csvFile ? (
               <div className="flex flex-col items-center gap-2">
-                <div className="text-green-400">✓</div>
+                <div className="text-green-400 text-2xl">✓</div>
                 <p className="text-white text-sm font-medium">{csvFile.name}</p>
                 <p className="text-gray-500 text-xs">{(csvFile.size / 1024).toFixed(2)} KB</p>
                 <button
@@ -203,7 +478,7 @@ export const Step7ResultsCSV = ({
               </div>
             ) : (
               <label className="cursor-pointer flex flex-col items-center gap-2">
-                <Upload02 className="w-10 h-10 text-gray-400" />
+                <Upload className="w-10 h-10 text-gray-400" />
                 <span className="text-gray-300 text-sm">Click to upload or drag and drop</span>
                 <span className="text-gray-500 text-xs">CSV files only</span>
                 <input
@@ -221,13 +496,13 @@ export const Step7ResultsCSV = ({
         {/* Preview */}
         {preview && preview.headers && (
           <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.1)] rounded-lg p-4">
-            <h3 className="text-white text-sm font-semibold mb-3">Preview</h3>
+            <h3 className="text-white text-sm font-semibold mb-3">CSV Preview (first 5 rows)</h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr>
                     {preview.headers.map((header, idx) => (
-                      <th key={idx} className="px-3 py-2 text-left text-gray-400 font-medium text-xs">
+                      <th key={idx} className="px-3 py-2 text-left text-gray-400 font-medium text-xs bg-[rgba(255,255,255,0.05)]">
                         {header}
                       </th>
                     ))}
@@ -266,7 +541,7 @@ export const Step7ResultsCSV = ({
           disabled={isLoading || uploading || !csvFile}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
-          {uploading ? 'Uploading...' : 'Complete Setup'}
+          {uploading ? 'Processing...' : 'Complete Setup & Generate Gradebooks'}
         </Button>
       </div>
     </div>

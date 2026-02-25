@@ -65,3 +65,42 @@ export async function initializeResultsSetup(req: Request, res: Response) {
     });
   }
 }
+
+export async function getClassSubjects(req: Request, res: Response) {
+  try {
+    const schoolId = req.user?.schoolId;
+    const classId = req.query.classId as string;
+
+    if (!schoolId) {
+      return res.status(400).json({
+        success: false,
+        error: 'School ID is required',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    if (!classId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Class ID is required',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    const subjects = await service.getSubjectsByClass(schoolId, classId);
+
+    res.json({
+      success: true,
+      data: {
+        subjects,
+      },
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    res.status(status).json({
+      success: false,
+      error: error.message,
+      code: error.code || 'ERROR',
+    });
+  }
+}

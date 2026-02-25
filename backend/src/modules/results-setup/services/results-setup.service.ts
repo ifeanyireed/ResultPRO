@@ -103,4 +103,51 @@ export class ResultsSetupService {
       },
     });
   }
+
+  async getSubjectsByClass(schoolId: string, classId: string) {
+    // First, try to get subjects linked to this specific class
+    const linkedSubjects = await prisma.subject.findMany({
+      where: {
+        schoolId,
+        classes: {
+          some: {
+            classId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        description: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    // If class has linked subjects, return them
+    if (linkedSubjects.length > 0) {
+      return linkedSubjects;
+    }
+
+    // Fallback: If no subjects are linked to class, return all subjects for the school
+    console.warn(`No subjects linked to class ${classId}, returning all school subjects as fallback`);
+    const allSubjects = await prisma.subject.findMany({
+      where: {
+        schoolId,
+      },
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        description: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    return allSubjects;
+  }
 }

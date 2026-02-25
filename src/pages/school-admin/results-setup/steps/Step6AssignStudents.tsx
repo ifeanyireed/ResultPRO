@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
-import { Plus, Trash01 } from '@hugeicons/react';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface Student {
   id: string;
-  admissionNumber: string;
-  firstName: string;
-  lastName: string;
+  classId: string;
   className: string;
+  name: string;
+  admissionNumber: string;
+  parentEmail?: string;
 }
 
 interface Step6Props {
@@ -28,19 +29,16 @@ export const Step6AssignStudents = ({
   sessionTermData,
 }: Step6Props) => {
   const { toast } = useToast();
-  const [students, setStudents] = useState<Student[]>(initialData?.students || []);
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedClass, setSelectedClass] = useState('');
-  const [classStudents, setClassStudents] = useState<Student[]>([]);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [students, setStudents] = useState<Student[]>(initialData?.students || []);
+  
+  // Form state for new student
+  const [name, setName] = useState('');
+  const [parentEmail, setParentEmail] = useState('');
   const [loadingClasses, setLoadingClasses] = useState(true);
-
-  // Update students when initialData changes (e.g., on page refresh when data loads from DB)
-  useEffect(() => {
-    if (initialData?.assignedStudents && initialData.assignedStudents.length > 0) {
-      setStudents(initialData.assignedStudents);
-    }
-  }, [initialData?.assignedStudents]);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [addingStudent, setAddingStudent] = useState(false);
 
   // Fetch classes on mount
   useEffect(() => {
@@ -62,50 +60,137 @@ export const Step6AssignStudents = ({
         setLoadingClasses(false);
       }
     };
+
     fetchClasses();
   }, [toast]);
 
-  // Fetch students when class changes
+  // Restore students from database on mount or when initialData changes
   useEffect(() => {
-    if (selectedClass) {
-      const fetchStudents = async () => {
-        try {
-          const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
-          const response = await axios.get(
-            `http://localhost:5000/api/results-setup/classes/${selectedClass}/students`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          setClassStudents(response.data.data?.students || []);
-        } catch (error) {
-          console.error('Failed to fetch students:', error);
-          toast({
-            title: 'Error',
-            description: 'Failed to load students',
-            variant: 'destructive',
-          });
+    const restoreStudents = async () => {
+      try {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+        
+        // Fetch all students for this school
+        const response = await axios.get(
+          'http://localhost:5000/api/results-setup/students',
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        
+        const allStudents = response.data.data?.students || [];
+        setStudents(allStudents);
+      } catch (error) {
+        console.error('Failed to restore students:', error);
+        // Fallback to initialData if restore fails
+        if (initialData?.students) {
+          setStudents(initialData.students);
         }
-      };
-      fetchStudents();
-    }
-  }, [selectedClass, toast]);
+      }
+    };
 
-  const addStudent = (student: Student) => {
-    if (!students.find(s => s.id === student.id)) {
-      setStudents([...students, student]);
+    restoreStudents();
+  }, [initialData?.students]);
+
+  // Filter students when selected class changes
+  useEffect(() => {
+    if (!selectedClass) {
+      // Show all students if no class selected
+      return;
+    }
+
+    // Students are pre-fetched, just keep the current state
+  }, [selectedClass]);
+
+  const handleAddStudent = async () => {
+    if (!selectedClass || !name) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please select a class and enter student name',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setAddingStudent(true);
+      const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      
+      const response = await axios.post(
+        'http://localhost:5000/api/results-setup/students/add',
+        {
+          classId: selectedClass,
+          name: name.trim(),
+          parentEmail: parentEmail.trim() || undefined,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.success) {
+        const newStudent = {
+          ...response.data.data.student,
+          className: classes.find(c => c.id === selectedClass)?.name,
+        };
+        
+        setStudents([...students, newStudent]);
+        setName('');
+        setParentEmail('');
+
+        toast({
+          title: 'Success',
+          description: `Student ${newStudent.name} added with admission number ${newStudent.admissionNumber}`,
+        });
+      }
+    } catch (error: any) {
+      const message = error.response?.data?.error || 'Failed to add student';
+      toast({
+        title: 'Error',
+        description: message,
+        variant: 'destructive',
+      });
+    } finally {
+      setAddingStudent(false);
     }
   };
 
-  const removeStudent = (studentId: string) => {
-    setStudents(students.filter(s => s.id !== studentId));
+  const handleRemoveStudent = async (studentId: string) => {
+    try {
+      const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      
+      await axios.delete(
+        `http://localhost:5000/api/results-setup/students/${studentId}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setStudents(students.filter(s => s.id !== studentId));
+      toast({
+        title: 'Success',
+        description: 'Student removed',
+      });
+    } catch (error: any) {
+      const message = error.response?.data?.error || 'Failed to remove student';
+      toast({
+        title: 'Error',
+        description: message,
+        variant: 'destructive',
+      });
+    }
   };
+
+  // Filter students based on selected class
+  const filteredStudents = selectedClass 
+    ? students.filter(s => s.classId === selectedClass)
+    : students;
 
   const handleSubmit = async () => {
     try {
       setSubmitError(null);
       if (students.length === 0) {
-        setSubmitError('Please assign at least one student');
+        setSubmitError('Please add at least one student');
         return;
       }
 
@@ -127,12 +212,12 @@ export const Step6AssignStudents = ({
       if (response.data.success) {
         toast({
           title: 'Success',
-          description: `${students.length} students assigned`,
+          description: `${students.length} students added`,
         });
         await onNext(response.data.data);
       }
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to assign students';
+      const message = error.response?.data?.error || 'Failed to add students';
       setSubmitError(message);
       toast({
         title: 'Error',
@@ -146,10 +231,10 @@ export const Step6AssignStudents = ({
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-bold text-white mb-2">
-          Assign Students
+          Add Students
         </h2>
         <p className="text-gray-400 text-sm">
-          Select students from each class to participate in this results session
+          Add students to classes for this results session. Admission numbers are auto-generated.
         </p>
       </div>
 
@@ -159,79 +244,94 @@ export const Step6AssignStudents = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Available Students */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-4">Available Students</h3>
-          
-          <div className="mb-4">
-            <label className="text-gray-300 text-sm">Select Class</label>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Add Student Form */}
+        <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.1)] rounded-lg p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-white">Add New Student</h3>
+
+          <div>
+            <label className="text-gray-300 text-sm block mb-2">Select Class *</label>
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
               disabled={loadingClasses}
-              className="w-full px-4 py-2 mt-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white rounded-lg focus:outline-none focus:border-blue-400"
+              className="w-full px-4 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white rounded-lg focus:outline-none focus:border-blue-400 appearance-none cursor-pointer"
+              style={{ backgroundColor: '#1f2937', color: '#ffffff' }}
             >
-              <option value="">Select a class...</option>
+              <option value="" style={{ backgroundColor: '#1f2937', color: '#ffffff' }}>Select a class...</option>
               {classes.map(cls => (
-                <option key={cls.id} value={cls.id}>{cls.name}</option>
+                <option key={cls.id} value={cls.id} style={{ backgroundColor: '#1f2937', color: '#ffffff' }}>{cls.name}</option>
               ))}
             </select>
           </div>
 
+          <div>
+            <label className="text-gray-300 text-sm block mb-2">Student Name *</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter student name (e.g., Ebere Mbilitam)"
+              className="w-full px-4 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-gray-600 rounded-lg focus:outline-none focus:border-blue-400"
+            />
+          </div>
+
+          <div>
+            <label className="text-gray-300 text-sm block mb-2">Parent Email</label>
+            <input
+              type="email"
+              value={parentEmail}
+              onChange={(e) => setParentEmail(e.target.value)}
+              placeholder="Enter parent email (optional)"
+              className="w-full px-4 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white placeholder:text-gray-600 rounded-lg focus:outline-none focus:border-blue-400"
+            />
+          </div>
+
+          <button
+            onClick={handleAddStudent}
+            disabled={addingStudent || !selectedClass}
+            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg flex items-center justify-center gap-2 font-medium"
+          >
+            <Plus className="w-4 h-4" />
+            {addingStudent ? 'Adding...' : 'Add Student'}
+          </button>
+        </div>
+
+        {/* Students List */}
+        <div className="bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.1)] rounded-lg p-6 space-y-4">
+          <h3 className="text-lg font-semibold text-white">
+            {selectedClass ? 'Class Students' : 'All Students'} ({filteredStudents.length})
+          </h3>
+
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {classStudents.length === 0 ? (
-              <p className="text-gray-500 text-sm">No students available</p>
+            {filteredStudents.length === 0 ? (
+              <p className="text-gray-500 text-sm">
+                {selectedClass ? 'No students in this class' : 'No students added yet'}
+              </p>
             ) : (
-              classStudents.map(student => (
+              filteredStudents.map(student => (
                 <div
                   key={student.id}
                   className="flex items-center justify-between p-3 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] rounded-lg"
                 >
                   <div className="flex-1">
                     <p className="text-white text-sm font-medium">
-                      {student.firstName} {student.lastName}
+                      {student.name}
                     </p>
-                    <p className="text-gray-500 text-xs">{student.admissionNumber}</p>
+                    <p className="text-gray-400 text-xs">
+                      Admission: {student.admissionNumber}
+                    </p>
+                    {student.parentEmail && (
+                      <p className="text-gray-500 text-xs">{student.parentEmail}</p>
+                    )}
+                    <p className="text-gray-600 text-xs">{student.className}</p>
                   </div>
                   <button
-                    onClick={() => addStudent(student)}
-                    className="text-blue-400 hover:text-blue-300 p-1"
+                    onClick={() => handleRemoveStudent(student.id)}
+                    className="text-red-400 hover:text-red-300 p-1 ml-2"
+                    title="Remove student"
                   >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Assigned Students */}
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-4">
-            Assigned Students ({students.length})
-          </h3>
-          
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {students.length === 0 ? (
-              <p className="text-gray-500 text-sm">No students assigned yet</p>
-            ) : (
-              students.map(student => (
-                <div
-                  key={student.id}
-                  className="flex items-center justify-between p-3 bg-[rgba(34, 197, 94, 0.1)] border border-emerald-400/20 rounded-lg"
-                >
-                  <div className="flex-1">
-                    <p className="text-white text-sm font-medium">
-                      {student.firstName} {student.lastName}
-                    </p>
-                    <p className="text-gray-500 text-xs">{student.admissionNumber}</p>
-                  </div>
-                  <button
-                    onClick={() => removeStudent(student.id)}
-                    className="text-red-400 hover:text-red-300 p-1"
-                  >
-                    <Trash01 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               ))
@@ -253,12 +353,14 @@ export const Step6AssignStudents = ({
         </Button>
         <Button
           onClick={handleSubmit}
-          disabled={isLoading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          disabled={isLoading || students.length === 0}
+          className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
         >
-          {isLoading ? 'Saving...' : 'Next: Results CSV'}
+          {isLoading ? 'Saving...' : 'Next: Upload Results'}
         </Button>
       </div>
     </div>
   );
 };
+
+export default Step6AssignStudents;
