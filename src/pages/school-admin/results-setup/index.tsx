@@ -140,10 +140,11 @@ export const ResultsSetupWizard = () => {
                 skills: JSON.parse(session.psychomotorSkills || '[]'),
               };
             }
-            if (session.principalSignatureUrl || session.teacherSignatureUrl) {
+            if (session.principalSignatureUrl || session.principalName || session.staffData) {
               newState.step5Data = {
+                principalName: session.principalName,
                 principalSignatureUrl: session.principalSignatureUrl,
-                teacherSignatureUrl: session.teacherSignatureUrl,
+                staffData: JSON.parse(session.staffData || '[]'),
               };
             }
             if (session.assignedStudents) {

@@ -59,6 +59,33 @@ export class ResultsSetupService {
     });
   }
 
+  async updateStaffDataRealtime(schoolId: string, dataUpdate: any) {
+    const session = await prisma.resultsSetupSession.findUnique({
+      where: { schoolId },
+    });
+
+    if (!session) {
+      throw new NotFoundException('Results setup session not found');
+    }
+
+    // Only update the fields provided (real-time partial update)
+    const updateData: any = {};
+    if (dataUpdate.principalName !== undefined) {
+      updateData.principalName = dataUpdate.principalName;
+    }
+    if (dataUpdate.principalSignatureUrl !== undefined) {
+      updateData.principalSignatureUrl = dataUpdate.principalSignatureUrl;
+    }
+    if (dataUpdate.staffData !== undefined) {
+      updateData.staffData = dataUpdate.staffData;
+    }
+
+    return prisma.resultsSetupSession.update({
+      where: { schoolId },
+      data: updateData,
+    });
+  }
+
   async initializeSession(schoolId: string) {
     const existingSession = await prisma.resultsSetupSession.findUnique({
       where: { schoolId },

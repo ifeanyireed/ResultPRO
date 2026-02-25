@@ -336,6 +336,22 @@ export class OnboardingService {
   }
 
   /**
+   * Get all classes for a school
+   */
+  async getClasses(schoolId: string) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) throw new NotFoundException('School not found');
+
+    const classes = await this.classRepo.findBySchool(schoolId);
+    
+    return classes.map((c: any) => ({
+      id: c.id,
+      name: c.name,
+      level: c.level,
+    }));
+  }
+
+  /**
    * Step 4: Create subjects for classes
    */
   async createSubjects(schoolId: string, data: any) {

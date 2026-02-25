@@ -245,6 +245,39 @@ export class OnboardingController {
   }
 
   /**
+   * GET /api/onboarding/classes
+   * Get all classes for the school
+   */
+  static async getClasses(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      if (!schoolId) {
+        return res.status(401).json({
+          success: false,
+          error: 'Unauthorized',
+          code: 'UNAUTHORIZED',
+        });
+      }
+
+      const classes = await onboardingService.getClasses(schoolId);
+
+      res.json({
+        success: true,
+        data: {
+          classes,
+        },
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
    * POST /api/onboarding/step/4
    * Create subjects
    */

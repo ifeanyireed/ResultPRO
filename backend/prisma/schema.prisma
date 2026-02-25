@@ -90,8 +90,9 @@ model ResultsSetupSession {
   psychomotorSkills         String   @default("[]") @map("psychomotor_skills")  // JSON array of skill names
   
   // Step 5: Staff Uploads
+  principalName             String?  @map("principal_name")
   principalSignatureUrl     String?  @map("principal_signature_url")
-  teacherSignatureUrl       String?  @map("teacher_signature_url")
+  staffData                 String   @default("[]") @map("staff_data")  // JSON array of {classId, className, teacherName, teacherSignatureUrl}
   
   // Step 6: Assigned Students
   assignedStudents          String   @default("[]") @map("assigned_students")  // JSON array as string

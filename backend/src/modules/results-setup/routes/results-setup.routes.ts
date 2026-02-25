@@ -1,11 +1,29 @@
 import { Router } from 'express';
+import multer from 'multer';
 import { handleStep1 } from '../controllers/step1.controller';
 import { handleStep2 } from '../controllers/step2.controller';
 import { handleStep3 } from '../controllers/step3.controller';
 import { handleStep4 } from '../controllers/step4.controller';
+import { handleStep5, updateStaffData } from '../controllers/step5.controller';
+import { uploadSignature } from '../controllers/signature-upload.controller';
 import { getResultsSetupSession, initializeResultsSetup } from '../controllers/results-setup.controller';
+import { createSampleClasses } from '../controllers/debug.controller';
 
 const router = Router();
+
+// Configure multer for signature uploads
+const uploadSignatureMiddleware = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPEG, PNG, WebP, and GIF images are allowed for signatures'));
+    }
+  },
+});
 
 // GET /api/results-setup/session - Fetch current setup session
 router.get('/session', getResultsSetupSession);
@@ -25,15 +43,24 @@ router.post('/step/3', handleStep3);
 // POST /api/results-setup/step/4 - Handle step 4 (Psychomotor Domain)
 router.post('/step/4', handleStep4);
 
+// POST /api/results-setup/upload-signature - Upload signature to S3
+router.post('/upload-signature', uploadSignatureMiddleware.single('file'), uploadSignature);
+
+// PATCH /api/results-setup/staff-data - Real-time staff data update
+router.patch('/staff-data', updateStaffData);
+
+// POST /api/results-setup/step/5 - Handle step 5 (Staff Uploads)
+router.post('/step/5', handleStep5);
+
 // Placeholder for remaining steps - to be implemented
-router.post('/step/5', (req, res) => {
-  res.json({ success: true, message: 'Step 5 not yet implemented' });
-});
 router.post('/step/6', (req, res) => {
   res.json({ success: true, message: 'Step 6 not yet implemented' });
 });
 router.post('/step/7', (req, res) => {
   res.json({ success: true, message: 'Step 7 not yet implemented' });
 });
+
+// DEBUG ONLY - Create sample classes for testing (development only)
+router.post('/debug/create-sample-classes', createSampleClasses);
 
 export default router;

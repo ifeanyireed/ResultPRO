@@ -45,6 +45,9 @@ router.post('/step/2', OnboardingController.createAcademicSession);
 // Step 3: Create classes
 router.post('/step/3', OnboardingController.createClasses);
 
+// Get all classes for the school
+router.get('/classes', OnboardingController.getClasses);
+
 // Partial update classes (real-time database writes)
 router.patch('/classes', OnboardingController.partialUpdateClasses);
 
