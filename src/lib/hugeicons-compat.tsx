@@ -54,6 +54,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   Plus: LucideIcons.Plus,
   ShoppingCart: LucideIcons.ShoppingCart,
   Headphones: LucideIcons.Headphones,
+  Heart: LucideIcons.Heart,
   RotateCcw: LucideIcons.RotateCcw,
   Save: LucideIcons.Save,
   Search: LucideIcons.Search,
@@ -122,6 +123,7 @@ export const EyeOff = iconMap.EyeOff || LucideIcons.EyeOff;
 export const File = iconMap.File || LucideIcons.File;
 export const FileText = iconMap.FileText || LucideIcons.FileText;
 export const Filter = iconMap.Filter || LucideIcons.Filter;
+export const Heart = iconMap.Heart || LucideIcons.Heart;
 export const Info = iconMap.Info || LucideIcons.Info;
 export const GripVertical = iconMap.GripVertical || LucideIcons.GripVertical;
 export const LayoutDashboard = iconMap.LayoutDashboard || LucideIcons.LayoutDashboard;

@@ -55,6 +55,7 @@ import {
   BillingSubscription,
   Profile as SchoolAdminProfile,
   Notifications as SchoolAdminNotifications,
+  ResultsSetupWizard,
 } from "./pages/school-admin";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -118,6 +119,7 @@ const App = () => (
           <Route path="/school-admin/billing" element={<SchoolAdminLayout><BillingSubscription /></SchoolAdminLayout>} />
           <Route path="/school-admin/profile" element={<SchoolAdminLayout><SchoolAdminProfile /></SchoolAdminLayout>} />
           <Route path="/school-admin/notifications" element={<SchoolAdminLayout><SchoolAdminNotifications /></SchoolAdminLayout>} />
+          <Route path="/school-admin/results-setup" element={<ResultsSetupWizard />} />
           <Route path="/school-admin/school-rejected" element={<SchoolRejected />} />
           
           <Route path="/:schoolSlug/result-checker" element={<ResultChecker />} />
