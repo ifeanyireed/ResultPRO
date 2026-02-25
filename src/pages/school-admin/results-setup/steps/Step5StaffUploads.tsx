@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -50,6 +50,18 @@ export const Step5StaffUploads = ({
       classTeacherSignature: '',
     },
   });
+
+  // Update form when initialData changes (e.g., on page refresh when data loads from DB)
+  useEffect(() => {
+    if (initialData) {
+      setPrincipalSigUrl(initialData.principalSignatureUrl || null);
+      setClassTeacherSigUrl(initialData.teacherSignatureUrl || null);
+      form.reset({
+        principalSignature: initialData.principalSignatureUrl || '',
+        classTeacherSignature: initialData.teacherSignatureUrl || '',
+      });
+    }
+  }, [initialData, form]);
 
   const handleFileUpload = async (file: File, signatureType: 'principal' | 'classTeacher') => {
     try {

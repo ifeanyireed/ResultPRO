@@ -125,24 +125,19 @@ export const ResultsSetupWizard = () => {
                 termName: session.termName,
               };
             }
-            if (session.examType) {
+            if (session.examConfigComponents) {
               newState.step2Data = {
-                examType: session.examType,
-                examName: session.examName,
-                examDate: session.examDate,
-                totalScore: session.totalScore,
+                components: JSON.parse(session.examConfigComponents),
               };
             }
-            if (session.affectiveDomainTitle) {
+            if (session.affectiveTraits) {
               newState.step3Data = {
-                title: session.affectiveDomainTitle,
-                description: session.affectiveDomainDescription,
+                traits: JSON.parse(session.affectiveTraits || '[]'),
               };
             }
-            if (session.psychomotorDomainTitle) {
+            if (session.psychomotorSkills) {
               newState.step4Data = {
-                title: session.psychomotorDomainTitle,
-                description: session.psychomotorDomainDescription,
+                skills: JSON.parse(session.psychomotorSkills || '[]'),
               };
             }
             if (session.principalSignatureUrl || session.teacherSignatureUrl) {
@@ -267,7 +262,7 @@ export const ResultsSetupWizard = () => {
 
     switch (state.currentStep) {
       case 1:
-        return <Step1SelectSessionTerm {...stepProps} />;
+        return <Step1SelectSessionTerm {...stepProps} initialData={state.sessionTermData} />;
       case 2:
         return <Step2ExamConfig {...stepProps} initialData={state.step2Data} />;
       case 3:

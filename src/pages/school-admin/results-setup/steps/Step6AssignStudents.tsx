@@ -35,6 +35,13 @@ export const Step6AssignStudents = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loadingClasses, setLoadingClasses] = useState(true);
 
+  // Update students when initialData changes (e.g., on page refresh when data loads from DB)
+  useEffect(() => {
+    if (initialData?.assignedStudents && initialData.assignedStudents.length > 0) {
+      setStudents(initialData.assignedStudents);
+    }
+  }, [initialData?.assignedStudents]);
+
   // Fetch classes on mount
   useEffect(() => {
     const fetchClasses = async () => {

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
@@ -25,6 +25,14 @@ export const Step7ResultsCSV = ({
   const [preview, setPreview] = useState<any[]>([]);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Update CSV file when initialData changes (e.g., on page refresh when data loads from DB)
+  useEffect(() => {
+    if (initialData?.resultsFileUrl) {
+      // Just restore the URL - the actual file isn't stored, just the path
+      // You may want to fetch preview data here if needed
+    }
+  }, [initialData?.resultsFileUrl]);
 
   const downloadTemplate = async () => {
     try {

@@ -84,20 +84,42 @@ export const Step1SelectSessionTerm = ({
     fetchSessions();
   }, [toast]);
 
-  // Fetch terms when session changes
+  // Restore form when sessions are loaded AND initialData is available
+  useEffect(() => {
+    if (initialData?.sessionId && initialData?.termId && sessions.length > 0 && !loadingSessions) {
+      // Find and set terms for the loaded session
+      const selectedSession = sessions.find(s => s.id === initialData.sessionId);
+      if (selectedSession?.terms) {
+        setTerms(selectedSession.terms);
+      }
+      
+      // Reset form with restored values
+      form.reset({
+        sessionId: initialData.sessionId,
+        termId: initialData.termId,
+      });
+    }
+  }, [initialData?.sessionId, initialData?.termId, sessions, loadingSessions, form]);
+
+  // Fetch terms when session changes (but don't interfere with restoration)
   const selectedSessionId = form.watch('sessionId');
   useEffect(() => {
-    if (selectedSessionId) {
-      // Find the selected session and get its terms
+    // Skip if we're in the middle of restoring from DB
+    if (initialData?.sessionId && initialData?.termId) {
+      return;
+    }
+    
+    if (selectedSessionId && sessions.length > 0) {
       const selectedSession = sessions.find(s => s.id === selectedSessionId);
       if (selectedSession?.terms) {
         setTerms(selectedSession.terms);
       } else {
         setTerms([]);
       }
-      form.setValue('termId', ''); // Reset term when session changes
+      // Reset term when session changes (only if not restoring)
+      form.setValue('termId', '');
     }
-  }, [selectedSessionId, sessions, form]);
+  }, [selectedSessionId, sessions, form, initialData?.sessionId, initialData?.termId]);
 
   const onSubmit = async (data: Step1FormData) => {
     try {
