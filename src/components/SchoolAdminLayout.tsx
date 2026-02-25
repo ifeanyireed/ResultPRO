@@ -18,8 +18,6 @@ import {
   User,
   Bell,
   LogOut,
-  ChevronLeft,
-  ChevronRight,
   Zap,
 } from '@hugeicons/react';
 
@@ -33,9 +31,7 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [schoolName, setSchoolName] = useState<string>('');
   const [schoolMotto, setSchoolMotto] = useState<string>('');
-  const [navPage, setNavPage] = useState(1);
   const navigate = useNavigate();
-  const ITEMS_PER_PAGE = 9;
 
   // Load school info
   useEffect(() => {
@@ -102,6 +98,7 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const navItems: NavItem[] = [
     { label: 'Overview', icon: LayoutDashboard, href: '/school-admin/overview' },
+    { label: 'Results Setup', icon: Zap, href: '/school-admin/results-setup' },
     { label: 'Sessions', icon: Calendar, href: '/school-admin/sessions' },
     { label: 'Classes', icon: BookOpen, href: '/school-admin/classes' },
     { label: 'Subjects', icon: Layers, href: '/school-admin/subjects' },
@@ -110,8 +107,6 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
     { label: 'CSV Preview', icon: ClipboardList, href: '/school-admin/csv-preview' },
     { label: 'Students', icon: Users, href: '/school-admin/students' },
     { label: 'Results Entry', icon: PieChart01, href: '/school-admin/results-entry' },
-    // Page 2
-    { label: 'Results Setup', icon: Zap, href: '/school-admin/results-setup' },
     { label: 'Bulk Results', icon: Upload01, href: '/school-admin/bulk-results' },
     { label: 'Publishing', icon: Mail, href: '/school-admin/publishing' },
     { label: 'Analytics', icon: BarChart01, href: '/school-admin/analytics' },
@@ -123,24 +118,6 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
   ];
 
   const isActive = (href: string) => window.location.pathname === href;
-
-  // Pagination logic
-  const totalPages = Math.ceil(navItems.length / ITEMS_PER_PAGE);
-  const startIdx = (navPage - 1) * ITEMS_PER_PAGE;
-  const endIdx = startIdx + ITEMS_PER_PAGE;
-  const pageItems = navItems.slice(startIdx, endIdx);
-
-  const handleNextPage = () => {
-    if (navPage < totalPages) {
-      setNavPage(navPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (navPage > 1) {
-      setNavPage(navPage - 1);
-    }
-  };
 
   return (
     <div className="w-full bg-black text-white min-h-screen flex flex-col relative">
@@ -237,66 +214,30 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
         background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.2) 100%)'
       }}>
         <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <div className="flex items-center justify-center gap-2 py-4">
-            {/* Previous Page Button */}
-            <button
-              onClick={handlePrevPage}
-              disabled={navPage === 1}
-              className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 ${
-                navPage === 1
-                  ? 'text-gray-600 bg-transparent border border-gray-700 cursor-not-allowed'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
-              }`}
-              title="Previous"
-            >
-              <ChevronLeft size={24} strokeWidth={1.5} />
-            </button>
-
-            {/* Navigation Items */}
-            <div className="flex items-center justify-center gap-2 flex-wrap flex-1">
-              {pageItems.map((item) => {
-                const Icon = item.icon;
-                const active = isActive(item.href);
-                return (
-                  <div key={item.href} className="relative">
-                    <Link
-                      to={item.href}
-                      onMouseEnter={() => setHoveredItem(item.href)}
-                      onMouseLeave={() => setHoveredItem(null)}
-                      className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 ${
-                        active
-                          ? 'text-white bg-white/15 border border-white/30 shadow-lg shadow-blue-500/20'
-                          : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
-                      }`}
-                    >
-                      <Icon size={24} strokeWidth={1.5} />
-                    </Link>
-                    {hoveredItem === item.href && (
-                      <div className="nav-tooltip">{item.label}</div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Next Page Button */}
-            <button
-              onClick={handleNextPage}
-              disabled={navPage === totalPages}
-              className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 ${
-                navPage === totalPages
-                  ? 'text-gray-600 bg-transparent border border-gray-700 cursor-not-allowed'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
-              }`}
-              title="Next"
-            >
-              <ChevronRight size={24} strokeWidth={1.5} />
-            </button>
-
-            {/* Page Indicator */}
-            <div className="ml-4 text-xs text-gray-500 font-medium whitespace-nowrap">
-              {navPage} / {totalPages}
-            </div>
+          <div className="flex items-center justify-center gap-2 py-4 flex-wrap">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(item.href);
+              return (
+                <div key={item.href} className="relative">
+                  <Link
+                    to={item.href}
+                    onMouseEnter={() => setHoveredItem(item.href)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 ${
+                      active
+                        ? 'text-white bg-white/15 border border-white/30 shadow-lg shadow-blue-500/20'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    }`}
+                  >
+                    <Icon size={24} strokeWidth={1.5} />
+                  </Link>
+                  {hoveredItem === item.href && (
+                    <div className="nav-tooltip">{item.label}</div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
