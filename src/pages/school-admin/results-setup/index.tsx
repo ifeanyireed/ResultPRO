@@ -196,13 +196,25 @@ export const ResultsSetupWizard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      <ResultsSetupStepIndicator
-        currentStep={state.currentStep}
-        completedSteps={state.completedSteps}
-        totalSteps={7}
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+      {/* Background Image */}
+      <img
+        src="/Hero.png"
+        className="absolute h-full w-full object-cover inset-0"
+        alt="Background"
       />
-      {renderStep()}
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      
+      {/* Content */}
+      <div className="relative z-10">
+        <ResultsSetupStepIndicator
+          currentStep={state.currentStep}
+          completedSteps={state.completedSteps}
+          totalSteps={7}
+        />
+        {renderStep()}
+      </div>
     </div>
   );
 };
