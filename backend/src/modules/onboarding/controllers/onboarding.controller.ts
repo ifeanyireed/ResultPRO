@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { onboardingService } from '../services/onboarding.service';
+import { prisma } from '@config/database';
 
 export class OnboardingController {
   /**

@@ -20,6 +20,7 @@ interface ResultsSetupState {
   completedSteps: number[];
   isLoading: boolean;
   error: string | null;
+  schoolName: string | null;
   sessionTermData: any;
   step2Data: any;
   step3Data: any;
@@ -37,6 +38,7 @@ export const ResultsSetupWizard = () => {
     completedSteps: [],
     isLoading: false,
     error: null,
+    schoolName: null,
     sessionTermData: null,
     step2Data: null,
     step3Data: null,
@@ -71,6 +73,11 @@ export const ResultsSetupWizard = () => {
           }
         );
 
+        // Store school name
+        if (schoolRes.data.data?.name) {
+          updateState({ schoolName: schoolRes.data.data.name });
+        }
+
         if (schoolRes.data.data?.currentOnboardingStep && schoolRes.data.data.currentOnboardingStep < 6) {
           toast({
             title: 'Incomplete Onboarding',
@@ -78,6 +85,89 @@ export const ResultsSetupWizard = () => {
           });
           navigate('/school-admin/onboarding', { replace: true });
           return;
+        }
+
+        // Check if results setup is already complete
+        if (schoolRes.data.data?.resultsSetupStatus === 'COMPLETE') {
+          navigate('/school-admin/overview', { replace: true });
+          return;
+        }
+
+        // Fetch existing results setup session if available
+        try {
+          const setupRes = await axios.get(
+            `${API_BASE}/results-setup/session`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          if (setupRes.data.data) {
+            const session = setupRes.data.data;
+            const completedSteps = JSON.parse(session.completedSteps || '[]');
+            
+            // Set current step to the next incomplete step
+            const nextStep = completedSteps.length > 0 
+              ? Math.max(...completedSteps) + 1 
+              : 1;
+
+            // Restore all step data
+            const newState: any = {
+              currentStep: nextStep > 7 ? 7 : nextStep,
+              completedSteps: completedSteps,
+            };
+
+            if (session.sessionId) {
+              newState.sessionTermData = {
+                sessionId: session.sessionId,
+                sessionName: session.sessionName,
+                termId: session.termId,
+                termName: session.termName,
+              };
+            }
+            if (session.examType) {
+              newState.step2Data = {
+                examType: session.examType,
+                examName: session.examName,
+                examDate: session.examDate,
+                totalScore: session.totalScore,
+              };
+            }
+            if (session.affectiveDomainTitle) {
+              newState.step3Data = {
+                title: session.affectiveDomainTitle,
+                description: session.affectiveDomainDescription,
+              };
+            }
+            if (session.psychomotorDomainTitle) {
+              newState.step4Data = {
+                title: session.psychomotorDomainTitle,
+                description: session.psychomotorDomainDescription,
+              };
+            }
+            if (session.principalSignatureUrl || session.teacherSignatureUrl) {
+              newState.step5Data = {
+                principalSignatureUrl: session.principalSignatureUrl,
+                teacherSignatureUrl: session.teacherSignatureUrl,
+              };
+            }
+            if (session.assignedStudents) {
+              newState.step6Data = {
+                assignedStudents: JSON.parse(session.assignedStudents || '[]'),
+              };
+            }
+            if (session.resultsFileUrl) {
+              newState.step7Data = {
+                resultsFileUrl: session.resultsFileUrl,
+                resultsFileName: session.resultsFileName,
+              };
+            }
+
+            updateState(newState);
+          }
+        } catch (error: any) {
+          // Session doesn't exist yet - start fresh
+          console.log('No existing results setup session found, starting fresh');
         }
       } catch (error) {
         console.error('Setup status check error:', error);
@@ -196,25 +286,71 @@ export const ResultsSetupWizard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
-      {/* Background Image */}
-      <img
-        src="/Hero.png"
-        className="absolute h-full w-full object-cover inset-0"
-        alt="Background"
-      />
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
-      
-      {/* Content */}
-      <div className="relative z-10">
-        <ResultsSetupStepIndicator
-          currentStep={state.currentStep}
-          completedSteps={state.completedSteps}
-          totalSteps={7}
+    <div className="w-full text-white min-h-screen flex flex-col">
+      {/* Fixed Background Image */}
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <img
+          src="/Hero.png"
+          className="w-full h-full object-cover object-center"
+          alt="Background"
         />
-        {renderStep()}
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
       </div>
+
+      {/* Sticky Header & Step Indicator */}
+      <div className="sticky top-0 z-40 px-4 md:px-12 lg:px-20 pt-4 pb-1 bg-gradient-to-b from-black via-black/60 to-transparent backdrop-blur-lg">
+        <div className="w-full max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="mb-4 pb-2">
+            <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
+              Results Setup Wizard
+            </h1>
+            <div className="flex items-center justify-between">
+              <p className="text-gray-400 text-sm">
+                Configure exam parameters and upload results data
+              </p>
+              {state.schoolName && (
+                <p className="text-gray-400 text-sm">
+                  {state.schoolName}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Step Indicator */}
+          <ResultsSetupStepIndicator
+            currentStep={state.currentStep}
+            completedSteps={state.completedSteps}
+            totalSteps={7}
+          />
+        </div>
+      </div>
+
+      {/* Scrolling Section */}
+      <section className="relative w-full flex flex-col px-4 md:px-12 lg:px-20 pb-12">
+        {/* Content Container */}
+        <div className="w-full max-w-5xl mx-auto pt-4">
+
+          {/* Steps - Glass Morphism Card - Visible Before Scroll */}
+          <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] border border-[rgba(255,255,255,0.07)] backdrop-blur-xl shadow-2xl p-8 mb-8">
+            {renderStep()}
+          </div>
+
+          {/* Error Message */}
+          {state.error && (
+            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-[15px] text-red-400 text-sm mb-8">
+              {state.error}
+            </div>
+          )}
+
+          {/* Footer */}
+          <div className="text-center text-sm text-gray-500 py-8">
+            <p>
+              Questions? Contact support@resultspro.ng
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

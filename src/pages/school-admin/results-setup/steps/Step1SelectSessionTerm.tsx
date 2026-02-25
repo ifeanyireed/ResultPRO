@@ -54,10 +54,22 @@ export const Step1SelectSessionTerm = ({
     const fetchSessions = async () => {
       try {
         const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
-        const response = await axios.get('http://localhost:5000/api/onboarding/sessions', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSessions(response.data.data?.sessions || []);
+        const schoolId = localStorage.getItem('schoolId');
+        
+        if (!schoolId) {
+          throw new Error('School ID not found');
+        }
+
+        const response = await axios.get(
+          `http://localhost:5000/api/onboarding/school/${schoolId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        
+        // Extract academic sessions from school data
+        const academicSessions = response.data.data?.academicSessions || [];
+        setSessions(academicSessions);
       } catch (error) {
         console.error('Failed to fetch sessions:', error);
         toast({
@@ -76,29 +88,16 @@ export const Step1SelectSessionTerm = ({
   const selectedSessionId = form.watch('sessionId');
   useEffect(() => {
     if (selectedSessionId) {
-      const fetchTerms = async () => {
-        try {
-          const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
-          const response = await axios.get(
-            `http://localhost:5000/api/onboarding/sessions/${selectedSessionId}/terms`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
-          setTerms(response.data.data?.terms || []);
-          form.setValue('termId', ''); // Reset term when session changes
-        } catch (error) {
-          console.error('Failed to fetch terms:', error);
-          toast({
-            title: 'Error',
-            description: 'Failed to load terms',
-            variant: 'destructive',
-          });
-        }
-      };
-      fetchTerms();
+      // Find the selected session and get its terms
+      const selectedSession = sessions.find(s => s.id === selectedSessionId);
+      if (selectedSession?.terms) {
+        setTerms(selectedSession.terms);
+      } else {
+        setTerms([]);
+      }
+      form.setValue('termId', ''); // Reset term when session changes
     }
-  }, [selectedSessionId, form, toast]);
+  }, [selectedSessionId, sessions, form]);
 
   const onSubmit = async (data: Step1FormData) => {
     try {
@@ -145,102 +144,112 @@ export const Step1SelectSessionTerm = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="rounded-lg bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-[rgba(255,255,255,0.05)] p-8 space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Select Session & Term
-              </h2>
-              <p className="text-gray-400 text-sm">
-                Choose the academic session and term for which you're setting up results
-              </p>
-            </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            Select Session & Term
+          </h2>
+          <p className="text-gray-400 text-sm">
+            Choose the academic session and term for which you're setting up results
+          </p>
+        </div>
 
-            {submitError && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-                <p className="text-red-400 text-sm">{submitError}</p>
-              </div>
+        {submitError && (
+          <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
+            <p className="text-red-400 text-sm">{submitError}</p>
+          </div>
+        )}
+
+        <div className="space-y-6">
+          <FormField
+            control={form.control}
+            name="sessionId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-300">Academic Session *</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    disabled={loadingSessions}
+                    className="w-full px-4 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white rounded-lg focus:outline-none focus:border-blue-400 disabled:opacity-50 appearance-none"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 0.75rem center',
+                      backgroundSize: '16px 12px',
+                      paddingRight: '2.5rem',
+                    }}
+                  >
+                    <option value="" style={{ backgroundColor: '#1f2937', color: '#ffffff' }}>Select a session...</option>
+                    {sessions.map((session) => (
+                      <option key={session.id} value={session.id} style={{ backgroundColor: '#1f2937', color: '#ffffff' }}>
+                        {session.name}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
             )}
+          />
 
-            <div className="space-y-6">
-              <FormField
-                control={form.control}
-                name="sessionId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-300">Academic Session *</FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        disabled={loadingSessions}
-                        className="w-full px-4 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white rounded-lg focus:outline-none focus:border-blue-400 disabled:opacity-50"
-                      >
-                        <option value="">Select a session...</option>
-                        {sessions.map((session) => (
-                          <option key={session.id} value={session.id}>
-                            {session.name}
-                          </option>
-                        ))}
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <FormField
+            control={form.control}
+            name="termId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-gray-300">Term *</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    disabled={!selectedSessionId || terms.length === 0}
+                    className="w-full px-4 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white rounded-lg focus:outline-none focus:border-blue-400 disabled:opacity-50 appearance-none"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e")`,
+                      backgroundRepeat: 'no-repeat',
+                      backgroundPosition: 'right 0.75rem center',
+                      backgroundSize: '16px 12px',
+                      paddingRight: '2.5rem',
+                    }}
+                  >
+                    <option value="" style={{ backgroundColor: '#1f2937', color: '#ffffff' }}>Select a term...</option>
+                    {terms.map((term) => (
+                      <option key={term.id} value={term.id} style={{ backgroundColor: '#1f2937', color: '#ffffff' }}>
+                        {term.name}
+                      </option>
+                    ))}
+                  </select>
+                </FormControl>
+                <FormDescription className="text-gray-500 text-xs">
+                  {selectedSessionId && terms.length === 0 ? 'No terms available for this session' : ''}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-              <FormField
-                control={form.control}
-                name="termId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-300">Term *</FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        disabled={!selectedSessionId || terms.length === 0}
-                        className="w-full px-4 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(255,255,255,0.1)] text-white rounded-lg focus:outline-none focus:border-blue-400 disabled:opacity-50"
-                      >
-                        <option value="">Select a term...</option>
-                        {terms.map((term) => (
-                          <option key={term.id} value={term.id}>
-                            {term.name || `Term ${term.termNumber}`}
-                          </option>
-                        ))}
-                      </select>
-                    </FormControl>
-                    <FormDescription className="text-gray-500 text-xs">
-                      {selectedSessionId && terms.length === 0 ? 'No terms available for this session' : ''}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="border-t border-[rgba(255,255,255,0.07)] pt-8 flex gap-4 justify-between">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onPrevious}
-                disabled={isLoading}
-                className="bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
-              >
-                Back
-              </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                {isLoading ? 'Saving...' : 'Next: Exam Config'}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+        {/* Action Buttons */}
+        <div className="border-t border-[rgba(255,255,255,0.07)] pt-8 flex gap-4 justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onPrevious}
+            disabled={isLoading}
+            className="bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
+          >
+            Back
+          </Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {isLoading ? 'Saving...' : 'Next: Exam Config'}
+          </Button>
+        </div>
+      </form>
+    </Form>
   );
 };

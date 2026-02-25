@@ -57,6 +57,10 @@ export async function createApp(): Promise<Express> {
   const csvRoutes = await import('@modules/onboarding/routes/csv.routes');
   app.use('/api/csv', authMiddleware, csvRoutes.default);
 
+  // Results Setup routes (protected)
+  const resultsSetupRoutes = await import('@modules/results-setup/routes/results-setup.routes');
+  app.use('/api/results-setup', authMiddleware, resultsSetupRoutes.default);
+
   // Payment routes
   const paymentRoutes = await import('@modules/payment/routes/payment.routes');
   app.use('/api/payment', paymentRoutes.default);

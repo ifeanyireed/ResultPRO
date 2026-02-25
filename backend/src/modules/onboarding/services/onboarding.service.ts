@@ -53,6 +53,30 @@ export class OnboardingService {
         subscriptionEndDate: true,
         maxStudents: true,
         maxTeachers: true,
+        academicSessions: {
+          select: {
+            id: true,
+            name: true,
+            startDate: true,
+            endDate: true,
+            isActive: true,
+            terms: {
+              select: {
+                id: true,
+                name: true,
+                startDate: true,
+                endDate: true,
+                isActive: true,
+              },
+              orderBy: {
+                name: 'asc',
+              },
+            },
+          },
+          orderBy: {
+            startDate: 'desc',
+          },
+        },
       },
     });
     if (!school) throw new NotFoundException('School not found');

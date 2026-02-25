@@ -60,10 +60,56 @@ model School {
   onboardingState OnboardingState[]
   payments Payment[]
   subscriptions Subscription[]
+  resultsSetupSession ResultsSetupSession?
 
   @@index([status])
   @@index([verificationStatus])
   @@map("schools")
+}
+
+model ResultsSetupSession {
+  id                        String   @id @default(cuid())
+  schoolId                  String   @unique @map("school_id")
+  currentStep               Int      @default(1) @map("current_step")
+  completedSteps            String   @default("[]") @map("completed_steps")  // JSON array as string
+  
+  // Step 1: Session & Term
+  sessionId                 String?  @map("session_id")
+  termId                    String?  @map("term_id")
+  sessionName               String?  @map("session_name")
+  termName                  String?  @map("term_name")
+  
+  // Step 2: Exam Config
+  examType                  String?  @map("exam_type")
+  examName                  String?  @map("exam_name")
+  examDate                  DateTime? @map("exam_date")
+  totalScore                Float?   @map("total_score")
+  
+  // Step 3: Affective Domain
+  affectiveDomainTitle      String?  @map("affective_domain_title")
+  affectiveDomainDescription String? @map("affective_domain_description")
+  
+  // Step 4: Psychomotor Domain
+  psychomotorDomainTitle    String?  @map("psychomotor_domain_title")
+  psychomotorDomainDescription String? @map("psychomotor_domain_description")
+  
+  // Step 5: Staff Uploads
+  principalSignatureUrl     String?  @map("principal_signature_url")
+  teacherSignatureUrl       String?  @map("teacher_signature_url")
+  
+  // Step 6: Assigned Students
+  assignedStudents          String   @default("[]") @map("assigned_students")  // JSON array as string
+  
+  // Step 7: Results CSV
+  resultsFileUrl            String?  @map("results_file_url")
+  resultsFileName           String?  @map("results_file_name")
+  
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+  
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  @@map("results_setup_sessions")
 }
 
 model SchoolAdminUser {

@@ -84,10 +84,8 @@ export const Step4PsychomotorDomain = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 pt-8">
-      <div className="max-w-2xl mx-auto px-4">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="rounded-lg bg-[rgba(255,255,255,0.02)] backdrop-blur-xl border border-[rgba(255,255,255,0.05)] p-8 space-y-8">
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-white mb-2">
                 Psychomotor Domain
@@ -162,7 +160,5 @@ export const Step4PsychomotorDomain = ({
             </div>
           </form>
         </Form>
-      </div>
-    </div>
-  );
+      );
 };
