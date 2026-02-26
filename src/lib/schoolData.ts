@@ -64,6 +64,12 @@ export interface SchoolResult {
     principal?: string;
     classTeacher?: string;
   };
+  staffInfo?: {
+    principalName?: string;
+    classTeacherName?: string;
+    principalSignature?: string;
+    classTeacherSignature?: string;
+  };
   totalObtainable?: number;
 }
 

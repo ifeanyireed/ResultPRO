@@ -448,6 +448,53 @@ export const Step7ResultsCSV = ({
       );
       const schoolData = schoolRes.data.data;
 
+      // Fetch results setup session to get principal and teacher details with signatures
+      let staffInfo: any = {
+        principalName: schoolData?.contactPersonName || 'Principal',
+        classTeacherName: 'Class Teacher',
+      };
+      
+      try {
+        const sessionRes = await axios.get(
+          `http://localhost:5000/api/results-setup/session`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const sessionData = sessionRes.data.data;
+        
+        if (sessionData) {
+          // Get principal info from session
+          if (sessionData.principalName) {
+            staffInfo.principalName = sessionData.principalName;
+          }
+          if (sessionData.principalSignatureUrl) {
+            staffInfo.principalSignature = sessionData.principalSignatureUrl;
+          }
+          
+          // Get class teacher info from session staff data
+          if (sessionData.staffData) {
+            try {
+              const staffDataArray = typeof sessionData.staffData === 'string' 
+                ? JSON.parse(sessionData.staffData)
+                : sessionData.staffData;
+              
+              if (Array.isArray(staffDataArray) && staffDataArray.length > 0) {
+                const firstTeacher = staffDataArray[0];
+                if (firstTeacher.teacherName) {
+                  staffInfo.classTeacherName = firstTeacher.teacherName;
+                }
+                if (firstTeacher.teacherSignatureUrl) {
+                  staffInfo.classTeacherSignature = firstTeacher.teacherSignatureUrl;
+                }
+              }
+            } catch (parseErr) {
+              console.warn('Could not parse staff data:', parseErr);
+            }
+          }
+        }
+      } catch (sessionErr) {
+        console.warn('Could not fetch results setup session:', sessionErr);
+      }
+
       // Fetch fresh logo URL
       let freshLogoUrl = schoolData?.logoUrl || schoolData?.logo;
       try {
@@ -606,6 +653,7 @@ export const Step7ResultsCSV = ({
             principal: principalComments,
             classTeacher: classTeacherComments,
           },
+          staffInfo: staffInfo,
         } as SchoolResult);
       }
 

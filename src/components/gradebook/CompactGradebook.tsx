@@ -217,10 +217,12 @@ export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, resu
               <div style={{ marginTop: '0', fontSize: '8px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '2mm', paddingRight: '0' }}>
                 <div>
                   <div style={{ fontSize: '8px', fontWeight: 'bold' }}>TEACHER'S NAME:</div>
-                  <div style={{ fontSize: '8px' }}>Mrs. Okafor</div>
+                  <div style={{ fontSize: '8px' }}>{result.staffInfo?.classTeacherName || 'Teacher'}</div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '14mm', height: '7mm', marginLeft: 'auto' }}>
-                  <img src="/signature.png" alt="Teacher Signature" style={{ maxHeight: '7mm', maxWidth: '14mm', objectFit: 'contain' }} />
+                  {result.staffInfo?.classTeacherSignature && 
+                    <img src={result.staffInfo.classTeacherSignature} alt="Teacher Signature" style={{ maxHeight: '7mm', maxWidth: '14mm', objectFit: 'contain' }} />
+                  }
                 </div>
               </div>
             </div>
@@ -236,10 +238,12 @@ export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, resu
               <div style={{ marginTop: '0', fontSize: '8px', width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: '2mm', paddingRight: '0' }}>
                 <div>
                   <div style={{ fontSize: '8px', fontWeight: 'bold' }}>PRINCIPAL'S NAME:</div>
-                  <div style={{ fontSize: '8px' }}>Ajayi Crowder</div>
+                  <div style={{ fontSize: '8px' }}>{result.staffInfo?.principalName || 'Principal'}</div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minWidth: '14mm', height: '7mm', marginLeft: 'auto' }}>
-                  <img src="/signature.png" alt="Principal Signature" style={{ maxHeight: '7mm', maxWidth: '14mm', objectFit: 'contain' }} />
+                  {result.staffInfo?.principalSignature &&
+                    <img src={result.staffInfo.principalSignature} alt="Principal Signature" style={{ maxHeight: '7mm', maxWidth: '14mm', objectFit: 'contain' }} />
+                  }
                 </div>
               </div>
             </div>
