@@ -316,6 +316,14 @@ model StudentResult {
   // Subject results - stored as JSON string: { "English": { ca1, ca2, project, exam, total, grade, classAverage, positionInClass, remark } }
   subjectResults        String   @map("subject_results")
 
+  // Student personal info from CSV
+  sex                   String?
+  dateOfBirth           String?  @map("date_of_birth")
+  age                   Int?
+  height                String?
+  weight                String?
+  favouriteColor        String?  @map("favourite_color")
+
   // Attendance
   daysPresent           Int      @map("days_present")
   daysSchoolOpen        Int      @map("days_school_open")

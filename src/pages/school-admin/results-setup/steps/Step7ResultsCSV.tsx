@@ -301,6 +301,97 @@ export const Step7ResultsCSV = ({
     }
   };
 
+  // Parse CSV into structured data
+  const parseCSVComplete = async (file: File) => {
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+      
+      if (lines.length < 4) {
+        throw new Error('CSV must have headers and at least one data row');
+      }
+
+      // Parse header rows (lines 0-1) and skip example row (line 2)
+      const mainHeaders = lines[0]
+        .split(',')
+        .map(h => h.replace(/"/g, '').trim());
+      
+      const subHeaders = lines[1]
+        .split(',')
+        .map(h => h.replace(/"/g, '').trim());
+
+      // Extract data rows (skip header, sub-header, and example row)
+      const dataRows = lines.slice(3).map(line =>
+        line.split(',').map(cell => cell.replace(/"/g, '').trim())
+      );
+
+      console.log('📊 CSV Parsed:');
+      console.log('  Main Headers:', mainHeaders);
+      console.log('  Sub Headers:', subHeaders);
+      console.log('  Data rows:', dataRows.length);
+
+      // Map subject positions (assume they start after favorite color - column 8)
+      // Each subject takes 4 columns (CA1, CA2, Project, Exam)
+      const subjectStartCol = 9;
+      const subjectEndCol = subjectStartCol + (subjects.length * 4);
+      
+      const subjectMap: Record<string, number> = {};
+      for (let i = 0; i < subjects.length; i++) {
+        subjectMap[subjects[i]] = subjectStartCol + (i * 4);
+      }
+
+      console.log('📚 Subject map:', subjectMap);
+
+      // Find affective traits start position
+      const affectiveStartIdx = mainHeaders.findIndex(h => h === 'Affective Domains');
+      const psychomotorStartIdx = mainHeaders.findIndex(h => h === 'Psychomotor Domains');
+      const commentsStartIdx = mainHeaders.findIndex(h => h === 'Comments');
+
+      console.log('📍 Section positions:', {
+        affective: affectiveStartIdx,
+        psychomotor: psychomotorStartIdx,
+        comments: commentsStartIdx,
+      });
+
+      // Extract affective traits from sub-headers between Affective and Psychomotor
+      const affectiveDomainTraits: Record<string, number> = {};
+      if (affectiveStartIdx >= 0 && psychomotorStartIdx > affectiveStartIdx) {
+        for (let col = affectiveStartIdx + 1; col < psychomotorStartIdx; col++) {
+          const trait = subHeaders[col];
+          if (trait && trait !== '' && trait !== 'Psychomotor Domains') {
+            affectiveDomainTraits[trait] = col;
+          }
+        }
+      }
+
+      // Extract psychomotor skills from sub-headers between Psychomotor and Comments
+      const psychomotorDomainSkills: Record<string, number> = {};
+      if (psychomotorStartIdx >= 0 && commentsStartIdx > psychomotorStartIdx) {
+        for (let col = psychomotorStartIdx + 1; col < commentsStartIdx; col++) {
+          const skill = subHeaders[col];
+          if (skill && skill !== '' && skill !== 'Comments' && skill !== 'Principal Comments' && skill !== 'Form Tutor Comments') {
+            psychomotorDomainSkills[skill] = col;
+          }
+        }
+      }
+
+      console.log('💁 Affective Traits:', affectiveDomainTraits);
+      console.log('🤸 Psychomotor Skills:', psychomotorDomainSkills);
+
+      return {
+        mainHeaders,
+        subHeaders,
+        dataRows,
+        subjectMap,
+        affectiveDomainTraits,
+        psychomotorDomainSkills,
+      };
+    } catch (error) {
+      console.error('CSV parsing error:', error);
+      throw error;
+    }
+  };
+
   const handleFileSelect = async (file: File) => {
     try {
       setCsvFile(file);
@@ -345,6 +436,146 @@ export const Step7ResultsCSV = ({
       setUploading(true);
       const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
 
+      // Parse CSV on frontend with full data extraction
+      const parsed = await parseCSVComplete(csvFile);
+      const { mainHeaders, subHeaders, dataRows, subjectMap, affectiveDomainTraits, psychomotorDomainSkills } = parsed;
+
+      // Fetch school data for gradebook
+      const schoolId = localStorage.getItem('schoolId');
+      const schoolRes = await axios.get(
+        `http://localhost:5000/api/onboarding/school/${schoolId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      const schoolData = schoolRes.data.data;
+
+      // Fetch fresh logo URL
+      let freshLogoUrl = schoolData?.logoUrl || schoolData?.logo;
+      try {
+        const logoRes = await axios.get(
+          'http://localhost:5000/api/results-setup/fresh-logo',
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        freshLogoUrl = logoRes.data.data?.logoUrl || freshLogoUrl;
+      } catch (logoErr) {
+        console.warn('Could not fetch fresh logo URL');
+      }
+
+      // Map to School format
+      const schoolFormatted: School = {
+        slug: schoolData.slug || 'school',
+        name: schoolData.name,
+        motto: schoolData.motto || '',
+        logo: freshLogoUrl || undefined,
+        logoEmoji: schoolData.logoEmoji,
+        primaryColor: schoolData.primaryColor || '#1e40af',
+        secondaryColor: schoolData.secondaryColor || '#475569',
+        accentColor: schoolData.accentColor || '#3b82f6',
+        contactEmail: schoolData.contactEmail,
+        contactPhone: schoolData.contactPhone,
+        contactEmail2: schoolData.altContactEmail,
+        contactPhone2: schoolData.altContactPhone,
+        fullAddress: schoolData.fullAddress,
+      };
+      
+      setSchool(schoolFormatted);
+
+      // Get template
+      const defaultTemplate = getTemplate('standard');
+      setTemplate(defaultTemplate);
+
+      // Get session data
+      const sessionId = sessionTermData?.sessionId || localStorage.getItem('sessionId');
+      const termId = sessionTermData?.termId || localStorage.getItem('termId');
+      
+      if (!sessionId || !termId) {
+        throw new Error('Session or Term data missing. Please complete Step 1 first.');
+      }
+
+      const selectedClassObj = classes.find(c => c.id === selectedClass);
+      const sessionData = sessionTermData ? {
+        sessionName: sessionTermData.sessionName || 'Session',
+        termName: sessionTermData.termName || 'Term 1',
+      } : { sessionName: 'Session', termName: 'Term 1' };
+
+      // Parse CSV data rows into gradebook format
+      console.log('🎓 Building gradebooks from parsed CSV...');
+      const gradebookPreviews: SchoolResult[] = [];
+
+      for (const row of dataRows) {
+        // Skip empty rows
+        if (!row[0] || !row[0].trim()) continue;
+
+        const admissionNumber = row[0].trim();
+        const studentName = row[1]?.trim() || 'N/A';
+        const daysPresent = parseInt(row[2] || '0') || 0;
+        const sex = row[3]?.trim() || 'M';
+        const dateOfBirth = row[4]?.trim() || '-';
+        const age = parseInt(row[5] || '0') || 16;
+        const height = row[6]?.trim() || '-';
+        const weight = row[7]?.trim() || '-';
+        const favouriteColor = row[8]?.trim() || '-';
+
+        console.log(`\n📌 Processing student: ${studentName} (${admissionNumber})`);
+
+        // Extract subject scores
+        const subjectResults: any[] = [];
+        for (const subject of subjects) {
+          const colPos = subjectMap[subject];
+          if (colPos !== undefined) {
+            const ca1 = parseInt(row[colPos] || '0') || 0;
+            const ca2 = parseInt(row[colPos + 1] || '0') || 0;
+            const project = parseInt(row[colPos + 2] || '0') || 0;
+            const exam = parseInt(row[colPos + 3] || '0') || 0;
+            const total = ca1 + ca2 + project + exam;
+
+            console.log(`  ${subject}: CA1=${ca1}, CA2=${ca2}, Project=${project}, Exam=${exam}, Total=${total}`);
+
+            subjectResults.push({
+              name: subject,
+              score: total,
+              ca: ca1 + ca2,
+              exam: exam,
+              project: project,
+              grade: total >= 80 ? 'A' : total >= 70 ? 'B' : total >= 60 ? 'C' : total >= 50 ? 'D' : 'F',
+              color: 'blue' as const,
+              remark: total >= 70 ? 'Good' : total >= 60 ? 'Average' : 'Needs Improvement',
+              classAverage: 0,
+              positionInClass: 0,
+            });
+          }
+        }
+
+        // Calculate overall average
+        const totalScores = subjectResults.reduce((sum, s) => sum + s.score, 0);
+        const overallAverage = subjectResults.length > 0 ? totalScores / subjectResults.length : 0;
+
+        gradebookPreviews.push({
+          studentName,
+          admissionNumber,
+          classLevel: selectedClassObj?.name || 'Class',
+          term: sessionData.termName,
+          resultType: 'MID-TERM',
+          position: '1', // Placeholder, will be calculated later
+          positionInSchool: 1,
+          totalStudents: dataRows.length,
+          sex: sex === '-' ? 'M' : sex,
+          age: age,
+          height: height,
+          weight: weight,
+          dateOfBirth: dateOfBirth,
+          favouriteColor: favouriteColor,
+          subjects: subjectResults,
+          totalObtainable: subjectResults.length * 100,
+        } as SchoolResult);
+      }
+
+      if (gradebookPreviews.length === 0) {
+        throw new Error('No valid student data found in CSV');
+      }
+
+      console.log('✅ Gradebooks created:', gradebookPreviews);
+
+      // Store gradebooks data using the backend endpoint
       const formData = new FormData();
       formData.append('csvFile', csvFile);
       formData.append('classId', selectedClass);
@@ -363,99 +594,17 @@ export const Step7ResultsCSV = ({
       if (response.data.success) {
         toast({
           title: 'Success',
-          description: 'Results CSV uploaded and processed successfully',
+          description: 'Results uploaded and gradebooks generated successfully',
         });
 
-        // Fetch school data for gradebook
-        const schoolId = localStorage.getItem('schoolId');
-        const schoolRes = await axios.get(
-          `http://localhost:5000/api/onboarding/school/${schoolId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        const schoolData = schoolRes.data.data;
-        console.log('School data fetched:', schoolData);
-        console.log('Logo URL:', schoolData?.logoUrl);
-        console.log('Logo field:', schoolData?.logo);
-
-        // Fetch fresh logo URL (presigned URLs expire)
-        let freshLogoUrl = schoolData?.logoUrl || schoolData?.logo;
-        try {
-          const logoRes = await axios.get(
-            'http://localhost:5000/api/results-setup/fresh-logo',
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          freshLogoUrl = logoRes.data.data?.logoUrl || freshLogoUrl;
-          console.log('Fresh logo URL fetched:', freshLogoUrl);
-        } catch (logoErr) {
-          console.warn('Could not fetch fresh logo URL, using stored one:', logoErr);
-        }
-
-        // Map to School format
-        const schoolFormatted: School = {
-          slug: schoolData.slug || 'school',
-          name: schoolData.name,
-          motto: schoolData.motto || '',
-          logo: freshLogoUrl || undefined,
-          logoEmoji: schoolData.logoEmoji,
-          primaryColor: schoolData.primaryColor || '#1e40af',
-          secondaryColor: schoolData.secondaryColor || '#475569',
-          accentColor: schoolData.accentColor || '#3b82f6',
-          contactEmail: schoolData.contactEmail,
-          contactPhone: schoolData.contactPhone,
-          contactEmail2: schoolData.altContactEmail,
-          contactPhone2: schoolData.altContactPhone,
-          fullAddress: schoolData.fullAddress,
-        };
-        
-        setSchool(schoolFormatted);
-
-        // Get template
-        const defaultTemplate = getTemplate('standard');
-        setTemplate(defaultTemplate);
-
-        // Map students to SchoolResult format
-        const classStudents = students.filter(s => s.classId === selectedClass).slice(0, 5);
-        const selectedClassObj = classes.find(c => c.id === selectedClass);
-        const sessionData = sessionTermData ? {
-          sessionName: sessionTermData.sessionName || 'Session',
-          termName: sessionTermData.termName || 'Term 1',
-        } : { sessionName: 'Session', termName: 'Term 1' };
-
-        const gradebookPreviews = classStudents.map((student: any) => ({
-          studentName: (student.firstName || '') + ' ' + (student.lastName || ''),
-          admissionNumber: student.admissionNumber || 'N/A',
-          classLevel: selectedClassObj?.name || 'Class',
-          term: sessionData.termName,
-          resultType: 'MID-TERM',
-          position: '1',
-          positionInSchool: 1,
-          totalStudents: classStudents.length,
-          sex: student.sex || 'M',
-          age: student.age || 15,
-          height: student.height || '-',
-          weight: student.weight || '-',
-          dateOfBirth: student.dateOfBirth || '-',
-          favouriteColor: student.favouriteColor || '-',
-          subjects: subjects.map((subj: string) => ({
-            name: subj,
-            score: 75,
-            ca: 30,
-            exam: 45,
-            grade: 'B' as const,
-            color: 'blue' as const,
-            remark: 'Good performance',
-            classAverage: 65,
-            positionInClass: 1,
-          })),
-          totalObtainable: subjects.length * 100,
-        })) as SchoolResult[];
-        
         setPreviewGradebooks(gradebookPreviews);
         setSelectedStudentIndex(0);
         setProcessingComplete(true);
       }
     } catch (error: any) {
-      const message = error.response?.data?.error || 'Failed to process CSV';
+      console.error('Full error object:', error);
+      console.error('Error response:', error.response?.data);
+      const message = error.response?.data?.error || error.message || 'Failed to process CSV';
       setSubmitError(message);
       toast({
         title: 'Error',

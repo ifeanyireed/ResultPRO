@@ -29,9 +29,10 @@ export async function processCSV(req: Request, res: Response) {
     // Get session data to find current session/term
     const session = await resultsSetupService.getSession(schoolId);
     if (!session) {
+      console.error('No results setup session found for school:', schoolId);
       return res.status(400).json({
         success: false,
-        error: 'No active results setup session',
+        error: 'No active results setup session. Please complete Step 1-4 first.',
         code: 'VALIDATION_ERROR',
       });
     }
@@ -43,10 +44,13 @@ export async function processCSV(req: Request, res: Response) {
     // Get classId from request (should be sent from frontend)
     const classId = req.body.classId || req.query.classId;
     
+    console.log('Processing CSV - SessionId:', sessionId, 'TermId:', termId, 'ClassId:', classId);
+    
     if (!classId || !sessionId || !termId) {
+      console.error('Missing required data - classId:', classId, 'sessionId:', sessionId, 'termId:', termId);
       return res.status(400).json({
         success: false,
-        error: 'Session, term, and class selection required',
+        error: `Session, term, and class selection required. Session: ${sessionId}, Term: ${termId}, Class: ${classId}`,
         code: 'VALIDATION_ERROR',
       });
     }
@@ -56,6 +60,8 @@ export async function processCSV(req: Request, res: Response) {
       ? JSON.parse(session.examConfigComponents) 
       : [];
     const subjects = examComponents.map((c: any) => c.name) || [];
+    
+    console.log('Subjects extracted from exam config:', subjects);
 
     // Read CSV file content
     const csvContent = req.file.buffer.toString('utf-8');
@@ -76,6 +82,7 @@ export async function processCSV(req: Request, res: Response) {
       data: result.data,
     });
   } catch (error: any) {
+    console.error('CSV Processing Error:', error);
     const status = error.status || 500;
     res.status(status).json({
       success: false,

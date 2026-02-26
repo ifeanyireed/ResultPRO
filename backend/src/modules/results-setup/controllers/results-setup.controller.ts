@@ -134,3 +134,40 @@ export async function getFreshLogoUrl(req: Request, res: Response) {
     });
   }
 }
+
+export async function getClassResults(req: Request, res: Response) {
+  try {
+    const schoolId = req.user?.schoolId;
+    if (!schoolId) {
+      return res.status(400).json({
+        success: false,
+        error: 'School ID is required',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    const { classId, sessionId, termId } = req.params;
+
+    if (!classId || !sessionId || !termId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Class ID, Session ID, and Term ID are required',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    const results = await service.getClassResults(schoolId, classId, sessionId, termId);
+
+    res.json({
+      success: true,
+      data: results,
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    res.status(status).json({
+      success: false,
+      error: error.message,
+      code: error.code || 'ERROR',
+    });
+  }
+}

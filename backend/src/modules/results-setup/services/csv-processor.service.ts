@@ -37,6 +37,9 @@ export class CSVProcessorService {
         throw new Error('CSV must have headers and at least one data row');
       }
 
+      console.log('\n🚀 CSV PROCESSING START');
+      console.log('Total CSV lines:', lines.length);
+
       // Skip first 3 rows (main headers, sub-headers, example row)
       const dataRows = lines.slice(3);
       
@@ -48,10 +51,20 @@ export class CSVProcessorService {
       const mainHeaderLine = lines[0];
       const mainHeaders = this.parseCSVLine(mainHeaderLine);
 
-      // Find subject positions in the header
+      console.log(`\n📋 Row 1 (Main Headers) - ${mainHeaders.length} columns:`);
+      console.log(mainHeaders);
+      
+      console.log(`\n📋 Row 2 (Sub Headers) - ${subHeaders.length} columns:`);
+      console.log(subHeaders);
+
+      // Find subject positions
       const subjectPositions = this.mapSubjectPositions(mainHeaders, subjects);
-      const affectiveTraitsPositions = this.getTraitPositions(subHeaders, 'Affective Domains');
-      const psychomotorPositions = this.getTraitPositions(subHeaders, 'Psychomotor Domains');
+
+      // Find affective and psychomotor positions by looking in mainHeaders for section start
+      const affectiveTraitsPositions = this.getTraitPositions(mainHeaders, subHeaders, 'Affective Domains');
+      const psychomotorPositions = this.getTraitPositions(mainHeaders, subHeaders, 'Psychomotor Domains');
+
+      console.log(`\n📨 About to parse ${dataRows.length} data rows`);
 
       // Parse each data row
       const parsedRows: ParsedStudentRow[] = [];
@@ -90,6 +103,11 @@ export class CSVProcessorService {
         where: { schoolId, isDefault: true },
         include: { grades: true },
       });
+
+      console.log('Grading system found:', gradingSystem);
+      if (!gradingSystem) {
+        console.warn('⚠️ No default grading system found for school:', schoolId);
+      }
 
       // Upsert student results
       const results = [];
@@ -158,41 +176,68 @@ export class CSVProcessorService {
   ): Record<string, number> {
     const positions: Record<string, number> = {};
 
+    console.log('🔍 mapSubjectPositions - Subjects to find:', subjects);
+    console.log('🔍 mapSubjectPositions - Available headers:', headers);
+
     for (const subject of subjects) {
       const index = headers.findIndex(h => h === subject);
       if (index >= 0) {
         positions[subject] = index;
+        console.log(`✅ Found subject "${subject}" at column ${index}`);
+      } else {
+        console.warn(`❌ Subject "${subject}" NOT found in headers`);
+        // Try to find partial matches
+        const partialMatches = headers
+          .map((h, i) => h.toLowerCase().includes(subject.toLowerCase()) ? i : -1)
+          .filter(i => i >= 0);
+        if (partialMatches.length > 0) {
+          console.warn(`   Found partial matches at positions:`, partialMatches);
+        }
       }
     }
 
+    console.log('📍 Final subject positions:', positions);
     return positions;
   }
 
   /**
    * Get positions of affective traits or psychomotor skills
+   * Look for section header in mainHeaders, then extract trait names from subHeaders
    */
-  private getTraitPositions(headers: string[], sectionName: string): Record<string, number> {
+  private getTraitPositions(mainHeaders: string[], subHeaders: string[], sectionName: string): Record<string, number> {
     const positions: Record<string, number> = {};
-    let capturing = false;
+    
+    // Find where this section starts in mainHeaders
+    const sectionStartIndex = mainHeaders.findIndex(h => h === sectionName);
+    if (sectionStartIndex < 0) {
+      console.warn(`Section "${sectionName}" not found in main headers`);
+      return positions;
+    }
 
-    for (let i = 0; i < headers.length; i++) {
-      if (headers[i] === sectionName) {
-        capturing = true;
-        continue;
-      }
+    console.log(`Found "${sectionName}" at position ${sectionStartIndex} in mainHeaders`);
 
-      if (capturing) {
-        // Stop if we hit another section header or end
-        if (headers[i] === 'Comments' || headers[i] === 'Psychomotor Domains' || headers[i] === 'Affective Domains') {
-          break;
-        }
-
-        if (headers[i] && headers[i] !== '') {
-          positions[headers[i]] = i;
-        }
+    // Find where next section starts (either "Psychomotor Domains", "Affective Domains", or "Comments")
+    const nextSectionKeywords = ['Comments', 'Psychomotor Domains', 'Affective Domains'];
+    let sectionEndIndex = mainHeaders.length;
+    
+    for (let i = sectionStartIndex + 1; i < mainHeaders.length; i++) {
+      if (nextSectionKeywords.includes(mainHeaders[i])) {
+        sectionEndIndex = i;
+        break;
       }
     }
 
+    console.log(`Section "${sectionName}" ends at position ${sectionEndIndex}`);
+
+    // Extract trait/skill names from subHeaders within this range
+    for (let i = sectionStartIndex; i < sectionEndIndex; i++) {
+      if (subHeaders[i] && subHeaders[i] !== '' && !nextSectionKeywords.includes(subHeaders[i])) {
+        positions[subHeaders[i]] = i;
+        console.log(`Added ${sectionName}: "${subHeaders[i]}" at position ${i}`);
+      }
+    }
+
+    console.log(`Final ${sectionName} positions:`, positions);
     return positions;
   }
 
@@ -210,39 +255,69 @@ export class CSVProcessorService {
   ): ParsedStudentRow {
     const subjectScores: Record<string, { ca1: number; ca2: number; project: number; exam: number }> = {};
 
+    // Debug log the row columns
+    console.log('\n📊 ========== PARSING STUDENT ROW ==========');
+    console.log('Student ID:', studentId, 'Name:', studentName);
+    console.log('Total columns in row:', columns.length);
+    console.log('Column data:', {
+      col0_studentId: columns[0],
+      col1_name: columns[1],
+      col2_attendance: columns[2],
+      col3_sex: columns[3],
+      col4_dob: columns[4],
+      col5_age: columns[5],
+      col6_height: columns[6],
+      col7_weight: columns[7],
+      col8_favColor: columns[8],
+    });
+
+    console.log('\n📚 Subject Positions:', subjectPositions);
+    console.log('Subjects to extract:', subjects);
+
     // Extract subject scores (4 columns per subject: CA1, CA2, Project, Exam)
     for (const subject of subjects) {
       const pos = subjectPositions[subject];
+      console.log(`\n  Processing subject: "${subject}" (position: ${pos})`);
+      
       if (pos !== undefined) {
-        subjectScores[subject] = {
+        const scores = {
           ca1: this.parseNumber(columns[pos] || '0'),
           ca2: this.parseNumber(columns[pos + 1] || '0'),
           project: this.parseNumber(columns[pos + 2] || '0'),
           exam: this.parseNumber(columns[pos + 3] || '0'),
         };
+        console.log(`  ✅ Extracted scores:`, scores);
+        subjectScores[subject] = scores;
+      } else {
+        console.warn(`  ⚠️ Position not found for subject "${subject}"`);
       }
     }
 
+    console.log('\n💁 Affective Trait Positions:', affectiveTraitsPositions);
     // Extract affective traits
     const affectiveDomain: Record<string, number> = {};
     for (const trait in affectiveTraitsPositions) {
       const pos = affectiveTraitsPositions[trait];
       affectiveDomain[trait] = this.parseNumber(columns[pos] || '0', 1, 5);
     }
+    console.log('Extracted affective domain:', affectiveDomain);
 
+    console.log('🤸 Psychomotor Positions:', psychomotorPositions);
     // Extract psychomotor skills
     const psychomotorDomain: Record<string, number> = {};
     for (const skill in psychomotorPositions) {
       const pos = psychomotorPositions[skill];
       psychomotorDomain[skill] = this.parseNumber(columns[pos] || '0', 1, 5);
     }
+    console.log('Extracted psychomotor domain:', psychomotorDomain);
+    console.log('========== END PARSING ==========\n');
 
     return {
       studentId,
       studentName,
       attendance: {
         daysPresent: this.parseNumber(columns[2] || '0'),
-        daysSchoolOpen: this.parseNumber(columns[3] || '0'),
+        daysSchoolOpen: 70, // Standard school days
       },
       sex: columns[3]?.trim() || undefined,
       dob: columns[4]?.trim() || undefined,
@@ -294,6 +369,8 @@ export class CSVProcessorService {
       );
       const grade = gradeRecord?.gradeName || 'F';
 
+      console.log(`Subject: ${subject}, Total: ${total}, Grade: ${grade}, GradeRecord:`, gradeRecord);
+
       subjectResults[subject] = {
         ca1: scores.ca1,
         ca2: scores.ca2,
@@ -326,6 +403,12 @@ export class CSVProcessorService {
       },
       update: {
         studentName: row.studentName,
+        sex: row.sex,
+        dateOfBirth: row.dob,
+        age: row.age,
+        height: row.height,
+        weight: row.weight,
+        favouriteColor: row.favouriteColor,
         subjectResults: JSON.stringify(subjectResults),
         daysPresent: row.attendance.daysPresent,
         daysSchoolOpen: row.attendance.daysSchoolOpen,
@@ -343,6 +426,12 @@ export class CSVProcessorService {
         termId,
         studentId: student.id,
         studentName: row.studentName,
+        sex: row.sex,
+        dateOfBirth: row.dob,
+        age: row.age,
+        height: row.height,
+        weight: row.weight,
+        favouriteColor: row.favouriteColor,
         subjectResults: JSON.stringify(subjectResults),
         daysPresent: row.attendance.daysPresent,
         daysSchoolOpen: row.attendance.daysSchoolOpen,

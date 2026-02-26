@@ -150,4 +150,33 @@ export class ResultsSetupService {
 
     return allSubjects;
   }
+
+  async getClassResults(schoolId: string, classId: string, sessionId: string, termId: string) {
+    const results = await prisma.studentResult.findMany({
+      where: {
+        schoolId,
+        classId,
+        sessionId,
+        termId,
+      },
+      include: {
+        student: {
+          select: {
+            admissionNumber: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        studentName: 'asc',
+      },
+    });
+
+    // Return results with student info
+    return results.map(result => ({
+      ...result,
+      admissionNumber: result.student?.admissionNumber || '',
+      studentName: result.student?.name || result.studentName,
+    }));
+  }
 }
