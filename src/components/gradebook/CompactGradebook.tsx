@@ -102,30 +102,30 @@ export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, resu
             <thead>
               <tr style={{ backgroundColor: '#e0e0e0', borderBottom: '0.5px solid #000' }}>
                 <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'left' }}>Subject</th>
-                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>CA</th>
+                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>CA 1</th>
+                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>CA 2</th>
+                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>Project</th>
                 <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>Exam</th>
                 <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>Total</th>
                 <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>Grd</th>
+                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>Avg</th>
                 <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>Pos</th>
                 <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'left' }}>Remark</th>
-                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>Avg</th>
-                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>1st</th>
-                <th style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>2nd</th>
               </tr>
             </thead>
             <tbody>
               {result.subjects.map((subject, idx) => (
                 <tr key={idx} style={{ borderBottom: '0.5px solid #ccc', height: '4mm' }}>
                   <td style={{ border: '0.5px solid #000', padding: '0.25mm' }}>{subject.name}</td>
-                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.ca}</td>
+                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.ca1 || '-'}</td>
+                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.ca2 || '-'}</td>
+                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.project || '-'}</td>
                   <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.exam}</td>
                   <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center', fontWeight: 'bold' }}>{subject.score}</td>
                   <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center', fontWeight: 'bold' }}>{subject.grade}</td>
-                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.positionInClass}</td>
+                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.classAverage || '-'}</td>
+                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.positionInClass || '-'}</td>
                   <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'left' }}>{subject.remark}</td>
-                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.classAverage}</td>
-                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.firstTermTotal}</td>
-                  <td style={{ border: '0.5px solid #000', padding: '0.25mm', textAlign: 'center' }}>{subject.secondTermTotal}</td>
                 </tr>
               ))}
             </tbody>

@@ -35,6 +35,9 @@ export interface SchoolResult {
     name: string;
     score: number;
     ca?: number;
+    ca1?: number;
+    ca2?: number;
+    project?: number;
     exam?: number;
     grade: 'A' | 'B' | 'C' | 'D' | 'F';
     color: 'green' | 'blue' | 'yellow' | 'orange' | 'red';

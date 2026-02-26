@@ -533,9 +533,10 @@ export const Step7ResultsCSV = ({
             subjectResults.push({
               name: subject,
               score: total,
-              ca: ca1 + ca2,
-              exam: exam,
+              ca1: ca1,
+              ca2: ca2,
               project: project,
+              exam: exam,
               grade: total >= 80 ? 'A' : total >= 70 ? 'B' : total >= 60 ? 'C' : total >= 50 ? 'D' : 'F',
               color: 'blue' as const,
               remark: total >= 70 ? 'Good' : total >= 60 ? 'Average' : 'Needs Improvement',
