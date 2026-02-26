@@ -1,4 +1,4 @@
-import { createApp } from './app';
+import { createApp } from './app.js';
 import { initializeDatabase } from '@config/database';
 import { initializeMailer } from '@config/mail';
 import { config } from '@config/environment';

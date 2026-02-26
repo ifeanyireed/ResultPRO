@@ -8,6 +8,9 @@ interface CompactGradebookProps {
 }
 
 export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, result, template }) => {
+  console.log('CompactGradebook received school:', school);
+  console.log('CompactGradebook logo:', school.logo);
+  
   const totalObtained = result.subjects.reduce((sum, s) => sum + s.score, 0);
   const totalObtainable = result.totalObtainable || (result.subjects.length * 100);
   const percentage = Math.round((totalObtained / totalObtainable) * 100);

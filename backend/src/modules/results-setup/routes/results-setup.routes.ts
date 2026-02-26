@@ -7,7 +7,7 @@ import { handleStep4 } from '../controllers/step4.controller';
 import { handleStep5, updateStaffData } from '../controllers/step5.controller';
 import { uploadSignature } from '../controllers/signature-upload.controller';
 import { processCSV } from '../controllers/csv-processor.controller';
-import { getResultsSetupSession, initializeResultsSetup, getClassSubjects } from '../controllers/results-setup.controller';
+import { getResultsSetupSession, initializeResultsSetup, getClassSubjects, getFreshLogoUrl } from '../controllers/results-setup.controller';
 import { createSampleClasses } from '../controllers/debug.controller';
 import { addStudent, getStudents, deleteStudent, updateStudent } from '../controllers/student.controller';
 
@@ -46,6 +46,9 @@ router.get('/session', getResultsSetupSession);
 
 // GET /api/results-setup/class-subjects - Get subjects for a specific class
 router.get('/class-subjects', getClassSubjects);
+
+// GET /api/results-setup/fresh-logo - Get fresh presigned URL for school logo
+router.get('/fresh-logo', getFreshLogoUrl);
 
 // POST /api/results-setup/initialize - Initialize new setup session
 router.post('/initialize', initializeResultsSetup);

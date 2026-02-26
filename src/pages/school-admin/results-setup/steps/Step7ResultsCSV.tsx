@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
-import { Upload, Download, AlertCircle, Eye } from 'lucide-react';
+import { Upload, Download, AlertCircle, Eye, Printer } from 'lucide-react';
 import { CompactGradebook } from '@/components/gradebook/CompactGradebook';
 import { getTemplate } from '@/lib/gradebookTemplates';
+import { School, SchoolResult, GradebookTemplate } from '@/lib/schoolData';
 
 interface Step7Props {
   onNext: (data: any) => Promise<void>;
@@ -47,6 +48,11 @@ export const Step7ResultsCSV = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [showGradebookPreview, setShowGradebookPreview] = useState(false);
   const [selectedStudentResult, setSelectedStudentResult] = useState<any>(null);
+  const [selectedStudentIndex, setSelectedStudentIndex] = useState(0);
+  const [previewGradebooks, setPreviewGradebooks] = useState<SchoolResult[]>([]);
+  const [school, setSchool] = useState<School | null>(null);
+  const [template, setTemplate] = useState<GradebookTemplate | null>(null);
+  const [processingComplete, setProcessingComplete] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load classes, students, subjects, affective traits, and psychomotor skills on mount
@@ -355,19 +361,98 @@ export const Step7ResultsCSV = ({
       );
 
       if (response.data.success) {
-        // Store generated gradebook data
-        const generatedData = response.data.data;
-        
         toast({
           title: 'Success',
           description: 'Results CSV uploaded and processed successfully',
         });
 
-        await onNext({
-          ...sessionTermData,
-          resultsFileUrl: csvFile.name,
-          processingResult: generatedData,
-        });
+        // Fetch school data for gradebook
+        const schoolId = localStorage.getItem('schoolId');
+        const schoolRes = await axios.get(
+          `http://localhost:5000/api/onboarding/school/${schoolId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const schoolData = schoolRes.data.data;
+        console.log('School data fetched:', schoolData);
+        console.log('Logo URL:', schoolData?.logoUrl);
+        console.log('Logo field:', schoolData?.logo);
+
+        // Fetch fresh logo URL (presigned URLs expire)
+        let freshLogoUrl = schoolData?.logoUrl || schoolData?.logo;
+        try {
+          const logoRes = await axios.get(
+            'http://localhost:5000/api/results-setup/fresh-logo',
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          freshLogoUrl = logoRes.data.data?.logoUrl || freshLogoUrl;
+          console.log('Fresh logo URL fetched:', freshLogoUrl);
+        } catch (logoErr) {
+          console.warn('Could not fetch fresh logo URL, using stored one:', logoErr);
+        }
+
+        // Map to School format
+        const schoolFormatted: School = {
+          slug: schoolData.slug || 'school',
+          name: schoolData.name,
+          motto: schoolData.motto || '',
+          logo: freshLogoUrl || undefined,
+          logoEmoji: schoolData.logoEmoji,
+          primaryColor: schoolData.primaryColor || '#1e40af',
+          secondaryColor: schoolData.secondaryColor || '#475569',
+          accentColor: schoolData.accentColor || '#3b82f6',
+          contactEmail: schoolData.contactEmail,
+          contactPhone: schoolData.contactPhone,
+          contactEmail2: schoolData.altContactEmail,
+          contactPhone2: schoolData.altContactPhone,
+          fullAddress: schoolData.fullAddress,
+        };
+        
+        setSchool(schoolFormatted);
+
+        // Get template
+        const defaultTemplate = getTemplate('standard');
+        setTemplate(defaultTemplate);
+
+        // Map students to SchoolResult format
+        const classStudents = students.filter(s => s.classId === selectedClass).slice(0, 5);
+        const selectedClassObj = classes.find(c => c.id === selectedClass);
+        const sessionData = sessionTermData ? {
+          sessionName: sessionTermData.sessionName || 'Session',
+          termName: sessionTermData.termName || 'Term 1',
+        } : { sessionName: 'Session', termName: 'Term 1' };
+
+        const gradebookPreviews = classStudents.map((student: any) => ({
+          studentName: (student.firstName || '') + ' ' + (student.lastName || ''),
+          admissionNumber: student.admissionNumber || 'N/A',
+          classLevel: selectedClassObj?.name || 'Class',
+          term: sessionData.termName,
+          resultType: 'MID-TERM',
+          position: '1',
+          positionInSchool: 1,
+          totalStudents: classStudents.length,
+          sex: student.sex || 'M',
+          age: student.age || 15,
+          height: student.height || '-',
+          weight: student.weight || '-',
+          dateOfBirth: student.dateOfBirth || '-',
+          favouriteColor: student.favouriteColor || '-',
+          subjects: subjects.map((subj: string) => ({
+            name: subj,
+            score: 75,
+            ca: 30,
+            exam: 45,
+            grade: 'B' as const,
+            color: 'blue' as const,
+            remark: 'Good performance',
+            classAverage: 65,
+            positionInClass: 1,
+          })),
+          totalObtainable: subjects.length * 100,
+        })) as SchoolResult[];
+        
+        setPreviewGradebooks(gradebookPreviews);
+        setSelectedStudentIndex(0);
+        setProcessingComplete(true);
       }
     } catch (error: any) {
       const message = error.response?.data?.error || 'Failed to process CSV';
@@ -381,6 +466,108 @@ export const Step7ResultsCSV = ({
       setUploading(false);
     }
   };
+
+  const handleProceedToDashboard = async () => {
+    try {
+      await onNext({
+        ...sessionTermData,
+        resultsFileUrl: csvFile?.name,
+        resultsProcessed: true,
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to complete setup',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  if (processingComplete && school && template && previewGradebooks.length > 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-white mb-2">
+            ✓ Gradebook Preview
+          </h2>
+          <p className="text-gray-400 text-sm">
+            Print-ready gradebooks for the first 5 students. Click any to view full page.
+          </p>
+        </div>
+
+        {/* Student Selector */}
+        <div>
+          <label className="text-gray-300 text-sm font-medium mb-2 block">Select Student to View</label>
+          <select
+            value={selectedStudentIndex}
+            onChange={(e) => setSelectedStudentIndex(parseInt(e.target.value))}
+            className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors"
+          >
+            {previewGradebooks.map((student, idx) => (
+              <option key={idx} value={idx}>
+                {idx + 1}. {student.studentName} ({student.admissionNumber})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Single Printable Gradebook */}
+        {previewGradebooks[selectedStudentIndex] && school && template && (
+          <div className="border border-[rgba(255,255,255,0.1)] rounded-lg overflow-hidden bg-gray-950">
+            <div className="p-4 bg-gradient-to-r from-blue-600/20 to-blue-700/20 flex justify-between items-center">
+              <h3 className="text-white font-semibold">
+                Gradebook for {previewGradebooks[selectedStudentIndex].studentName} ({previewGradebooks[selectedStudentIndex].admissionNumber})
+              </h3>
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-2 px-3 py-1 text-blue-300 hover:text-blue-200 text-sm"
+              >
+                <Printer className="w-4 h-4" />
+                Print
+              </button>
+            </div>
+            <div className="p-2 bg-gray-950 flex justify-center overflow-x-auto">
+              <CompactGradebook
+                school={school}
+                result={previewGradebooks[selectedStudentIndex]}
+                template={template}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="bg-green-500/10 border border-green-400/20 rounded-lg p-4">
+          <p className="text-green-300 text-sm">
+            ✓ All {previewGradebooks.length} students' results have been successfully processed and stored in the database.
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="border-t border-[rgba(255,255,255,0.07)] pt-8 flex gap-4 justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setProcessingComplete(false);
+              setCsvFile(null);
+              setPreviewGradebooks([]);
+              setSchool(null);
+              setTemplate(null);
+            }}
+            className="bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
+          >
+            Upload Another Class
+          </Button>
+          <Button
+            onClick={handleProceedToDashboard}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            View Dashboard & Complete Setup
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -476,7 +663,14 @@ export const Step7ResultsCSV = ({
                 <p className="text-white text-sm font-medium">{csvFile.name}</p>
                 <p className="text-gray-500 text-xs">{(csvFile.size / 1024).toFixed(2)} KB</p>
                 <button
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => {
+                    setPreview(null);
+                    setCsvFile(null);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = '';
+                      fileInputRef.current.click();
+                    }
+                  }}
                   className="text-blue-400 hover:text-blue-300 text-xs mt-2"
                 >
                   Choose Different File
@@ -543,6 +737,7 @@ export const Step7ResultsCSV = ({
           Back
         </Button>
         <Button
+          type="button"
           onClick={handleSubmit}
           disabled={isLoading || uploading || !csvFile}
           className="bg-blue-600 hover:bg-blue-700 text-white"

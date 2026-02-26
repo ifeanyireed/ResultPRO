@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ResultsSetupService } from '../services/results-setup.service';
+import { getFreshLogoPresignedUrl } from '@modules/common/utils/logo-upload';
 
 const service = new ResultsSetupService();
 
@@ -93,6 +94,35 @@ export async function getClassSubjects(req: Request, res: Response) {
       success: true,
       data: {
         subjects,
+      },
+    });
+  } catch (error: any) {
+    const status = error.status || 500;
+    res.status(status).json({
+      success: false,
+      error: error.message,
+      code: error.code || 'ERROR',
+    });
+  }
+}
+
+export async function getFreshLogoUrl(req: Request, res: Response) {
+  try {
+    const schoolId = req.user?.schoolId;
+    if (!schoolId) {
+      return res.status(400).json({
+        success: false,
+        error: 'School ID is required',
+        code: 'VALIDATION_ERROR',
+      });
+    }
+
+    const logoUrl = await getFreshLogoPresignedUrl(schoolId);
+
+    res.json({
+      success: true,
+      data: {
+        logoUrl: logoUrl || null,
       },
     });
   } catch (error: any) {

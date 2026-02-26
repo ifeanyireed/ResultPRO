@@ -76,6 +76,52 @@ export async function uploadLogoToS3(): Promise<string> {
 }
 
 /**
+ * Generate a fresh presigned URL for the existing school logo
+ */
+export async function getFreshLogoPresignedUrl(schoolId: string): Promise<string> {
+  try {
+    if (!config.aws?.s3Bucket) {
+      console.warn('⚠️ AWS S3 bucket not configured');
+      return '';
+    }
+
+    // School logos are stored at: logos/{schoolId}/{filename}
+    // Get all objects with this prefix
+    const listParams = {
+      Bucket: config.aws.s3Bucket,
+      Prefix: `logos/${schoolId}/`,
+    };
+
+    const listResult = await s3.listObjectsV2(listParams).promise();
+    
+    if (!listResult.Contents || listResult.Contents.length === 0) {
+      console.warn(`⚠️ No logo found in S3 for school ${schoolId}`);
+      return '';
+    }
+
+    // Get the most recent logo (S3 returns in order)
+    const logoKey = listResult.Contents[listResult.Contents.length - 1].Key;
+    
+    if (!logoKey) {
+      return '';
+    }
+
+    console.log(`🔗 Generating fresh presigned URL for logo at: ${logoKey}`);
+    const presignedUrl = await s3.getSignedUrlPromise('getObject', {
+      Bucket: config.aws.s3Bucket,
+      Key: logoKey,
+      Expires: 3600, // 1 hour - fresh URL each time
+    });
+
+    console.log(`✓ Generated fresh presigned URL for school ${schoolId} logo`);
+    return presignedUrl;
+  } catch (error) {
+    console.error(`✗ Failed to generate fresh logo URL for school ${schoolId}:`, error);
+    return '';
+  }
+}
+
+/**
  * Initialize logo URL on application startup
  */
 export async function initializeLogoUrl(): Promise<string> {
