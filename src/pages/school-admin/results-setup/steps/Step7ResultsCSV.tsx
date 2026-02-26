@@ -546,6 +546,34 @@ export const Step7ResultsCSV = ({
           }
         }
 
+        // Extract affective domain traits
+        const affectiveDomainData: Record<string, number> = {};
+        for (const trait in affectiveDomainTraits) {
+          const colPos = affectiveDomainTraits[trait];
+          const score = parseInt(row[colPos] || '0') || 0;
+          if (score > 0) {
+            affectiveDomainData[trait] = Math.min(5, Math.max(1, score)); // Clamp to 1-5
+            console.log(`  Affective: ${trait} = ${affectiveDomainData[trait]}`);
+          }
+        }
+
+        // Extract psychomotor domain skills
+        const psychomotorDomainData: Record<string, number> = {};
+        for (const skill in psychomotorDomainSkills) {
+          const colPos = psychomotorDomainSkills[skill];
+          const score = parseInt(row[colPos] || '0') || 0;
+          if (score > 0) {
+            psychomotorDomainData[skill] = Math.min(5, Math.max(1, score)); // Clamp to 1-5
+            console.log(`  Psychomotor: ${skill} = ${psychomotorDomainData[skill]}`);
+          }
+        }
+
+        // Extract comments from last 2 columns
+        const principalComments = row[row.length - 2]?.trim() || '';
+        const classTeacherComments = row[row.length - 1]?.trim() || '';
+        console.log(`  Principal Comments: ${principalComments}`);
+        console.log(`  Class Teacher Comments: ${classTeacherComments}`);
+
         // Calculate overall average
         const totalScores = subjectResults.reduce((sum, s) => sum + s.score, 0);
         const overallAverage = subjectResults.length > 0 ? totalScores / subjectResults.length : 0;
@@ -554,6 +582,7 @@ export const Step7ResultsCSV = ({
           studentName,
           admissionNumber,
           classLevel: selectedClassObj?.name || 'Class',
+          session: sessionData.sessionName,
           term: sessionData.termName,
           resultType: 'MID-TERM',
           position: '1', // Placeholder, will be calculated later
@@ -567,6 +596,16 @@ export const Step7ResultsCSV = ({
           favouriteColor: favouriteColor,
           subjects: subjectResults,
           totalObtainable: subjectResults.length * 100,
+          attendance: {
+            daysPresent: daysPresent,
+            daysSchoolOpen: 70, // Standard school term days
+          },
+          affectiveDomain: affectiveDomainData,
+          psychomotorDomain: psychomotorDomainData,
+          teacherComments: {
+            principal: principalComments,
+            classTeacher: classTeacherComments,
+          },
         } as SchoolResult);
       }
 

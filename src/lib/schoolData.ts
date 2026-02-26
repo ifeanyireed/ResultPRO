@@ -18,6 +18,7 @@ export interface School {
 export interface SchoolResult {
   studentName: string;
   admissionNumber: string;
+  session?: string; // e.g., "2025/2026"
   term: string;
   resultType: string;
   classLevel: string;

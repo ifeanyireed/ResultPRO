@@ -75,7 +75,7 @@ export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, resu
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', gap: '2mm', marginTop: '1mm' }}>
           <div>
-            <span style={{ fontWeight: 'bold' }}>SESSION:</span> {result.term}
+            <span style={{ fontWeight: 'bold' }}>SESSION:</span> {result.session ? `${result.session}, ${result.term}` : result.term}
           </div>
           <div>
             <span style={{ fontWeight: 'bold' }}>HEIGHT:</span> {result.height || 'N/A'}
