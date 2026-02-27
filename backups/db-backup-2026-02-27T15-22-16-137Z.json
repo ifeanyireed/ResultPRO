@@ -12,9 +12,9 @@
       "role": "SUPER_ADMIN",
       "status": "ACTIVE",
       "firstLogin": false,
-      "lastLoginAt": "2026-02-24T09:08:43.407Z",
+      "lastLoginAt": "2026-02-25T08:24:05.445Z",
       "createdAt": "2026-02-24T08:49:23.132Z",
-      "updatedAt": "2026-02-24T09:08:43.413Z",
+      "updatedAt": "2026-02-25T08:24:05.449Z",
       "deletedAt": null
     }
   ],
@@ -48,6 +48,8 @@
       "onboardingStatus": "COMPLETE",
       "onboardingCompletedAt": "2026-02-24T16:08:53.496Z",
       "currentOnboardingStep": 0,
+      "resultsSetupStatus": "NOT_STARTED",
+      "resultsSetupCompletedAt": null,
       "subscriptionTier": "Pro",
       "subscriptionStartDate": null,
       "subscriptionEndDate": null,
@@ -66,39 +68,19 @@
       "firstName": null,
       "lastName": null,
       "fullName": "Alexander Obi International College",
-      "passwordHash": "$2b$10$oEy9omo43v7/EdLuDi36TuDptJFWvEXLA2qmx2OTA8D97J0lpc26q",
+      "passwordHash": "$2b$10$XeeVeX.4VNBjwAH3jgZsOeIKHyjlwphKm92SKJOQgJ6is27Gx/P4C",
       "passwordResetToken": null,
       "passwordResetTokenExpiry": null,
       "role": "SCHOOL_ADMIN",
       "status": "ACTIVE",
       "firstLogin": false,
-      "lastLoginAt": "2026-02-24T17:00:42.800Z",
+      "lastLoginAt": "2026-02-25T08:19:41.690Z",
       "createdAt": "2026-02-24T09:03:13.249Z",
-      "updatedAt": "2026-02-24T17:00:42.806Z",
+      "updatedAt": "2026-02-25T08:19:41.697Z",
       "deletedAt": null
     }
   ],
   "academicSession": [
-    {
-      "id": "cmm0kzyyy000113cqjxdawy57",
-      "schoolId": "cmm0docxe0000njulskocbum9",
-      "name": "2026/2027",
-      "startDate": "2025-09-15T00:00:00.000Z",
-      "endDate": "2026-07-24T00:00:00.000Z",
-      "isActive": true,
-      "createdAt": "2026-02-24T12:28:12.105Z",
-      "updatedAt": "2026-02-24T12:28:46.899Z"
-    },
-    {
-      "id": "cmm0l06yb000313cq7y63x5yq",
-      "schoolId": "cmm0docxe0000njulskocbum9",
-      "name": "2025/2027",
-      "startDate": "2026-02-24T12:28:22.448Z",
-      "endDate": "2026-02-24T12:28:22.448Z",
-      "isActive": true,
-      "createdAt": "2026-02-24T12:28:22.451Z",
-      "updatedAt": "2026-02-24T12:28:22.451Z"
-    },
     {
       "id": "cmm0l08pb000513cq38h62omf",
       "schoolId": "cmm0docxe0000njulskocbum9",

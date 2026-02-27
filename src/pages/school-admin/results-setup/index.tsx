@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useToast } from '@/hooks/use-toast';
 import { ResultsSetupStepIndicator } from './StepIndicator';
@@ -32,6 +32,7 @@ interface ResultsSetupState {
 
 export const ResultsSetupWizard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [state, setState] = useState<ResultsSetupState>({
     currentStep: 1,
@@ -91,14 +92,19 @@ export const ResultsSetupWizard = () => {
         // Users will be forced here on first login by Login.tsx when resultsSetupStatus !== 'COMPLETE'
         // But they can also access it voluntarily from the dashboard anytime
 
-        // Fetch existing results setup session if available
-        try {
-          const setupRes = await axios.get(
-            `${API_BASE}/results-setup/session`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          );
+        // Check if this is a fresh start (new instance from Results Entry page)
+        const searchParams = new URLSearchParams(location.search);
+        const isFreshStart = searchParams.get('fresh') === 'true';
+
+        // Fetch existing results setup session if available (unless starting fresh)
+        if (!isFreshStart) {
+          try {
+            const setupRes = await axios.get(
+              `${API_BASE}/results-setup/session`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
 
           if (setupRes.data.data) {
             const session = setupRes.data.data;
@@ -162,6 +168,9 @@ export const ResultsSetupWizard = () => {
         } catch (error: any) {
           // Session doesn't exist yet - start fresh
           console.log('No existing results setup session found, starting fresh');
+        }
+        } else {
+          console.log('Starting fresh results instance wizard');
         }
       } catch (error) {
         console.error('Setup status check error:', error);

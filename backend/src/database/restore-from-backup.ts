@@ -48,6 +48,8 @@ async function restoreFromBackup() {
     
     const modelsInOrder = [
       'grade',
+      'resultsInstance',
+      'resultsSetupSession',
       'onboardingState',
       'gradingSystem',
       'subject',
@@ -82,6 +84,8 @@ async function restoreFromBackup() {
       'gradingSystem',
       'grade',
       'onboardingState',
+      'resultsSetupSession',
+      'resultsInstance',
     ] as const;
 
     for (const model of restoreModels) {

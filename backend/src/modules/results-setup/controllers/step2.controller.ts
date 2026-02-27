@@ -6,6 +6,8 @@ const service = new ResultsSetupService();
 export async function handleStep2(req: Request, res: Response) {
   try {
     const schoolId = req.user?.schoolId;
+    console.log('🟢 STEP 2 CALLED - schoolId:', schoolId);
+    
     if (!schoolId) {
       return res.status(400).json({
         success: false,
@@ -15,6 +17,7 @@ export async function handleStep2(req: Request, res: Response) {
     }
 
     const { examConfigComponents, totalExamScore } = req.body;
+    console.log('📝 Step 2 data received - components:', examConfigComponents?.length || 0);
 
     if (!examConfigComponents || !Array.isArray(examConfigComponents)) {
       return res.status(400).json({
@@ -40,6 +43,7 @@ export async function handleStep2(req: Request, res: Response) {
       examConfigComponents: JSON.stringify(examConfigComponents),
       totalExamScore: totalScore,
     });
+    console.log('💾 Step 2 data saved to DB');
 
     res.json({
       success: true,
@@ -47,6 +51,7 @@ export async function handleStep2(req: Request, res: Response) {
       data: updated,
     });
   } catch (error: any) {
+    console.error('❌ STEP 2 ERROR:', error.message);
     const status = error.status || 500;
     res.status(status).json({
       success: false,

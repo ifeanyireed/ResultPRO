@@ -61,8 +61,13 @@ model School {
   payments Payment[]
   subscriptions Subscription[]
   resultsSetupSession ResultsSetupSession?
+  resultsInstances ResultsInstance[]
   students Student[]
   studentResults StudentResult[] @relation("StudentResultsToSchool")
+  scratchCardBatches ScratchCardBatch[] @relation("BatchesToSchool")
+  scratchCards ScratchCard[] @relation("CardsToSchool")
+  scratchCardUsages ScratchCardUsage[] @relation("UsagesToSchool")
+  batchRequests BatchRequest[] @relation("RequestsToSchool")
 
   @@index([status])
   @@index([verificationStatus])
@@ -110,6 +115,51 @@ model ResultsSetupSession {
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   
   @@map("results_setup_sessions")
+}
+
+model ResultsInstance {
+  id                        String   @id @default(cuid())
+  schoolId                  String   @map("school_id")
+  classId                   String   @map("class_id")
+  sessionId                 String   @map("session_id")
+  termId                    String   @map("term_id")
+  
+  // Instance metadata
+  instanceName              String   @map("instance_name")  // e.g., "Form 4 Term 1 2025/26"
+  sessionName               String?  @map("session_name")  // Stored for display (e.g., "2024/2025")
+  termName                  String?  @map("term_name")  // Stored for display (e.g., "First Term")
+  status                    String   @default("active") @map("status")  // active | archived
+  
+  // Configuration snapshot (saved at instance creation)
+  examConfigComponents      String   @default("[]") @map("exam_config_components")  // JSON array of {name, score}
+  affectiveTraits           String   @default("[]") @map("affective_traits")  // JSON array of trait names
+  psychomotorSkills         String   @default("[]") @map("psychomotor_skills")  // JSON array of skill names
+  
+  // CSV storage
+  csvFileName               String?  @map("csv_file_name")
+  csvFileUrl                String?  @map("csv_file_url")  // S3 or local path for download
+  
+  // Parsed gradebook data - stored as JSON string
+  gradebookData             String   @default("[]") @map("gradebook_data")  // JSON array of parsed student results
+  totalStudents             Int      @default(0) @map("total_students")
+  
+  // Audit trail
+  createdAt                 DateTime @default(now()) @map("created_at")
+  createdBy                 String?  @map("created_by")  // userId
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+  archivedAt                DateTime? @map("archived_at")
+  archivedBy                String?  @map("archived_by")  // userId
+  
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  
+  // Indexes for querying
+  @@index([schoolId])
+  @@index([classId])
+  @@index([sessionId])
+  @@index([termId])
+  @@index([status])
+  @@map("results_instances")
 }
 
 model SchoolAdminUser {
@@ -206,6 +256,7 @@ model Class {
   subjects ClassSubject[]
   students Student[]
   studentResults StudentResult[] @relation("StudentResults")
+  resultsInstances ResultsInstance[]
 
   @@unique([schoolId, name])
   @@index([schoolId])
@@ -441,4 +492,126 @@ model Payment {
   @@index([status])
   @@index([paystackReference])
   @@map("payments")
+}
+
+// ============================================================================
+// SCRATCH CARD MODELS
+// ============================================================================
+
+model ScratchCardBatch {
+  id                String   @id @default(cuid())
+  batchCode         String   @unique  // e.g., "SCB-2026-001"
+  schoolId          String   @map("school_id")
+  quantity          Int      // Total cards in batch
+  generated         DateTime @default(now())
+  
+  // Assignment & Activation
+  assignedAt        DateTime? @map("assigned_at")
+  assignedBy        String?   @map("assigned_by")  // SuperAdmin ID
+  activatedAt       DateTime? @map("activated_at")
+  activatedBy       String?   @map("activated_by")
+  deactivatedAt     DateTime? @map("deactivated_at")
+  
+  // Status tracking
+  status            String   @default("PENDING")  // PENDING | ASSIGNED | ACTIVE | DEPLETED | DEACTIVATED
+  
+  // Usage statistics
+  usedCount         Int      @default(0) @map("used_count")
+  deactivatedCount  Int      @default(0) @map("deactivated_count")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  school School @relation("BatchesToSchool", fields: [schoolId], references: [id], onDelete: Cascade)
+  cards ScratchCard[]
+  requestHistory BatchRequest[]
+  
+  @@index([schoolId])
+  @@index([status])
+  @@map("scratch_card_batches")
+}
+
+model ScratchCard {
+  id                String   @id @default(cuid())
+  batchId           String   @map("batch_id")
+  schoolId          String   @map("school_id")
+  pin               String   @unique  // Unique PIN code
+  
+  // Usage tracking
+  usesRemaining     Int      @default(3) @map("uses_remaining")
+  usageCount        Int      @default(0) @map("usage_count")
+  lastUsedAt        DateTime? @map("last_used_at")
+  usedByEmail       String?  @map("used_by_email")
+  
+  // Activation control
+  isActive          Boolean  @default(true) @map("is_active")
+  activatedAt       DateTime? @map("activated_at")
+  deactivatedAt     DateTime? @map("deactivated_at")
+  deactivationReason String? @map("deactivation_reason")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  batch ScratchCardBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  school School @relation("CardsToSchool", fields: [schoolId], references: [id], onDelete: Cascade)
+  usageHistory ScratchCardUsage[]
+  
+  @@index([batchId])
+  @@index([schoolId])
+  @@index([isActive])
+  @@map("scratch_cards")
+}
+
+model ScratchCardUsage {
+  id                String   @id @default(cuid())
+  cardId            String   @map("card_id")
+  schoolId          String   @map("school_id")
+  
+  // What was accessed
+  studentAdmissionNumber String @map("student_admission_number")
+  sessionId         String?  @map("session_id")
+  termId            String?  @map("term_id")
+  
+  // Who used it
+  usedByEmail       String   @map("used_by_email")
+  usedByIpAddress   String?  @map("used_by_ip_address")
+  
+  usedAt            DateTime @default(now()) @map("used_at")
+  
+  card ScratchCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  school School @relation("UsagesToSchool", fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  @@index([cardId])
+  @@index([schoolId])
+  @@index([usedAt])
+  @@map("scratch_card_usages")
+}
+
+model BatchRequest {
+  id                String   @id @default(cuid())
+  batchId           String?  @map("batch_id")
+  schoolId          String   @map("school_id")
+  schoolAdminId     String   @map("school_admin_id")
+  
+  // Request details
+  quantity          Int      // How many cards requested
+  reason            String?  // Why they need them
+  
+  // Status tracking
+  status            String   @default("PENDING")  // PENDING | APPROVED | REJECTED | DELIVERED
+  requestedAt       DateTime @default(now()) @map("requested_at")
+  approvedAt        DateTime? @map("approved_at")
+  approvedBy        String?   @map("approved_by")  // SuperAdmin ID
+  deliveredAt       DateTime? @map("delivered_at")
+  rejectionReason   String?  @map("rejection_reason")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  batch ScratchCardBatch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  school School @relation("RequestsToSchool", fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  @@index([schoolId])
+  @@index([status])
+  @@map("batch_requests")
 }

@@ -10,6 +10,7 @@ import { processCSV } from '../controllers/csv-processor.controller';
 import { getResultsSetupSession, initializeResultsSetup, getClassSubjects, getFreshLogoUrl, getClassResults } from '../controllers/results-setup.controller';
 import { createSampleClasses } from '../controllers/debug.controller';
 import { addStudent, getStudents, deleteStudent, updateStudent } from '../controllers/student.controller';
+import resultsInstanceRoutes from './results-instance.routes';
 
 const router = Router();
 
@@ -106,5 +107,8 @@ router.post('/step/7', (req, res) => {
 
 // DEBUG ONLY - Create sample classes for testing (development only)
 router.post('/debug/create-sample-classes', createSampleClasses);
+
+// Results Instance Management Routes
+router.use('/instances', resultsInstanceRoutes);
 
 export default router;

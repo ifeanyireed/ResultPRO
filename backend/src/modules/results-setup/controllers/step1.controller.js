@@ -70,11 +70,7 @@ export async function handleStep1(req, res) {
         // Find existing session or create new one
         let resultsSetupSession = await prisma.resultsSetupSession.findUnique({
             where: {
-                schoolId_sessionId_termId: {
-                    schoolId,
-                    sessionId,
-                    termId,
-                },
+                schoolId,
             },
         });
         if (resultsSetupSession) {
@@ -84,7 +80,10 @@ export async function handleStep1(req, res) {
                     id: resultsSetupSession.id,
                 },
                 data: {
-                    step1Data: JSON.stringify(step1Data),
+                    sessionId,
+                    sessionName,
+                    termId,
+                    termName,
                     currentStep: 1,
                     completedSteps: JSON.stringify([1]),
                 },
@@ -96,8 +95,9 @@ export async function handleStep1(req, res) {
                 data: {
                     schoolId,
                     sessionId,
+                    sessionName,
                     termId,
-                    step1Data: JSON.stringify(step1Data),
+                    termName,
                     currentStep: 1,
                     completedSteps: JSON.stringify([1]),
                 },

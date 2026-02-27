@@ -28,6 +28,8 @@ async function backupDatabase() {
       'gradingSystem',
       'grade',
       'onboardingState',
+      'resultsSetupSession',
+      'resultsInstance',
     ] as const;
 
     for (const model of models) {

@@ -72,6 +72,18 @@ export async function createApp(): Promise<Express> {
   // School routes (protected)
   app.use('/api/schools', authMiddleware, onboardingRoutes.default);
 
+  // Admin Scratch Card routes (protected - for SuperAdmin)
+  const adminScratchCardRoutes = await import('@modules/scratch-cards/routes/admin-scratch-cards.routes');
+  app.use('/api/admin/scratch-cards', adminScratchCardRoutes.default);
+
+  // School Scratch Card routes (protected - for SchoolAdmin)
+  const schoolScratchCardRoutes = await import('@modules/scratch-cards/routes/school-scratch-cards.routes');
+  app.use('/api/school/scratch-cards', schoolScratchCardRoutes.default);
+
+  // Public Scratch Card routes (no authentication required)
+  const publicScratchCardRoutes = await import('@modules/scratch-cards/routes/public-scratch-cards.routes');
+  app.use('/api/scratch-cards', publicScratchCardRoutes.default);
+
   // 404 handler
   app.use((req: Request, res: Response) => {
     res.status(404).json({

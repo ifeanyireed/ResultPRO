@@ -48,6 +48,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   MoreVertical: LucideIcons.MoreVertical,
   PanelLeft: LucideIcons.PanelLeft,
   Pause: LucideIcons.Pause,
+  Play: LucideIcons.Play,
   PieChart01: LucideIcons.PieChart,
   Phone: LucideIcons.Phone,
   Phone01: LucideIcons.Phone,
@@ -136,6 +137,7 @@ export const MoreHorizontal = iconMap.MoreHorizontal || LucideIcons.MoreHorizont
 export const MoreVertical = iconMap.MoreVertical || LucideIcons.MoreVertical;
 export const PanelLeft = iconMap.PanelLeft || LucideIcons.PanelLeft;
 export const Pause = iconMap.Pause || LucideIcons.Pause;
+export const Play = iconMap.Play || LucideIcons.Play;
 export const PieChart01 = iconMap.PieChart01 || LucideIcons.PieChart;
 export const Phone = iconMap.Phone || LucideIcons.Phone;
 export const Phone01 = iconMap.Phone01 || LucideIcons.Phone;

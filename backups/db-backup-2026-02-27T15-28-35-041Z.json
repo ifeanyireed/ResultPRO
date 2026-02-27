@@ -12,9 +12,9 @@
       "role": "SUPER_ADMIN",
       "status": "ACTIVE",
       "firstLogin": false,
-      "lastLoginAt": "2026-02-24T09:08:43.407Z",
+      "lastLoginAt": "2026-02-25T08:24:05.445Z",
       "createdAt": "2026-02-24T08:49:23.132Z",
-      "updatedAt": "2026-02-24T09:08:43.413Z",
+      "updatedAt": "2026-02-25T08:24:05.449Z",
       "deletedAt": null
     }
   ],
@@ -23,17 +23,17 @@
       "id": "cmm0docxe0000njulskocbum9",
       "name": "Alexander Obi International College",
       "slug": "alexander-obi-international-college",
-      "motto": "",
-      "logoUrl": "",
+      "motto": "Excellence in Education",
+      "logoUrl": "https://resultspro-documents.s3.amazonaws.com/logos/cmm0docxe0000njulskocbum9/1771951327935-AOIC.png?AWSAccessKeyId=AKIAS4ND3QS24JUIXVVZ&Expires=1772037734&Signature=kkDPR3FJ4ochaPAoLozjATMCjyU%3D",
       "logoEmoji": null,
       "primaryColor": "#1e40af",
       "secondaryColor": "#0ea5e9",
       "accentColor": "#f59e0b",
       "contactEmail": "ifeanyireed@gmail.com",
-      "contactPhone": "",
-      "contactPersonName": "",
-      "altContactEmail": "",
-      "altContactPhone": null,
+      "contactPhone": "07035672289",
+      "contactPersonName": "Praise Eto",
+      "altContactEmail": "info@alexanderobiintlcol.com",
+      "altContactPhone": "08035428870",
       "fullAddress": "Plot 4-6, Aladinma Extension, Off MCC road, Ikenegbu",
       "state": "Imo",
       "lga": "Owerri North",
@@ -45,16 +45,18 @@
       "documentVerificationType": "CAC",
       "documentVerificationUrl": "https://resultspro-documents.s3.amazonaws.com/documents/cmm0docxe0000njulskocbum9/CAC/1771923968145-WhatsApp%20Image%202026-02-09%20at%2017.53.53.jpeg?AWSAccessKeyId=AKIAS4ND3QS24JUIXVVZ&Expires=1803459970&Signature=chaS3CNHKvaucVC5Ib8KGgavD%2Bk%3D",
       "documentVerificationSubmittedAt": "2026-02-24T09:06:10.095Z",
-      "onboardingStatus": "ACTIVE",
-      "onboardingCompletedAt": null,
+      "onboardingStatus": "COMPLETE",
+      "onboardingCompletedAt": "2026-02-24T16:08:53.496Z",
       "currentOnboardingStep": 0,
-      "subscriptionTier": "BASIC",
+      "resultsSetupStatus": "NOT_STARTED",
+      "resultsSetupCompletedAt": null,
+      "subscriptionTier": "Pro",
       "subscriptionStartDate": null,
       "subscriptionEndDate": null,
       "maxStudents": 100,
       "maxTeachers": 20,
       "createdAt": "2026-02-24T09:03:13.010Z",
-      "updatedAt": "2026-02-24T12:52:37.911Z",
+      "updatedAt": "2026-02-24T16:42:14.100Z",
       "deletedAt": null
     }
   ],
@@ -66,39 +68,19 @@
       "firstName": null,
       "lastName": null,
       "fullName": "Alexander Obi International College",
-      "passwordHash": "$2b$10$441zN99Zn3ulzzUvUtHC2u.BXvQ06/t4SPn9.K3zzHGgJvqOoNsWe",
+      "passwordHash": "$2b$10$XeeVeX.4VNBjwAH3jgZsOeIKHyjlwphKm92SKJOQgJ6is27Gx/P4C",
       "passwordResetToken": null,
       "passwordResetTokenExpiry": null,
       "role": "SCHOOL_ADMIN",
       "status": "ACTIVE",
       "firstLogin": false,
-      "lastLoginAt": "2026-02-24T09:12:45.956Z",
+      "lastLoginAt": "2026-02-25T08:19:41.690Z",
       "createdAt": "2026-02-24T09:03:13.249Z",
-      "updatedAt": "2026-02-24T09:12:45.959Z",
+      "updatedAt": "2026-02-25T08:19:41.697Z",
       "deletedAt": null
     }
   ],
   "academicSession": [
-    {
-      "id": "cmm0kzyyy000113cqjxdawy57",
-      "schoolId": "cmm0docxe0000njulskocbum9",
-      "name": "2026/2027",
-      "startDate": "2025-09-15T00:00:00.000Z",
-      "endDate": "2026-07-24T00:00:00.000Z",
-      "isActive": true,
-      "createdAt": "2026-02-24T12:28:12.105Z",
-      "updatedAt": "2026-02-24T12:28:46.899Z"
-    },
-    {
-      "id": "cmm0l06yb000313cq7y63x5yq",
-      "schoolId": "cmm0docxe0000njulskocbum9",
-      "name": "2025/2027",
-      "startDate": "2026-02-24T12:28:22.448Z",
-      "endDate": "2026-02-24T12:28:22.448Z",
-      "isActive": true,
-      "createdAt": "2026-02-24T12:28:22.451Z",
-      "updatedAt": "2026-02-24T12:28:22.451Z"
-    },
     {
       "id": "cmm0l08pb000513cq38h62omf",
       "schoolId": "cmm0docxe0000njulskocbum9",
@@ -193,17 +175,109 @@
       "updatedAt": "2026-02-24T12:42:16.102Z"
     }
   ],
-  "gradingSystem": [],
-  "grade": [],
+  "gradingSystem": [
+    {
+      "id": "cmm0ofltw0001rfw06w7xzibk",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "name": "Grading System",
+      "description": null,
+      "isDefault": true,
+      "createdAt": "2026-02-24T14:04:20.404Z",
+      "updatedAt": "2026-02-24T14:04:20.404Z"
+    },
+    {
+      "id": "cmm0ptfe7000171lemb0462xd",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "name": "standard",
+      "description": "standard grading system",
+      "isDefault": true,
+      "createdAt": "2026-02-24T14:43:04.880Z",
+      "updatedAt": "2026-02-24T14:43:04.880Z"
+    }
+  ],
+  "grade": [
+    {
+      "id": "cmm0ptfga000271lesc2spxe2",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "subjectId": null,
+      "gradingSystemId": "cmm0ptfe7000171lemb0462xd",
+      "gradeName": "A",
+      "minScore": 80,
+      "maxScore": 100,
+      "description": "",
+      "createdAt": "2026-02-24T14:43:04.955Z",
+      "updatedAt": "2026-02-24T14:43:04.955Z"
+    },
+    {
+      "id": "cmm0ptfgb000371leedll2z88",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "subjectId": null,
+      "gradingSystemId": "cmm0ptfe7000171lemb0462xd",
+      "gradeName": "B",
+      "minScore": 70,
+      "maxScore": 79,
+      "description": "",
+      "createdAt": "2026-02-24T14:43:04.955Z",
+      "updatedAt": "2026-02-24T14:43:04.955Z"
+    },
+    {
+      "id": "cmm0ptfgb000471letwkjef1x",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "subjectId": null,
+      "gradingSystemId": "cmm0ptfe7000171lemb0462xd",
+      "gradeName": "C",
+      "minScore": 60,
+      "maxScore": 69,
+      "description": "",
+      "createdAt": "2026-02-24T14:43:04.955Z",
+      "updatedAt": "2026-02-24T14:43:04.955Z"
+    },
+    {
+      "id": "cmm0ptfgb000571leb9kppjek",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "subjectId": null,
+      "gradingSystemId": "cmm0ptfe7000171lemb0462xd",
+      "gradeName": "D",
+      "minScore": 50,
+      "maxScore": 59,
+      "description": "",
+      "createdAt": "2026-02-24T14:43:04.955Z",
+      "updatedAt": "2026-02-24T14:43:04.955Z"
+    },
+    {
+      "id": "cmm0ptfgb000671leo3dyjs6k",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "subjectId": null,
+      "gradingSystemId": "cmm0ptfe7000171lemb0462xd",
+      "gradeName": "E",
+      "minScore": 40,
+      "maxScore": 49,
+      "description": "",
+      "createdAt": "2026-02-24T14:43:04.955Z",
+      "updatedAt": "2026-02-24T14:43:04.955Z"
+    },
+    {
+      "id": "cmm0ptfgc000771ley0zjccvd",
+      "schoolId": "cmm0docxe0000njulskocbum9",
+      "subjectId": null,
+      "gradingSystemId": "cmm0ptfe7000171lemb0462xd",
+      "gradeName": "F",
+      "minScore": 0,
+      "maxScore": 39,
+      "description": "",
+      "createdAt": "2026-02-24T14:43:04.955Z",
+      "updatedAt": "2026-02-24T14:43:04.955Z"
+    }
+  ],
   "onboardingState": [
     {
       "id": "cmm0druaj0004njuldo8g4tty",
       "schoolId": "cmm0docxe0000njulskocbum9",
-      "completedSteps": "[1,2,3,4]",
-      "currentStep": 5,
-      "isComplete": false,
+      "completedSteps": "[1,2,3,4,5,6]",
+      "currentStep": 6,
+      "isComplete": true,
       "createdAt": "2026-02-24T09:05:55.483Z",
-      "updatedAt": "2026-02-24T12:52:31.131Z"
+      "updatedAt": "2026-02-24T16:08:53.463Z"
     }
   ]
 }

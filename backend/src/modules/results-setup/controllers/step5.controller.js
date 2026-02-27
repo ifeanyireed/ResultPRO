@@ -40,36 +40,32 @@ export async function handleStep5(req, res) {
             }
         }
         // Save to ResultsSetupSession
-        if (sessionId && termId) {
-            const resultsSetupSession = await prisma.resultsSetupSession.findUnique({
-                where: {
-                    schoolId_sessionId_termId: {
-                        schoolId,
-                        sessionId,
-                        termId,
-                    },
-                },
+        const resultsSetupSession = await prisma.resultsSetupSession.findUnique({
+            where: {
+                schoolId,
+            },
+        });
+        if (!resultsSetupSession) {
+            return res.status(404).json({
+                success: false,
+                error: 'Results setup session not found. Please complete Step 1 first.',
             });
-            if (!resultsSetupSession) {
-                return res.status(404).json({
-                    success: false,
-                    error: 'Results setup session not found. Please complete Step 1 first.',
-                });
-            }
-            const step5Payload = { classTeachers, principalName, principalSignatureUrl };
-            console.log('💾 Saving to database:', JSON.stringify(step5Payload).substring(0, 200) + '...');
-            await prisma.resultsSetupSession.update({
-                where: {
-                    id: resultsSetupSession.id,
-                },
-                data: {
-                    step5Data: JSON.stringify(step5Payload),
-                    currentStep: 5,
-                    completedSteps: JSON.stringify([1, 2, 3, 4, 5]),
-                },
-            });
-            console.log('✅ Step 5 saved to database');
         }
+        const step5Payload = { classTeachers, principalName, principalSignatureUrl };
+        console.log('💾 Saving to database:', JSON.stringify(step5Payload).substring(0, 200) + '...');
+        await prisma.resultsSetupSession.update({
+            where: {
+                id: resultsSetupSession.id,
+            },
+            data: {
+                principalName: principalName || 'Principal',
+                principalSignatureUrl: principalSignatureUrl,
+                staffData: JSON.stringify(classTeachers || []),
+                currentStep: 5,
+                completedSteps: JSON.stringify([1, 2, 3, 4, 5]),
+            },
+        });
+        console.log('✅ Step 5 saved to database');
         res.json({
             success: true,
             message: 'Staff configuration saved successfully',

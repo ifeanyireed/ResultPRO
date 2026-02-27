@@ -18,7 +18,10 @@ interface Step7Props {
   initialData?: any;
   isLoading?: boolean;
   sessionTermData?: any;
-  examConfig?: { components?: ExamComponent[] };
+  examConfig?: { 
+    components?: ExamComponent[];
+    examConfigComponents?: string | any;
+  };
   affectiveDomainData?: any;
   psychomotorDomainData?: any;
 }
@@ -65,6 +68,9 @@ export const Step7ResultsCSV = ({
   const [school, setSchool] = useState<School | null>(null);
   const [template, setTemplate] = useState<GradebookTemplate | null>(null);
   const [processingComplete, setProcessingComplete] = useState(false);
+  const [showInstanceNameDialog, setShowInstanceNameDialog] = useState(false);
+  const [instanceName, setInstanceName] = useState('');
+  const [savingInstance, setSavingInstance] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load exam components from Step 2 config
@@ -887,17 +893,73 @@ export const Step7ResultsCSV = ({
 
   const handleProceedToDashboard = async () => {
     try {
-      await onNext({
-        ...sessionTermData,
-        resultsFileUrl: csvFile?.name,
-        resultsProcessed: true,
-      });
-    } catch (error) {
+      if (!instanceName.trim()) {
+        toast({
+          title: 'Error',
+          description: 'Please enter an instance name',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      setSavingInstance(true);
+      const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+      const sessionId = sessionTermData?.sessionId || localStorage.getItem('sessionId');
+      const termId = sessionTermData?.termId || localStorage.getItem('termId');
+
+      // Build CSV content from gradebook data
+      let csvContent = '';
+      if (csvFile) {
+        csvContent = await csvFile.text();
+      }
+
+      // Prepare instance data
+      const instanceData = {
+        classId: selectedClass,
+        sessionId,
+        termId,
+        instanceName,
+        sessionName: sessionTermData?.sessionName,
+        termName: sessionTermData?.termName,
+        examConfigComponents: examComponents,
+        affectiveTraits: affectiveTraits,
+        psychomotorSkills: psychomotorSkills,
+        csvFileName: csvFile?.name || 'results.csv',
+        gradebookData: previewGradebooks,
+        totalStudents: previewGradebooks.length,
+      };
+
+      console.log('💾 Saving results instance:', instanceData);
+
+      const response = await axios.post(
+        'http://localhost:5000/api/results-setup/instances',
+        instanceData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.data.success) {
+        toast({
+          title: 'Success',
+          description: `Results saved as instance: ${instanceName}`,
+        });
+
+        // Redirect to results entry page or dashboard
+        window.location.href = '/school-admin/results-entry';
+      }
+    } catch (error: any) {
+      console.error('Error saving instance:', error);
+      const message = error.response?.data?.error || error.message || 'Failed to save instance';
       toast({
         title: 'Error',
-        description: 'Failed to complete setup',
+        description: message,
         variant: 'destructive',
       });
+    } finally {
+      setSavingInstance(false);
     }
   };
 
@@ -991,12 +1053,50 @@ export const Step7ResultsCSV = ({
             Upload Another Class
           </Button>
           <Button
-            onClick={handleProceedToDashboard}
+            onClick={() => setShowInstanceNameDialog(true)}
             className="bg-green-600 hover:bg-green-700 text-white"
           >
-            Complete Result Setup
+            Save as Instance
           </Button>
         </div>
+
+        {/* Instance Name Dialog */}
+        {showInstanceNameDialog && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 rounded-lg">
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-md mx-auto">
+              <h3 className="text-xl font-bold text-white mb-4">Save Results as Instance</h3>
+              <p className="text-gray-400 text-sm mb-4">
+                Give this results set a name to save it. You can create multiple instances per term.
+              </p>
+              <input
+                type="text"
+                value={instanceName}
+                onChange={(e) => setInstanceName(e.target.value)}
+                placeholder="e.g., Form 4 Mid-Term 2025"
+                className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-gray-400 outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-colors mb-6"
+                autoFocus
+              />
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowInstanceNameDialog(false)}
+                  disabled={savingInstance}
+                  className="flex-1 bg-transparent border-[rgba(255,255,255,0.2)] text-gray-300 hover:bg-white/5 hover:text-white"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleProceedToDashboard}
+                  disabled={savingInstance || !instanceName.trim()}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {savingInstance ? 'Saving...' : 'Save Instance'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

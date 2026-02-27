@@ -21,11 +21,7 @@ export async function handleStep3(req, res) {
         if (sessionId && termId) {
             const resultsSetupSession = await prisma.resultsSetupSession.findUnique({
                 where: {
-                    schoolId_sessionId_termId: {
-                        schoolId,
-                        sessionId,
-                        termId,
-                    },
+                    schoolId,
                 },
             });
             if (!resultsSetupSession) {
@@ -39,7 +35,7 @@ export async function handleStep3(req, res) {
                     id: resultsSetupSession.id,
                 },
                 data: {
-                    step3Data: JSON.stringify({ affectiveDomains, enableAffective }),
+                    affectiveTraits: JSON.stringify(affectiveDomains || []),
                     currentStep: 3,
                     completedSteps: JSON.stringify([1, 2, 3]),
                 },

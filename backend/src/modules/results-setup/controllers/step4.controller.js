@@ -30,33 +30,27 @@ export async function handleStep4(req, res) {
             }
         }
         // Save to ResultsSetupSession
-        if (sessionId && termId) {
-            const resultsSetupSession = await prisma.resultsSetupSession.findUnique({
-                where: {
-                    schoolId_sessionId_termId: {
-                        schoolId,
-                        sessionId,
-                        termId,
-                    },
-                },
-            });
-            if (!resultsSetupSession) {
-                return res.status(404).json({
-                    success: false,
-                    error: 'Results setup session not found. Please complete Step 1 first.',
-                });
-            }
-            await prisma.resultsSetupSession.update({
-                where: {
-                    id: resultsSetupSession.id,
-                },
-                data: {
-                    step4Data: JSON.stringify({ psychomotorDomains, enablePsychomotor }),
-                    currentStep: 4,
-                    completedSteps: JSON.stringify([1, 2, 3, 4]),
-                },
+        const resultsSetupSession = await prisma.resultsSetupSession.findUnique({
+            where: {
+                schoolId,
+            },
+        });
+        if (!resultsSetupSession) {
+            return res.status(404).json({
+                success: false,
+                error: 'Results setup session not found. Please complete Step 1 first.',
             });
         }
+        await prisma.resultsSetupSession.update({
+            where: {
+                id: resultsSetupSession.id,
+            },
+            data: {
+                psychomotorSkills: JSON.stringify(psychomotorDomains || []),
+                currentStep: 4,
+                completedSteps: JSON.stringify([1, 2, 3, 4]),
+            },
+        });
         res.json({
             success: true,
             message: 'Psychomotor configuration saved successfully',

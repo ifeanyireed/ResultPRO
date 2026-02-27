@@ -5,7 +5,7 @@ export { default as SubjectManagement } from './SubjectManagement';
 export { default as GradingSystemSetup } from './GradingSystemSetup';
 export { default as StudentsList } from './StudentsList';
 export { default as StudentProfile } from './StudentProfile';
-export { default as ResultsEntry } from './ResultsEntry';
+export { default as ResultsEntry } from './results-entry/ResultsEntryPage';
 export { default as ResultsPublishing } from './ResultsPublishing';
 export { default as AnalyticsDashboard } from './AnalyticsDashboard';
 export { default as LeaderboardManagement } from './LeaderboardManagement';

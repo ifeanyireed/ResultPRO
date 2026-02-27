@@ -102,7 +102,7 @@ export async function handleStep2(req, res) {
                 id: resultsSetupSession.id,
             },
             data: {
-                step2Data: JSON.stringify({ classes }),
+                examConfigComponents: JSON.stringify(classes),
                 currentStep: 2,
                 completedSteps: JSON.stringify([1, 2]),
             },

@@ -6,6 +6,8 @@ const service = new ResultsSetupService();
 export async function handleStep3(req: Request, res: Response) {
   try {
     const schoolId = req.user?.schoolId;
+    console.log('🟡 STEP 3 CALLED - schoolId:', schoolId);
+    
     if (!schoolId) {
       return res.status(400).json({
         success: false,
@@ -15,6 +17,7 @@ export async function handleStep3(req: Request, res: Response) {
     }
 
     const { sessionId, termId, affectiveTraits } = req.body;
+    console.log('📝 Step 3 data received - traits:', affectiveTraits?.length || 0);
 
     if (!sessionId || !termId) {
       return res.status(400).json({
@@ -37,6 +40,7 @@ export async function handleStep3(req: Request, res: Response) {
       currentStep: 4,
       affectiveTraits: JSON.stringify(affectiveTraits),
     });
+    console.log('💾 Step 3 data saved to DB');
 
     res.json({
       success: true,
@@ -44,6 +48,7 @@ export async function handleStep3(req: Request, res: Response) {
       data: updated,
     });
   } catch (error: any) {
+    console.error('❌ STEP 3 ERROR:', error.message);
     const status = error.status || 500;
     res.status(status).json({
       success: false,
