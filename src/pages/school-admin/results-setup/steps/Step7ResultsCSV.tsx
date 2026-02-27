@@ -405,7 +405,7 @@ export const Step7ResultsCSV = ({
         throw new Error('CSV must have headers and at least one data row');
       }
 
-      // Parse header rows (lines 0-1) and skip example row (line 2)
+      // Parse header rows (lines 0-1) and include all data rows (including example row at line 2)
       const mainHeaders = lines[0]
         .split(',')
         .map(h => h.replace(/"/g, '').trim());
@@ -414,8 +414,8 @@ export const Step7ResultsCSV = ({
         .split(',')
         .map(h => h.replace(/"/g, '').trim());
 
-      // Extract data rows (skip header, sub-header, and example row)
-      const dataRows = lines.slice(3).map(line =>
+      // Extract data rows (skip header and sub-header, but include example row and all student rows)
+      const dataRows = lines.slice(2).map(line =>
         line.split(',').map(cell => cell.replace(/"/g, '').trim())
       );
 
@@ -451,7 +451,7 @@ export const Step7ResultsCSV = ({
       // Extract affective traits from sub-headers between Affective and Psychomotor
       const affectiveDomainTraits: Record<string, number> = {};
       if (affectiveStartIdx >= 0 && psychomotorStartIdx > affectiveStartIdx) {
-        for (let col = affectiveStartIdx + 1; col < psychomotorStartIdx; col++) {
+        for (let col = affectiveStartIdx; col < psychomotorStartIdx; col++) {
           const trait = subHeaders[col];
           if (trait && trait !== '' && trait !== 'Psychomotor Domains') {
             affectiveDomainTraits[trait] = col;
@@ -462,7 +462,7 @@ export const Step7ResultsCSV = ({
       // Extract psychomotor skills from sub-headers between Psychomotor and Comments
       const psychomotorDomainSkills: Record<string, number> = {};
       if (psychomotorStartIdx >= 0 && commentsStartIdx > psychomotorStartIdx) {
-        for (let col = psychomotorStartIdx + 1; col < commentsStartIdx; col++) {
+        for (let col = psychomotorStartIdx; col < commentsStartIdx; col++) {
           const skill = subHeaders[col];
           if (skill && skill !== '' && skill !== 'Comments' && skill !== 'Principal Comments' && skill !== 'Form Tutor Comments') {
             psychomotorDomainSkills[skill] = col;
