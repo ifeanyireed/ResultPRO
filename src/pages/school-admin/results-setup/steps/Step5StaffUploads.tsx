@@ -31,6 +31,9 @@ export const Step5StaffUploads = ({
   const [principalSignatureUrl, setPrincipalSignatureUrl] = useState<string | null>(
     initialData?.principalSignatureUrl || null
   );
+  const [principalS3Key, setPrincipalS3Key] = useState<string | null>(
+    initialData?.principalS3Key || null
+  );
   const [teacherSignatures, setTeacherSignatures] = useState<TeacherSignature[]>(
     initialData?.staffData || []
   );
@@ -94,6 +97,7 @@ export const Step5StaffUploads = ({
         {
           principalName: name,
           principalSignatureUrl,
+          principalS3Key,
           staffData: teacherSignatures,
         },
         {
@@ -120,6 +124,7 @@ export const Step5StaffUploads = ({
         {
           principalName,
           principalSignatureUrl,
+          principalS3Key,
           staffData: updated,
         },
         {
@@ -160,15 +165,18 @@ export const Step5StaffUploads = ({
 
       if (response.data.success) {
         const signatureUrl = response.data.s3Url;
+        const s3Key = response.data.s3Key;
 
         if (signatureType === 'principal') {
           setPrincipalSignatureUrl(signatureUrl);
+          setPrincipalS3Key(s3Key);
           // Real-time save
           await axios.patch(
             'http://localhost:5000/api/results-setup/staff-data',
             {
               principalName,
               principalSignatureUrl: signatureUrl,
+              principalS3Key: s3Key,
               staffData: teacherSignatures,
             },
             {
@@ -188,6 +196,7 @@ export const Step5StaffUploads = ({
             {
               principalName,
               principalSignatureUrl,
+              principalS3Key,
               staffData: updated,
             },
             {
@@ -241,6 +250,7 @@ export const Step5StaffUploads = ({
         ...sessionTermData,
         principalName,
         principalSignatureUrl,
+        principalS3Key,
         staffData: teacherSignatures,
       };
 

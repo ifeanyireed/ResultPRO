@@ -50,10 +50,18 @@ export class ResultsSetupService {
       completedSteps.sort((a: number, b: number) => a - b);
     }
 
+    // Filter out null/undefined values to avoid Prisma errors
+    const cleanedData: any = {};
+    for (const [key, value] of Object.entries(stepData)) {
+      if (value !== null && value !== undefined) {
+        cleanedData[key] = value;
+      }
+    }
+
     return prisma.resultsSetupSession.update({
       where: { schoolId },
       data: {
-        ...stepData,
+        ...cleanedData,
         completedSteps: JSON.stringify(completedSteps),
       },
     });
@@ -75,6 +83,9 @@ export class ResultsSetupService {
     }
     if (dataUpdate.principalSignatureUrl !== undefined) {
       updateData.principalSignatureUrl = dataUpdate.principalSignatureUrl;
+    }
+    if (dataUpdate.principalS3Key !== undefined) {
+      updateData.principalS3Key = dataUpdate.principalS3Key;
     }
     if (dataUpdate.staffData !== undefined) {
       updateData.staffData = dataUpdate.staffData;

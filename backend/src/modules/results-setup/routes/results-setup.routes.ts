@@ -5,7 +5,7 @@ import { handleStep2 } from '../controllers/step2.controller';
 import { handleStep3 } from '../controllers/step3.controller';
 import { handleStep4 } from '../controllers/step4.controller';
 import { handleStep5, updateStaffData } from '../controllers/step5.controller';
-import { uploadSignature } from '../controllers/signature-upload.controller';
+import { uploadSignature, getSignaturePresignedUrl } from '../controllers/signature-upload.controller';
 import { processCSV } from '../controllers/csv-processor.controller';
 import { getResultsSetupSession, initializeResultsSetup, getClassSubjects, getFreshLogoUrl, getClassResults } from '../controllers/results-setup.controller';
 import { createSampleClasses } from '../controllers/debug.controller';
@@ -70,6 +70,9 @@ router.post('/step/4', handleStep4);
 
 // POST /api/results-setup/upload-signature - Upload signature to S3
 router.post('/upload-signature', uploadSignatureMiddleware.single('file'), uploadSignature);
+
+// GET /api/results-setup/signature-presigned-url - Get fresh presigned URL for viewing signature
+router.get('/signature-presigned-url', getSignaturePresignedUrl);
 
 // PATCH /api/results-setup/staff-data - Real-time staff data update
 router.patch('/staff-data', updateStaffData);

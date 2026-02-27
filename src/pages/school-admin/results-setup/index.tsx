@@ -87,11 +87,9 @@ export const ResultsSetupWizard = () => {
           return;
         }
 
-        // Check if results setup is already complete
-        if (schoolRes.data.data?.resultsSetupStatus === 'COMPLETE') {
-          navigate('/school-admin/overview', { replace: true });
-          return;
-        }
+        // Allow accessing results setup multiple times (not just first time)
+        // Users will be forced here on first login by Login.tsx when resultsSetupStatus !== 'COMPLETE'
+        // But they can also access it voluntarily from the dashboard anytime
 
         // Fetch existing results setup session if available
         try {
@@ -209,7 +207,22 @@ export const ResultsSetupWizard = () => {
       try {
         const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
         
-        await axios.post(
+        if (!token) {
+          console.error('❌ No auth token found');
+          toast({
+            title: 'Error',
+            description: 'Authentication token not found. Please log in again.',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        console.log('📊 Marking results setup as complete...', {
+          endpoint: `${API_BASE}/onboarding/mark-results-setup-complete`,
+          token: token.substring(0, 20) + '...',
+        });
+        
+        const response = await axios.post(
           `${API_BASE}/onboarding/mark-results-setup-complete`,
           {},
           {
@@ -217,15 +230,23 @@ export const ResultsSetupWizard = () => {
           }
         );
 
+        console.log('✅ Results setup marked as complete:', response.data);
+
         toast({
           title: 'Success',
           description: 'Results setup completed successfully!',
         });
-      } catch (error) {
-        console.error('Failed to mark results setup complete:', error);
+      } catch (error: any) {
+        console.error('❌ Failed to mark results setup complete:', {
+          error: error,
+          response: error.response?.data,
+          status: error.response?.status,
+          message: error.message,
+        });
         toast({
-          title: 'Warning',
-          description: 'Setup complete but failed to sync. Proceeding anyway.',
+          title: 'Error',
+          description: error.response?.data?.error || error.message || 'Failed to mark results setup as complete',
+          variant: 'destructive',
         });
       }
       
@@ -275,7 +296,7 @@ export const ResultsSetupWizard = () => {
       case 6:
         return <Step6AssignStudents {...stepProps} initialData={state.step6Data} />;
       case 7:
-        return <Step7ResultsCSV {...stepProps} initialData={state.step7Data} />;
+        return <Step7ResultsCSV {...stepProps} examConfig={state.step2Data} affectiveDomainData={state.step3Data} psychomotorDomainData={state.step4Data} initialData={state.step7Data} />;
       default:
         return null;
     }

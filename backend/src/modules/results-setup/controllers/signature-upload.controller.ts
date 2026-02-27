@@ -89,18 +89,20 @@ export async function uploadSignature(req: Request, res: Response) {
       throw new Error(`Failed to verify signature upload. Please try again.`);
     }
 
-    // Generate presigned URL for preview (24 hours)
+    // Generate presigned URL for immediate preview (7 days expiration)
+    // Store the S3 key for later regeneration if needed
     const s3Url = await s3.getSignedUrlPromise('getObject', {
       Bucket: config.aws.s3Bucket,
       Key: key,
-      Expires: 86400,
+      Expires: 604800, // 7 days instead of 24 hours
     });
 
-    console.log('✓ Generated presigned URL for signature');
+    console.log('✓ Generated presigned URL for signature (7 day expiration)');
 
     res.json({
       success: true,
       s3Url,
+      s3Key: key, // Return S3 key for regenerating presigned URLs if needed
       key,
       signatureType,
       classId: classId || null,
@@ -110,6 +112,81 @@ export async function uploadSignature(req: Request, res: Response) {
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Failed to upload signature',
+    });
+  }
+}
+/**
+ * Generate a fresh presigned URL for an existing signature
+ * This allows retrieving signatures even after the initial presigned URL expires
+ */
+export async function getSignaturePresignedUrl(req: Request, res: Response) {
+  try {
+    const { s3Key } = req.query;
+
+    if (!s3Key || typeof s3Key !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'S3 key is required',
+      });
+    }
+
+    const schoolId = req.user?.schoolId;
+    if (!schoolId) {
+      return res.status(401).json({
+        success: false,
+        error: 'Unauthorized - no schoolId found',
+      });
+    }
+
+    // Verify the S3 key belongs to the requesting school
+    if (!s3Key.includes(`signatures/${schoolId}/`)) {
+      return res.status(403).json({
+        success: false,
+        error: 'Forbidden - you do not have access to this signature',
+      });
+    }
+
+    if (!config.aws?.s3Bucket) {
+      return res.status(500).json({
+        success: false,
+        error: 'S3 bucket not configured',
+      });
+    }
+
+    // Verify the signature still exists in S3
+    try {
+      console.log('🔍 Verifying signature exists in S3:', s3Key);
+      await s3.headObject({
+        Bucket: config.aws.s3Bucket,
+        Key: s3Key,
+      }).promise();
+      console.log('✓ Signature found in S3');
+    } catch (headError: any) {
+      return res.status(404).json({
+        success: false,
+        error: 'Signature not found in S3',
+      });
+    }
+
+    // Generate a fresh presigned URL (7 days expiration)
+    const freshSignedUrl = await s3.getSignedUrlPromise('getObject', {
+      Bucket: config.aws.s3Bucket,
+      Key: s3Key,
+      Expires: 604800, // 7 days
+    });
+
+    console.log('✓ Generated fresh presigned URL for signature');
+
+    res.json({
+      success: true,
+      s3Url: freshSignedUrl,
+      s3Key,
+    });
+  } catch (error) {
+    console.error('Error generating presigned URL:', error);
+    res.status(500).json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to generate presigned URL',
     });
   }
 }

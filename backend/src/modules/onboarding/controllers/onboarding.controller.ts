@@ -487,14 +487,20 @@ export class OnboardingController {
 
   static async markResultsSetupComplete(req: Request, res: Response) {
     try {
+      console.log('📊 [markResultsSetupComplete] Request received');
+      console.log('📊 [markResultsSetupComplete] req.user:', req.user);
+      
       const schoolId = req.user?.schoolId;
       if (!schoolId) {
+        console.error('❌ [markResultsSetupComplete] No schoolId found in req.user');
         return res.status(401).json({
           success: false,
-          error: 'Unauthorized',
+          error: 'Unauthorized - no schoolId',
           code: 'UNAUTHORIZED',
         });
       }
+
+      console.log('📊 [markResultsSetupComplete] Updating school:', schoolId);
 
       // Update school to mark results setup as complete
       const updatedSchool = await prisma.school.update({
@@ -503,6 +509,12 @@ export class OnboardingController {
           resultsSetupStatus: 'COMPLETE',
           resultsSetupCompletedAt: new Date(),
         },
+      });
+
+      console.log('✅ [markResultsSetupComplete] School updated successfully:', {
+        schoolId,
+        resultsSetupStatus: updatedSchool.resultsSetupStatus,
+        updatedAt: updatedSchool.updatedAt,
       });
 
       res.json({
@@ -515,6 +527,11 @@ export class OnboardingController {
         },
       });
     } catch (error: any) {
+      console.error('❌ [markResultsSetupComplete] Error:', {
+        message: error.message,
+        code: error.code,
+        stack: error.stack,
+      });
       const status = error.status || 500;
       res.status(status).json({
         success: false,

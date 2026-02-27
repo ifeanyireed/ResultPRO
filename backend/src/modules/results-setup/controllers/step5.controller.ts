@@ -14,7 +14,7 @@ export async function handleStep5(req: Request, res: Response) {
       });
     }
 
-    const { sessionId, termId, principalName, principalSignatureUrl, staffData } = req.body;
+    const { sessionId, termId, principalName, principalSignatureUrl, principalS3Key, staffData } = req.body;
 
     if (!sessionId || !termId) {
       return res.status(400).json({
@@ -64,6 +64,7 @@ export async function handleStep5(req: Request, res: Response) {
       currentStep: 6,
       principalName,
       principalSignatureUrl,
+      principalS3Key, // Store S3 key for regenerating URLs later
       staffData: JSON.stringify(staffData),
     });
 

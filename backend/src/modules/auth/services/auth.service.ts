@@ -521,6 +521,7 @@ export class AuthService {
           motto: school.motto,
           slug: school.slug,
           onboardingStatus: school.onboardingStatus,
+          resultsSetupStatus: school.resultsSetupStatus,
           status: school.status,
         },
       };
@@ -565,6 +566,7 @@ export class AuthService {
           motto: school.motto,
           slug: school.slug,
           onboardingStatus: school.onboardingStatus,
+          resultsSetupStatus: school.resultsSetupStatus,
           status: school.status,
         },
       };
@@ -619,6 +621,7 @@ export class AuthService {
         motto: school.motto,
         slug: school.slug,
         onboardingStatus: school.onboardingStatus,
+        resultsSetupStatus: school.resultsSetupStatus,
         status: school.status,
       },
     };

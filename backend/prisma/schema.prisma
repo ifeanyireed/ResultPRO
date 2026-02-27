@@ -94,6 +94,7 @@ model ResultsSetupSession {
   // Step 5: Staff Uploads
   principalName             String?  @map("principal_name")
   principalSignatureUrl     String?  @map("principal_signature_url")
+  principalS3Key            String?  @map("principal_s3_key")
   staffData                 String   @default("[]") @map("staff_data")  // JSON array of {classId, className, teacherName, teacherSignatureUrl}
   
   // Step 6: Assigned Students

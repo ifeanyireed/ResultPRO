@@ -53,6 +53,10 @@ export class OnboardingService {
         subscriptionEndDate: true,
         maxStudents: true,
         maxTeachers: true,
+        onboardingStatus: true,
+        currentOnboardingStep: true,
+        resultsSetupStatus: true,
+        resultsSetupCompletedAt: true,
         academicSessions: {
           select: {
             id: true,

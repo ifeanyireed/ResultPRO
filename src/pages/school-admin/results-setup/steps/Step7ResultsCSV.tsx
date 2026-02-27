@@ -7,12 +7,20 @@ import { CompactGradebook } from '@/components/gradebook/CompactGradebook';
 import { getTemplate } from '@/lib/gradebookTemplates';
 import { School, SchoolResult, GradebookTemplate } from '@/lib/schoolData';
 
+interface ExamComponent {
+  name: string;
+  score: number;
+}
+
 interface Step7Props {
   onNext: (data: any) => Promise<void>;
   onPrevious: () => void;
   initialData?: any;
   isLoading?: boolean;
   sessionTermData?: any;
+  examConfig?: { components?: ExamComponent[] };
+  affectiveDomainData?: any;
+  psychomotorDomainData?: any;
 }
 
 interface StudentResult {
@@ -34,6 +42,9 @@ export const Step7ResultsCSV = ({
   initialData,
   isLoading = false,
   sessionTermData,
+  examConfig,
+  affectiveDomainData,
+  psychomotorDomainData,
 }: Step7Props) => {
   const { toast } = useToast();
   const [classes, setClasses] = useState<any[]>([]);
@@ -42,6 +53,7 @@ export const Step7ResultsCSV = ({
   const [subjects, setSubjects] = useState<any[]>([]);
   const [affectiveTraits, setAffectiveTraits] = useState<string[]>([]);
   const [psychomotorSkills, setPsychomotorSkills] = useState<string[]>([]);
+  const [examComponents, setExamComponents] = useState<ExamComponent[]>([]);
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<{ headers: string[]; rows: string[][] } | null>(null);
@@ -54,6 +66,40 @@ export const Step7ResultsCSV = ({
   const [template, setTemplate] = useState<GradebookTemplate | null>(null);
   const [processingComplete, setProcessingComplete] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Load exam components from Step 2 config
+  useEffect(() => {
+    let componentsToLoad = null;
+    
+    // Handle both formats: { components: [...] } and { examConfigComponents: "..." }
+    if (examConfig?.components && Array.isArray(examConfig.components)) {
+      componentsToLoad = examConfig.components;
+      console.log('📊 Exam components loaded from Step 2 (components format):', examConfig.components);
+    } else if (examConfig?.examConfigComponents) {
+      try {
+        const parsed = typeof examConfig.examConfigComponents === 'string'
+          ? JSON.parse(examConfig.examConfigComponents)
+          : examConfig.examConfigComponents;
+        componentsToLoad = parsed;
+        console.log('📊 Exam components loaded from Step 2 (examConfigComponents format):', parsed);
+      } catch (e) {
+        console.error('Failed to parse examConfigComponents:', e);
+      }
+    }
+    
+    if (componentsToLoad && componentsToLoad.length > 0) {
+      setExamComponents(componentsToLoad);
+    } else {
+      // Fallback to default components if not provided
+      setExamComponents([
+        { name: 'CA 1', score: 20 },
+        { name: 'CA 2', score: 20 },
+        { name: 'Project', score: 10 },
+        { name: 'Exam', score: 50 },
+      ]);
+      console.log('📊 Using default exam components (Step 2 config not available or empty)');
+    }
+  }, [examConfig]);
 
   // Load classes, students, subjects, affective traits, and psychomotor skills on mount
   useEffect(() => {
@@ -75,29 +121,67 @@ export const Step7ResultsCSV = ({
         const allStudents = studentsResponse.data.data?.students || [];
         setStudents(allStudents);
 
-        // Get affective traits - with better error handling
-        if (sessionTermData?.affectiveTraits) {
+        // Fetch session data once if needed (fallback source)
+        let sessionData = null;
+        if (!affectiveDomainData?.affectiveTraits || !psychomotorDomainData?.psychomotorSkills) {
           try {
-            const traits = typeof sessionTermData.affectiveTraits === 'string' 
-              ? JSON.parse(sessionTermData.affectiveTraits)
-              : sessionTermData.affectiveTraits;
+            const sessionResponse = await axios.get('http://localhost:5000/api/results-setup/session', {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            sessionData = sessionResponse.data.data;
+            console.log('✓ Session data fetched from API');
+          } catch (e) {
+            console.warn('Could not fetch session data:', e);
+          }
+        }
+
+        // Get affective traits - prioritize passed data → sessionTermData → session API
+        let affectiveTraitsData = null;
+        if (affectiveDomainData?.affectiveTraits) {
+          affectiveTraitsData = affectiveDomainData.affectiveTraits;
+          console.log('📍 Using affective traits from Step 3 props');
+        } else if (sessionTermData?.affectiveTraits) {
+          affectiveTraitsData = sessionTermData.affectiveTraits;
+          console.log('📍 Using affective traits from sessionTermData');
+        } else if (sessionData?.affectiveTraits) {
+          affectiveTraitsData = sessionData.affectiveTraits;
+          console.log('📍 Using affective traits from session API');
+        }
+
+        if (affectiveTraitsData) {
+          try {
+            const traits = typeof affectiveTraitsData === 'string' 
+              ? JSON.parse(affectiveTraitsData)
+              : affectiveTraitsData;
             const traitsArray = Array.isArray(traits) ? traits : [];
             setAffectiveTraits(traitsArray);
-            console.log('Affective traits loaded:', traitsArray);
+            console.log('✓ Affective traits loaded:', traitsArray);
           } catch (e) {
             console.error('Failed to parse affective traits:', e);
           }
         }
 
-        // Get psychomotor skills - with better error handling
-        if (sessionTermData?.psychomotorSkills) {
+        // Get psychomotor skills - prioritize passed data → sessionTermData → session API
+        let psychomotorSkillsData = null;
+        if (psychomotorDomainData?.psychomotorSkills) {
+          psychomotorSkillsData = psychomotorDomainData.psychomotorSkills;
+          console.log('📍 Using psychomotor skills from Step 4 props');
+        } else if (sessionTermData?.psychomotorSkills) {
+          psychomotorSkillsData = sessionTermData.psychomotorSkills;
+          console.log('📍 Using psychomotor skills from sessionTermData');
+        } else if (sessionData?.psychomotorSkills) {
+          psychomotorSkillsData = sessionData.psychomotorSkills;
+          console.log('📍 Using psychomotor skills from session API');
+        }
+
+        if (psychomotorSkillsData) {
           try {
-            const skills = typeof sessionTermData.psychomotorSkills === 'string'
-              ? JSON.parse(sessionTermData.psychomotorSkills)
-              : sessionTermData.psychomotorSkills;
+            const skills = typeof psychomotorSkillsData === 'string'
+              ? JSON.parse(psychomotorSkillsData)
+              : psychomotorSkillsData;
             const skillsArray = Array.isArray(skills) ? skills : [];
             setPsychomotorSkills(skillsArray);
-            console.log('Psychomotor skills loaded:', skillsArray);
+            console.log('✓ Psychomotor skills loaded:', skillsArray);
           } catch (e) {
             console.error('Failed to parse psychomotor skills:', e);
           }
@@ -113,7 +197,7 @@ export const Step7ResultsCSV = ({
     };
 
     loadData();
-  }, [sessionTermData, toast]);
+  }, [sessionTermData, affectiveDomainData, psychomotorDomainData, toast]);
 
   // Load subjects when class is selected
   useEffect(() => {
@@ -177,7 +261,7 @@ export const Step7ResultsCSV = ({
       'Height',
       'Weight',
       'Favourite Color',
-      ...subjects.flatMap(s => [s, '', '', '']), // Subject name spans 4 columns
+      ...subjects.flatMap(s => [s, ...Array(examComponents.length - 1).fill('')]), // Subject name spans N columns (one for each exam component)
       'Affective Domains',
       ...Array(Math.max(0, affectiveTraitsArray.length - 1)).fill(''), // Span remaining affective columns
       'Psychomotor Domains',
@@ -186,7 +270,7 @@ export const Step7ResultsCSV = ({
       '',
     ];
 
-    // Create sub-headers (row 2) with format hints and score ranges
+    // Create sub-headers (row 2) with component names and score ranges
     const subHeaders = [
       '', // Student ID
       '', // Name
@@ -197,7 +281,9 @@ export const Step7ResultsCSV = ({
       '', // Height
       '', // Weight
       '', // Favourite Color
-      ...subjects.flatMap(() => ['CAT 1 (20)', 'CAT 2 (20)', 'Project (10)', 'Final Exam (50)']),
+      ...subjects.flatMap(() => 
+        examComponents.map(comp => `${comp.name} (${comp.score})`)
+      ),
       ...affectiveTraitsArray, // Affective traits as sub-headers
       ...psychomotorSkillsArray, // Psychomotor skills as sub-headers
       'Principal Comments', // Comments sub-header 1
@@ -215,7 +301,13 @@ export const Step7ResultsCSV = ({
       '165cm',
       '58kg',
       'Blue',
-      ...subjects.flatMap(() => ['14', '14', '7', '35']), // Sample scores
+      ...subjects.flatMap(() => 
+        examComponents.map(comp => {
+          // Linear scoring: give lower components lower values, higher components higher values
+          const ratio = comp.score / 100;
+          return Math.round(comp.score * 0.7 * ratio).toString(); // 70% of component max as example
+        })
+      ),
       ...affectiveTraitsArray.map(() => '4'), // Sample affective score (1-5)
       ...psychomotorSkillsArray.map(() => '4'), // Sample psychomotor score (1-5)
       'Excellent performance',
@@ -235,7 +327,9 @@ export const Step7ResultsCSV = ({
         '', // Height
         '', // Weight
         '', // Favourite Color
-        ...subjects.flatMap(() => ['', '', '', '']), // 4 empty cells per subject
+        ...subjects.flatMap(() => 
+          examComponents.map(() => '') // One empty cell per exam component
+        ),
         ...affectiveTraitsArray.map(() => ''), // Empty affective cells
         ...psychomotorSkillsArray.map(() => ''), // Empty psychomotor cells
         '', // Principal Comments
@@ -329,18 +423,19 @@ export const Step7ResultsCSV = ({
       console.log('  Main Headers:', mainHeaders);
       console.log('  Sub Headers:', subHeaders);
       console.log('  Data rows:', dataRows.length);
+      console.log('  Exam components:', examComponents);
 
-      // Map subject positions (assume they start after favorite color - column 8)
-      // Each subject takes 4 columns (CA1, CA2, Project, Exam)
+      // Map subject positions - each subject takes N columns (one per exam component)
       const subjectStartCol = 9;
-      const subjectEndCol = subjectStartCol + (subjects.length * 4);
+      const componentsPerSubject = examComponents.length;
+      const subjectEndCol = subjectStartCol + (subjects.length * componentsPerSubject);
       
       const subjectMap: Record<string, number> = {};
       for (let i = 0; i < subjects.length; i++) {
-        subjectMap[subjects[i]] = subjectStartCol + (i * 4);
+        subjectMap[subjects[i]] = subjectStartCol + (i * componentsPerSubject);
       }
 
-      console.log('📚 Subject map:', subjectMap);
+      console.log('📚 Subject map (components per subject: ' + componentsPerSubject + '):', subjectMap);
 
       // Find affective traits start position
       const affectiveStartIdx = mainHeaders.findIndex(h => h === 'Affective Domains');
@@ -385,6 +480,7 @@ export const Step7ResultsCSV = ({
         subjectMap,
         affectiveDomainTraits,
         psychomotorDomainSkills,
+        componentsPerSubject,
       };
     } catch (error) {
       console.error('CSV parsing error:', error);
@@ -564,55 +660,70 @@ export const Step7ResultsCSV = ({
 
         console.log(`\n📌 Processing student: ${studentName} (${admissionNumber})`);
 
-        // Extract subject scores
+        // Extract subject scores using dynamic component count
         const subjectResults: any[] = [];
         for (const subject of subjects) {
           const colPos = subjectMap[subject];
           if (colPos !== undefined) {
-            const ca1 = parseInt(row[colPos] || '0') || 0;
-            const ca2 = parseInt(row[colPos + 1] || '0') || 0;
-            const project = parseInt(row[colPos + 2] || '0') || 0;
-            const exam = parseInt(row[colPos + 3] || '0') || 0;
-            const total = ca1 + ca2 + project + exam;
+            // Extract scores for each exam component
+            const componentScores: number[] = [];
+            let total = 0;
+            
+            for (let i = 0; i < examComponents.length; i++) {
+              const score = parseInt(row[colPos + i] || '0') || 0;
+              componentScores.push(score);
+              total += score;
+            }
 
-            console.log(`  ${subject}: CA1=${ca1}, CA2=${ca2}, Project=${project}, Exam=${exam}, Total=${total}`);
+            console.log(`  ${subject}: ${examComponents.map((c, i) => `${c.name}=${componentScores[i]}`).join(', ')}, Total=${total}`);
 
-            subjectResults.push({
+            // Map component scores to dynamic property names based on exam config
+            const subjectResultData: any = {
               name: subject,
               score: total,
-              ca1: ca1,
-              ca2: ca2,
-              project: project,
-              exam: exam,
               grade: total >= 80 ? 'A' : total >= 70 ? 'B' : total >= 60 ? 'C' : total >= 50 ? 'D' : 'F',
               color: 'blue' as const,
               remark: total >= 70 ? 'Good' : total >= 60 ? 'Average' : 'Needs Improvement',
               classAverage: 0,
               positionInClass: 0,
+            };
+
+            // Dynamically add component scores with standardized names
+            // For compatibility with gradebook, also keep CA1, CA2, Project, Exam if those components exist
+            examComponents.forEach((component, idx) => {
+              // Use component name as key (e.g., "CA 1", "Exam")
+              subjectResultData[component.name.toLowerCase().replace(/\s+/g, '_')] = componentScores[idx];
+              
+              // For backward compatibility with gradebook display, map to standard names if they match
+              const compName = component.name.toLowerCase();
+              if (compName.includes('ca') && compName.includes('1')) subjectResultData.ca1 = componentScores[idx];
+              if (compName.includes('ca') && compName.includes('2')) subjectResultData.ca2 = componentScores[idx];
+              if (compName.includes('project')) subjectResultData.project = componentScores[idx];
+              if (compName.includes('exam') || compName.includes('final')) subjectResultData.exam = componentScores[idx];
             });
+
+            subjectResults.push(subjectResultData);
           }
         }
 
-        // Extract affective domain traits
+        // Extract affective domain traits - include ALL traits from CSV headers
         const affectiveDomainData: Record<string, number> = {};
         for (const trait in affectiveDomainTraits) {
           const colPos = affectiveDomainTraits[trait];
           const score = parseInt(row[colPos] || '0') || 0;
-          if (score > 0) {
-            affectiveDomainData[trait] = Math.min(5, Math.max(1, score)); // Clamp to 1-5
-            console.log(`  Affective: ${trait} = ${affectiveDomainData[trait]}`);
-          }
+          // Include all traits, even if score is 0 (just show as '-' or 0 in display)
+          affectiveDomainData[trait] = score > 0 ? Math.min(5, Math.max(1, score)) : 0;
+          console.log(`  Affective: ${trait} = ${affectiveDomainData[trait]}`);
         }
 
-        // Extract psychomotor domain skills
+        // Extract psychomotor domain skills - include ALL skills from CSV headers
         const psychomotorDomainData: Record<string, number> = {};
         for (const skill in psychomotorDomainSkills) {
           const colPos = psychomotorDomainSkills[skill];
           const score = parseInt(row[colPos] || '0') || 0;
-          if (score > 0) {
-            psychomotorDomainData[skill] = Math.min(5, Math.max(1, score)); // Clamp to 1-5
-            console.log(`  Psychomotor: ${skill} = ${psychomotorDomainData[skill]}`);
-          }
+          // Include all skills, even if score is 0 (just show as '-' or 0 in display)
+          psychomotorDomainData[skill] = score > 0 ? Math.min(5, Math.max(1, score)) : 0;
+          console.log(`  Psychomotor: ${skill} = ${psychomotorDomainData[skill]}`);
         }
 
         // Extract comments from last 2 columns
@@ -850,6 +961,7 @@ export const Step7ResultsCSV = ({
                 school={school}
                 result={previewGradebooks[selectedStudentIndex]}
                 template={template}
+                examComponents={examComponents}
                 previewMode={true}
               />
             </div>

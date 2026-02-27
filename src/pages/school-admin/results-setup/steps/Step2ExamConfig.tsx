@@ -42,23 +42,49 @@ export const Step2ExamConfig = ({
   sessionTermData,
 }: Step2Props) => {
   const { toast } = useToast();
-  const [components, setComponents] = useState<ExamComponent[]>(
-    initialData?.components || DEFAULT_COMPONENTS
-  );
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  // Update components when initialData changes (e.g., on page refresh when data loads from DB)
-  useEffect(() => {
-    if (initialData?.components && initialData.components.length > 0) {
-      // Ensure each component has an id
-      const componentsWithIds = initialData.components.map((c: any, index: number) => ({
+  
+  // Parse initialData properly - handle both formats: { components: [...] } and { examConfigComponents: "..." }
+  const getInitialComponents = () => {
+    if (!initialData) return DEFAULT_COMPONENTS;
+    
+    if (initialData.components && Array.isArray(initialData.components)) {
+      // Format: { components: [...] }
+      return initialData.components.map((c: any, index: number) => ({
         id: c.id || `${Date.now()}-${index}`,
         name: c.name,
         score: c.score,
       }));
-      setComponents(componentsWithIds);
     }
-  }, [initialData?.components]);
+    
+    if (initialData.examConfigComponents) {
+      // Format: { examConfigComponents: "..." } - JSON string from database
+      try {
+        const parsed = typeof initialData.examConfigComponents === 'string'
+          ? JSON.parse(initialData.examConfigComponents)
+          : initialData.examConfigComponents;
+        return parsed.map((c: any, index: number) => ({
+          id: c.id || `${Date.now()}-${index}`,
+          name: c.name,
+          score: c.score,
+        }));
+      } catch (e) {
+        console.error('Failed to parse examConfigComponents:', e);
+        return DEFAULT_COMPONENTS;
+      }
+    }
+    
+    return DEFAULT_COMPONENTS;
+  };
+  
+  const [components, setComponents] = useState<ExamComponent[]>(getInitialComponents());
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Update components when initialData changes (e.g., on page refresh when data loads from DB)
+  useEffect(() => {
+    const updatedComponents = getInitialComponents();
+    setComponents(updatedComponents);
+    console.log('📝 Step 2 components loaded:', updatedComponents);
+  }, [initialData]);
 
   const getTotalScore = () => components.reduce((sum, c) => sum + c.score, 0);
 
@@ -127,7 +153,11 @@ export const Step2ExamConfig = ({
           title: 'Success',
           description: 'Exam configuration saved',
         });
-        await onNext(response.data.data);
+        // Pass components in the format initialData expects
+        await onNext({
+          ...response.data.data,
+          components: components.map(({ id, ...rest }) => rest),
+        });
       }
     } catch (error: any) {
       const message = error.response?.data?.error || 'Failed to save exam configuration';
