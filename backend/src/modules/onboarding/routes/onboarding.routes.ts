@@ -42,6 +42,9 @@ router.patch('/academic-session', OnboardingController.partialUpdateAcademicSess
 // Step 2: Create academic session and terms
 router.post('/step/2', OnboardingController.createAcademicSession);
 
+// Delete an academic session
+router.delete('/academic-session/:sessionId', OnboardingController.deleteAcademicSession);
+
 // Step 3: Create classes
 router.post('/step/3', OnboardingController.createClasses);
 

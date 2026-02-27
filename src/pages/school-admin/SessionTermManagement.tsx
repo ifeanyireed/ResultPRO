@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit02, Trash01, Calendar, CheckCircle, AlertCircle, Loader } from '@hugeicons/react';
+import { Plus, Edit02, Trash01, Calendar, CheckCircle, AlertCircle } from '@hugeicons/react';
+import { Loader } from 'lucide-react';
 import axios from 'axios';
 import { SessionFormModal } from './components/SessionFormModal';
 import { useToast } from '@/hooks/use-toast';
@@ -93,7 +94,7 @@ const SessionTermManagement: React.FC = () => {
     }
   };
 
-  const handleAddTerm = () => {
+  const handleAddSession = () => {
     setIsEditing(false);
     setEditingTermId(null);
     setEditingData(null);
@@ -141,48 +142,68 @@ const SessionTermManagement: React.FC = () => {
     }
   };
 
+  const handleDeleteSession = async (sessionId: string) => {
+    if (!confirm('Are you sure you want to delete this entire academic session and all its terms?')) return;
+
+    try {
+      const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+
+      // Delete session from backend (adjust endpoint as per your API)
+      await axios.delete(
+        `http://localhost:5000/api/onboarding/academic-session/${sessionId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      toast({
+        title: 'Success',
+        description: 'Academic session deleted successfully',
+      });
+
+      // Clear selection if we deleted the selected session
+      if (selectedSessionId === sessionId) {
+        setSelectedSessionId(null);
+      }
+
+      await fetchSessionsAndTerms();
+    } catch (err: any) {
+      toast({
+        title: 'Error',
+        description: err.response?.data?.message || 'Failed to delete session',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleSubmitForm = async (formData: any) => {
     try {
       setIsSubmitting(true);
       setSubmitError(null);
 
       const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
-      const schoolId = localStorage.getItem('schoolId');
-
-      if (!selectedSessionId) {
-        setSubmitError('No session selected');
-        return;
-      }
 
       if (isEditing && editingTermId) {
-        // Update existing term
-        await axios.patch(
-          `http://localhost:5000/api/onboarding/academic-session/term/${editingTermId}`,
-          {
-            ...formData,
-            academicSessionId: selectedSessionId,
-          },
+        // This is for editing a single session - use step/2 endpoint
+        await axios.post(
+          'http://localhost:5000/api/onboarding/step/2',
+          formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         toast({
           title: 'Success',
-          description: 'Term updated successfully',
+          description: 'Academic session updated successfully',
         });
       } else {
-        // Create new term
+        // Create new full session with terms - use step/2 endpoint
         await axios.post(
-          `http://localhost:5000/api/onboarding/academic-session/term`,
-          {
-            ...formData,
-            academicSessionId: selectedSessionId,
-          },
+          'http://localhost:5000/api/onboarding/step/2',
+          formData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
         toast({
           title: 'Success',
-          description: 'Term created successfully',
+          description: 'Academic session created successfully',
         });
       }
 
@@ -190,22 +211,28 @@ const SessionTermManagement: React.FC = () => {
       await fetchSessionsAndTerms();
     } catch (err: any) {
       console.error('Error submitting form:', err);
-      setSubmitError(err.response?.data?.message || 'Failed to save term');
+      setSubmitError(err.response?.data?.message || 'Failed to save academic session');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   // Calculate statistics
-  const activeSessions = sessions.filter(s => {
-    const today = new Date();
+  const today = new Date();
+  
+  // Find current session (based on today's date)
+  const currentSession = sessions.find(s => {
     const start = new Date(s.startDate);
     const end = new Date(s.endDate);
     return today >= start && today <= end;
-  }).length;
+  });
 
-  const activeTerms = allTerms.filter(t => t.status === 'Active').length;
-  const pendingTerms = allTerms.filter(t => t.status === 'Pending').length;
+  // Find current term (based on today's date within current session)
+  const currentTerm = currentSession?.terms?.find(t => {
+    const start = new Date(t.startDate);
+    const end = new Date(t.endDate);
+    return today >= start && today <= end;
+  });
 
   const selectedSession = sessions.find(s => s.id === selectedSessionId);
   const selectedSessionTerms = selectedSession?.terms || [];
@@ -228,12 +255,11 @@ const SessionTermManagement: React.FC = () => {
           <p className="text-gray-400 text-sm mt-1">Create and manage academic sessions and terms</p>
         </div>
         <button
-          onClick={handleAddTerm}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 rounded-lg text-blue-400 font-medium transition-colors disabled:opacity-50"
-          disabled={!selectedSessionId}
+          onClick={handleAddSession}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 rounded-lg text-blue-400 font-medium transition-colors"
         >
           <Plus className="w-4 h-4" />
-          New Term
+          New Session
         </button>
       </div>
 
@@ -247,8 +273,19 @@ const SessionTermManagement: React.FC = () => {
 
       {/* Session Selector */}
       {sessions.length > 0 && (
-        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
-          <label className="text-gray-300 text-sm font-medium block mb-2">Select Academic Session</label>
+        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-gray-300 text-sm font-medium">Select Academic Session</label>
+            {selectedSessionId && (
+              <button
+                onClick={() => handleDeleteSession(selectedSessionId)}
+                className="text-red-400 hover:text-red-300 text-xs font-medium transition-colors flex items-center gap-1"
+              >
+                <Trash01 className="w-3 h-3" />
+                Delete
+              </button>
+            )}
+          </div>
           <select
             value={selectedSessionId || ''}
             onChange={(e) => setSelectedSessionId(e.target.value)}
@@ -350,23 +387,33 @@ const SessionTermManagement: React.FC = () => {
             <h3 className="text-white font-semibold">Total Sessions</h3>
           </div>
           <p className="text-3xl font-bold text-white">{sessions.length}</p>
-          <p className="text-gray-500 text-xs mt-2">{activeSessions} currently active</p>
+          <p className="text-gray-500 text-xs mt-2">Configured sessions</p>
         </div>
         <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
           <div className="flex items-center gap-3 mb-4">
-            <CheckCircle className="w-5 h-5 text-green-400" />
-            <h3 className="text-white font-semibold">Active Terms</h3>
+            <Calendar className="w-5 h-5 text-green-400" />
+            <h3 className="text-white font-semibold">Current Session</h3>
           </div>
-          <p className="text-3xl font-bold text-white">{activeTerms}</p>
-          <p className="text-gray-500 text-xs mt-2">Out of {allTerms.length} total</p>
+          <p className="text-3xl font-bold text-white">{currentSession?.name || '-'}</p>
+          <p className="text-gray-500 text-xs mt-2">
+            {currentSession 
+              ? `${new Date(currentSession.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(currentSession.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+              : 'No active session'
+            }
+          </p>
         </div>
         <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
           <div className="flex items-center gap-3 mb-4">
-            <Calendar className="w-5 h-5 text-amber-400" />
-            <h3 className="text-white font-semibold">Pending Terms</h3>
+            <CheckCircle className="w-5 h-5 text-amber-400" />
+            <h3 className="text-white font-semibold">Current Term</h3>
           </div>
-          <p className="text-3xl font-bold text-white">{pendingTerms}</p>
-          <p className="text-gray-500 text-xs mt-2">Awaiting activation</p>
+          <p className="text-3xl font-bold text-white">{currentTerm?.name || '-'}</p>
+          <p className="text-gray-500 text-xs mt-2">
+            {currentTerm
+              ? `${new Date(currentTerm.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${new Date(currentTerm.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+              : 'No active term'
+            }
+          </p>
         </div>
       </div>
 
@@ -379,7 +426,6 @@ const SessionTermManagement: React.FC = () => {
         isEditing={isEditing}
         isSubmitting={isSubmitting}
         error={submitError}
-        sessionName={selectedSession?.name || currentSessionName}
       />
     </div>
   );

@@ -523,4 +523,77 @@ export class OnboardingController {
       });
     }
   }
+
+  /**
+   * DELETE /api/onboarding/academic-session/:sessionId
+   * Delete an academic session and all its terms
+   */
+  static async deleteAcademicSession(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      const sessionId = req.params.sessionId;
+
+      if (!schoolId) {
+        return res.status(400).json({
+          success: false,
+          error: 'School ID is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      if (!sessionId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Session ID is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      // Verify the session exists and belongs to this school
+      const session = await prisma.academicSession.findUnique({
+        where: { id: sessionId },
+      });
+
+      if (!session) {
+        return res.status(404).json({
+          success: false,
+          error: 'Academic session not found',
+          code: 'NOT_FOUND',
+        });
+      }
+
+      if (session.schoolId !== schoolId) {
+        return res.status(403).json({
+          success: false,
+          error: 'Unauthorized: Session does not belong to this school',
+          code: 'FORBIDDEN',
+        });
+      }
+
+      // Delete all associated terms first (in case of cascading constraints)
+      await prisma.term.deleteMany({
+        where: { sessionId: sessionId },
+      });
+
+      // Delete the academic session
+      await prisma.academicSession.delete({
+        where: { id: sessionId },
+      });
+
+      res.json({
+        success: true,
+        message: 'Academic session deleted successfully',
+        data: {
+          deletedSessionId: sessionId,
+        },
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
 }
