@@ -110,26 +110,52 @@ export class CSVProcessorService {
       }
 
       // Upsert student results
-      const results = [];
+      const processedStudents = [];
+      const failedStudents = [];
+
       for (const row of parsedRows) {
-        const studentResult = await this.upsertStudentResult(
-          schoolId,
-          classId,
-          sessionId,
-          termId,
-          row,
-          gradingSystem
-        );
-        results.push(studentResult);
+        try {
+          await this.upsertStudentResult(
+            schoolId,
+            classId,
+            sessionId,
+            termId,
+            row,
+            gradingSystem
+          );
+          processedStudents.push(row.studentName);
+        } catch (error: any) {
+          console.error(`❌ Failed to process student ${row.studentName} (${row.studentId}):`, error.message);
+          failedStudents.push({
+            name: row.studentName,
+            id: row.studentId,
+            reason: error.message,
+          });
+          // Continue processing other students even if one fails
+        }
+      }
+
+      console.log(`\n✅ Successfully processed: ${processedStudents.length} students`, processedStudents);
+      console.log(`❌ Failed to process: ${failedStudents.length} students`, failedStudents);
+
+      if (processedStudents.length === 0) {
+        throw new Error(`No students could be processed. Failed: ${failedStudents.map(s => `${s.name} (${s.reason})`).join(', ')}`);
       }
 
       // Calculate positions and class averages
       await this.calculatePositionsAndAverages(schoolId, classId, sessionId, termId);
 
+      // Fetch the updated results with calculated averages and positions
+      const updatedResults = await prisma.studentResult.findMany({
+        where: { schoolId, classId, sessionId, termId },
+        orderBy: { studentName: 'asc' },
+      });
+
       return {
         success: true,
-        message: `Processed ${results.length} student results`,
-        data: results,
+        message: `Processed ${updatedResults.length} student results (${failedStudents.length} failed)`,
+        data: updatedResults,
+        failedStudents: failedStudents.length > 0 ? failedStudents : undefined,
       };
     } catch (error: any) {
       throw new Error(error.message || 'Failed to process CSV');
@@ -461,22 +487,31 @@ export class CSVProcessorService {
       where: { schoolId, classId, sessionId, termId },
     });
 
-    // Calculate overall positions (by overall average)
+    if (allResults.length === 0) return;
+
+    // Calculate overall positions (by overall average) - handle ties correctly
     const sorted = [...allResults].sort((a, b) => (b.overallAverage || 0) - (a.overallAverage || 0));
     
     for (let i = 0; i < sorted.length; i++) {
+      // Check if current score equals previous score (tie)
+      let position = i + 1;
+      if (i > 0 && sorted[i].overallAverage === sorted[i - 1].overallAverage) {
+        // Use the same position as previous student
+        const prevResult = await prisma.studentResult.findUnique({
+          where: { id: sorted[i - 1].id },
+        });
+        position = prevResult?.overallPosition || i + 1;
+      }
+      
       await prisma.studentResult.update({
         where: { id: sorted[i].id },
-        data: { overallPosition: i + 1 },
+        data: { overallPosition: position },
       });
     }
 
     // Calculate subject positions and class averages
     // Parse subjectResults from JSON string
-    const firstResult = allResults[0];
-    if (!firstResult) return;
-    
-    const firstSubjectResults = JSON.parse(firstResult.subjectResults) as Record<string, any>;
+    const firstSubjectResults = JSON.parse(allResults[0].subjectResults) as Record<string, any>;
     const subjects = Object.keys(firstSubjectResults);
 
     for (const subject of subjects) {
@@ -489,22 +524,43 @@ export class CSVProcessorService {
         const subjectResult = parsedResults[subject];
         if (subjectResult) {
           totalSubjectScore += subjectResult.total;
-          subjectScores.push({ id: result.id, total: subjectResult.total });
+          subjectScores.push({ 
+            id: result.id, 
+            total: subjectResult.total,
+            studentName: result.studentName 
+          });
         }
       }
 
-      const classAverage = subjectScores.length > 0 ? totalSubjectScore / subjectScores.length : 0;
+      const classAverage = subjectScores.length > 0 
+        ? Math.round((totalSubjectScore / subjectScores.length) * 100) / 100 
+        : 0;
 
-      // Sort by subject score and get positions
+      // Sort by subject score (descending) for positions
       const sorted = [...subjectScores].sort((a, b) => b.total - a.total);
 
-      // Update each result with class average and position
+      // Assign positions with tie handling
+      const positionMap: Record<string, number> = {};
+      let currentPosition = 1;
+
       for (let i = 0; i < sorted.length; i++) {
-        const result = allResults.find((r: any) => r.id === sorted[i].id);
+        if (i > 0 && sorted[i].total === sorted[i - 1].total) {
+          // Same score as previous = same position
+          positionMap[sorted[i].id] = positionMap[sorted[i - 1].id];
+        } else {
+          // Different score = rank based on index
+          positionMap[sorted[i].id] = currentPosition;
+        }
+        currentPosition = i + 2; // Next position will be i+2 if there's a tie
+      }
+
+      // Update each result with class average and position
+      for (const scoreData of subjectScores) {
+        const result = allResults.find((r: any) => r.id === scoreData.id);
         if (result) {
           const updatedSubjects = JSON.parse(result.subjectResults) as Record<string, any>;
-          updatedSubjects[subject].classAverage = Math.round(classAverage * 100) / 100;
-          updatedSubjects[subject].positionInClass = i + 1;
+          updatedSubjects[subject].classAverage = classAverage;
+          updatedSubjects[subject].positionInClass = positionMap[scoreData.id];
 
           await prisma.studentResult.update({
             where: { id: result.id },
@@ -512,6 +568,8 @@ export class CSVProcessorService {
           });
         }
       }
+
+      console.log(`✅ Subject "${subject}" - Class Average: ${classAverage}, Positions assigned for ${subjectScores.length} students`);
     }
   }
 

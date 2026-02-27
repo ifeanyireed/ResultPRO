@@ -40,17 +40,13 @@ import {
   ClassManagement,
   SubjectManagement,
   GradingSystemSetup,
-  CSVUpload,
-  CSVPreviewValidation,
   StudentsList,
   StudentProfile,
   ResultsEntry,
-  BulkResultsManagement,
   ResultsPublishing,
   AnalyticsDashboard,
   LeaderboardManagement,
   ParentAccountsManagement,
-  ReportCardDesigner,
   SchoolSettings,
   BillingSubscription,
   Profile as SchoolAdminProfile,
@@ -104,17 +100,13 @@ const App = () => (
           <Route path="/school-admin/classes" element={<SchoolAdminLayout><ClassManagement /></SchoolAdminLayout>} />
           <Route path="/school-admin/subjects" element={<SchoolAdminLayout><SubjectManagement /></SchoolAdminLayout>} />
           <Route path="/school-admin/grading" element={<SchoolAdminLayout><GradingSystemSetup /></SchoolAdminLayout>} />
-          <Route path="/school-admin/csv-upload" element={<SchoolAdminLayout><CSVUpload /></SchoolAdminLayout>} />
-          <Route path="/school-admin/csv-preview" element={<SchoolAdminLayout><CSVPreviewValidation /></SchoolAdminLayout>} />
           <Route path="/school-admin/students" element={<SchoolAdminLayout><StudentsList /></SchoolAdminLayout>} />
           <Route path="/school-admin/student-profile" element={<SchoolAdminLayout><StudentProfile /></SchoolAdminLayout>} />
           <Route path="/school-admin/results-entry" element={<SchoolAdminLayout><ResultsEntry /></SchoolAdminLayout>} />
-          <Route path="/school-admin/bulk-results" element={<SchoolAdminLayout><BulkResultsManagement /></SchoolAdminLayout>} />
           <Route path="/school-admin/publishing" element={<SchoolAdminLayout><ResultsPublishing /></SchoolAdminLayout>} />
           <Route path="/school-admin/analytics" element={<SchoolAdminLayout><AnalyticsDashboard /></SchoolAdminLayout>} />
           <Route path="/school-admin/leaderboard" element={<SchoolAdminLayout><LeaderboardManagement /></SchoolAdminLayout>} />
           <Route path="/school-admin/parents" element={<SchoolAdminLayout><ParentAccountsManagement /></SchoolAdminLayout>} />
-          <Route path="/school-admin/report-cards" element={<SchoolAdminLayout><ReportCardDesigner /></SchoolAdminLayout>} />
           <Route path="/school-admin/settings" element={<SchoolAdminLayout><SchoolSettings /></SchoolAdminLayout>} />
           <Route path="/school-admin/billing" element={<SchoolAdminLayout><BillingSubscription /></SchoolAdminLayout>} />
           <Route path="/school-admin/profile" element={<SchoolAdminLayout><SchoolAdminProfile /></SchoolAdminLayout>} />

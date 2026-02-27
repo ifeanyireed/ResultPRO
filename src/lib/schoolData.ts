@@ -26,6 +26,8 @@ export interface SchoolResult {
   positionInSchool: number;
   positionInState?: number;
   totalStudents: number;
+  overallAverage?: number;
+  overallRemark?: string;
   sex?: string;
   age?: number;
   height?: string;

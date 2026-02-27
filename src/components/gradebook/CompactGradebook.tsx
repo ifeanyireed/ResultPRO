@@ -5,9 +5,10 @@ interface CompactGradebookProps {
   school: School;
   result: SchoolResult;
   template: GradebookTemplate;
+  previewMode?: boolean;
 }
 
-export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, result, template }) => {
+export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, result, template, previewMode = false }) => {
   console.log('CompactGradebook received school:', school);
   console.log('CompactGradebook logo:', school.logo);
   
@@ -25,7 +26,7 @@ export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, resu
   }
 
   return (
-    <div style={{ width: '150mm', height: '297mm', padding: '5mm', fontSize: '12px', fontFamily: 'Arial, sans-serif', backgroundColor: 'white', color: '#000' }}>
+    <div style={{ width: '150mm', height: previewMode ? 'auto' : '297mm', padding: '5mm', fontSize: '12px', fontFamily: 'Arial, sans-serif', backgroundColor: 'white', color: '#000' }}>
       {/* Header with Logo Top-Left */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '5mm', marginBottom: '2mm' }}>
         {school.logo && (
@@ -140,7 +141,7 @@ export const CompactGradebook: React.FC<CompactGradebookProps> = ({ school, resu
               <div style={{ borderRight: '0.5px solid #ccc', borderBottom: '0.5px solid #ccc', padding: '0.25mm' }}>Percentage: {percentage}%</div>
               <div style={{ fontWeight: 'bold', borderBottom: '0.5px solid #ccc', padding: '0.25mm' }}>Grade: {overallGrade}</div>
               <div style={{ borderRight: '0.5px solid #ccc', padding: '0.25mm' }}>Position: {result.position}/{result.totalStudents}</div>
-              <div style={{ fontWeight: 'bold', padding: '0.25mm' }}>Overall Remark: Excellent</div>
+              <div style={{ fontWeight: 'bold', padding: '0.25mm' }}>Overall Remark: {result.overallRemark || 'Excellent'}</div>
             </div>
           </div>
         </div>

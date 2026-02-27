@@ -643,6 +643,7 @@ export const Step7ResultsCSV = ({
           favouriteColor: favouriteColor,
           subjects: subjectResults,
           totalObtainable: subjectResults.length * 100,
+          overallAverage: overallAverage,
           attendance: {
             daysPresent: daysPresent,
             daysSchoolOpen: 70, // Standard school term days
@@ -655,6 +656,75 @@ export const Step7ResultsCSV = ({
           },
           staffInfo: staffInfo,
         } as SchoolResult);
+      }
+
+      // CALCULATE CLASS AVERAGES, POSITIONS AND REMARKS FROM PARSED CSV DATA
+      if (gradebookPreviews.length > 0) {
+        // Calculate overall class positions based on overall average
+        const sortedByAverage = [...gradebookPreviews].map((student, idx) => ({
+          studentIndex: idx,
+          average: student.overallAverage || 0,
+        })).sort((a, b) => b.average - a.average);
+        
+        // Assign positions and remarks
+        const positionMap: Record<number, number> = {};
+        const generateRemark = (avg: number): string => {
+          if (avg >= 80) return 'Excellent';
+          if (avg >= 70) return 'Very Good';
+          if (avg >= 60) return 'Good';
+          if (avg >= 50) return 'Average';
+          return 'Needs Improvement';
+        };
+        
+        for (let i = 0; i < sortedByAverage.length; i++) {
+          if (i > 0 && sortedByAverage[i].average === sortedByAverage[i - 1].average) {
+            positionMap[sortedByAverage[i].studentIndex] = positionMap[sortedByAverage[i - 1].studentIndex];
+          } else {
+            positionMap[sortedByAverage[i].studentIndex] = i + 1;
+          }
+        }
+        
+        // Update gradebook previews with positions and remarks
+        for (let i = 0; i < gradebookPreviews.length; i++) {
+          gradebookPreviews[i].position = `${positionMap[i]}`;
+          gradebookPreviews[i].overallRemark = generateRemark(gradebookPreviews[i].overallAverage || 0);
+        }
+
+        const subjectNames = gradebookPreviews[0].subjects.map(s => s.name);
+        
+        for (const subjectName of subjectNames) {
+          // Get all scores for this subject
+          const subjectScores = gradebookPreviews.map((student, idx) => ({
+            studentIndex: idx,
+            score: student.subjects.find(s => s.name === subjectName)?.score || 0,
+          }));
+
+          // Calculate class average
+          const classAverage = subjectScores.length > 0
+            ? Math.round((subjectScores.reduce((sum, s) => sum + s.score, 0) / subjectScores.length) * 100) / 100
+            : 0;
+
+          // Sort by score for positions (handle ties)
+          const sorted = [...subjectScores].sort((a, b) => b.score - a.score);
+          const positionMap: Record<number, number> = {};
+          
+          for (let i = 0; i < sorted.length; i++) {
+            if (i > 0 && sorted[i].score === sorted[i - 1].score) {
+              positionMap[sorted[i].studentIndex] = positionMap[sorted[i - 1].studentIndex];
+            } else {
+              positionMap[sorted[i].studentIndex] = i + 1;
+            }
+          }
+
+          // Update gradebook previews
+          for (let i = 0; i < gradebookPreviews.length; i++) {
+            const subject = gradebookPreviews[i].subjects.find(s => s.name === subjectName);
+            if (subject) {
+              subject.classAverage = classAverage;
+              subject.positionInClass = positionMap[i] || 0;
+            }
+          }
+        }
       }
 
       if (gradebookPreviews.length === 0) {
@@ -756,18 +826,31 @@ export const Step7ResultsCSV = ({
                 Gradebook for {previewGradebooks[selectedStudentIndex].studentName} ({previewGradebooks[selectedStudentIndex].admissionNumber})
               </h3>
               <button
-                onClick={() => window.print()}
+                onClick={() => {
+                  const printArea = document.getElementById('gradebook-print-area');
+                  if (printArea) {
+                    const printWindow = window.open('', '', 'height=800,width=1000');
+                    if (printWindow) {
+                      printWindow.document.write('<html><head><title>Gradebook</title></head><body>');
+                      printWindow.document.write(printArea.innerHTML);
+                      printWindow.document.write('</body></html>');
+                      printWindow.document.close();
+                      printWindow.print();
+                    }
+                  }
+                }}
                 className="flex items-center gap-2 px-3 py-1 text-blue-300 hover:text-blue-200 text-sm"
               >
                 <Printer className="w-4 h-4" />
                 Print
               </button>
             </div>
-            <div className="p-2 bg-gray-950 flex justify-center overflow-x-auto">
+            <div id="gradebook-print-area" className="p-2 bg-gray-950 flex justify-center overflow-x-auto">
               <CompactGradebook
                 school={school}
                 result={previewGradebooks[selectedStudentIndex]}
                 template={template}
+                previewMode={true}
               />
             </div>
           </div>
@@ -799,7 +882,7 @@ export const Step7ResultsCSV = ({
             onClick={handleProceedToDashboard}
             className="bg-green-600 hover:bg-green-700 text-white"
           >
-            View Dashboard & Complete Setup
+            Complete Result Setup
           </Button>
         </div>
       </div>
