@@ -140,7 +140,7 @@ export class PaymentService {
         },
       });
 
-      // Update school with subscription info
+      // Update school with subscription info and mark as subscribed
       await prisma.school.update({
         where: { id: payment.schoolId },
         data: {

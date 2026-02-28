@@ -170,6 +170,17 @@ export const Step6PaymentPlans = ({
               startDate: new Date(data.subscriptionStartDate),
               endDate: new Date(data.subscriptionEndDate),
             });
+            // If subscription exists, auto-select the corresponding plan
+            if (!selectedPlanId) {
+              const planTier = data.subscriptionTier.toLowerCase();
+              if (planTier === 'pro') {
+                setSelectedPlanId('pro-year'); // Default to annual
+              } else if (planTier === 'enterprise') {
+                setSelectedPlanId('enterprise-year'); // Default to annual
+              } else if (planTier === 'free') {
+                setSelectedPlanId('free');
+              }
+            }
           }
         }
       } catch (error) {
@@ -193,6 +204,31 @@ export const Step6PaymentPlans = ({
   const handleProceedToPayment = async () => {
     if (!selectedPlanId) {
       setSubmitError('Please select a plan to continue');
+      return;
+    }
+
+    // If user already has an active subscription, proceed to next step
+    if (currentSubscription) {
+      setIsProcessing(true);
+      try {
+        setSubmitError(null);
+        setError(null);
+
+        // Call the onNext handler to proceed to Step 7
+        await onNext({
+          selectedPlanId: selectedPlanId,
+          paymentMethod: 'paystack',
+        });
+      } catch (error: any) {
+        const errorMessage =
+          error?.response?.data?.error ||
+          error?.message ||
+          'Failed to proceed';
+        setSubmitError(errorMessage);
+        setError(errorMessage);
+      } finally {
+        setIsProcessing(false);
+      }
       return;
     }
 
@@ -247,17 +283,30 @@ export const Step6PaymentPlans = ({
 
         {/* Current Subscription Info */}
         {currentSubscription && (
-          <div className="mb-8 p-4 rounded-lg bg-green-500/10 border border-green-500/30">
-            <div className="flex items-start gap-3">
+          <div className="mb-8 p-6 rounded-lg bg-green-500/15 border border-green-500/40">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+              </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-green-400">Current Plan: {currentSubscription.tier}</p>
-                <p className="text-xs text-green-300 mt-1">
-                  Expires on {currentSubscription.endDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
+                <h3 className="text-lg font-semibold text-green-400 mb-2">Active Subscription</h3>
+                <div className="space-y-1">
+                  <p className="text-sm text-green-300">
+                    <span className="font-medium">Subscription Type:</span> {currentSubscription.tier}
+                  </p>
+                  <p className="text-sm text-green-300">
+                    <span className="font-medium">Valid Until:</span> {currentSubscription.endDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                  <p className="text-xs text-green-200 mt-2">
+                    Your payment has been processed successfully. You can now add students and proceed with setup.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -374,10 +423,10 @@ export const Step6PaymentPlans = ({
           </Button>
           <Button
             onClick={handleProceedToPayment}
-            disabled={isProcessing || !selectedPlanId}
+            disabled={isProcessing || (!selectedPlanId && !currentSubscription)}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            {isProcessing ? 'Processing...' : 'Proceed to Payment'}
+            {isProcessing ? 'Processing...' : currentSubscription ? 'Next: Add Students' : 'Proceed to Payment'}
           </Button>
         </div>
 

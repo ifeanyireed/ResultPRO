@@ -32,19 +32,12 @@ export const PaymentComplete = () => {
           setMessage('Payment verified successfully!');
           toast({
             title: 'Payment Successful',
-            description: 'Your subscription is now active. Redirecting to dashboard...',
+            description: 'Your subscription is now active. Redirecting to setup wizard...',
           });
 
-          // Complete onboarding
-          await axios.post(
-            `${API_BASE}/onboarding/complete`,
-            {},
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-
-          // Redirect to dashboard after 2 seconds
+          // Redirect back to onboarding wizard (Step 6) to show subscription details
           setTimeout(() => {
-            navigate('/school-admin/overview', { replace: true });
+            navigate('/onboarding?step=6', { replace: true });
           }, 2000);
         } else {
           setStatus('error');
