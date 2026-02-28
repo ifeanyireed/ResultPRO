@@ -348,11 +348,43 @@ export class OnboardingService {
 
     const classes = await this.classRepo.findBySchool(schoolId);
     
-    return classes.map((c: any) => ({
-      id: c.id,
-      name: c.name,
-      level: c.level,
-    }));
+    // Get the staff data from ResultsSetupSession
+    const resultsSetup = await prisma.resultsSetupSession.findFirst({
+      where: { schoolId },
+      orderBy: { createdAt: 'desc' }, // Get the latest session
+    });
+
+    const staffDataMap: Map<string, string> = new Map();
+    if (resultsSetup && resultsSetup.staffData) {
+      try {
+        const staffData = JSON.parse(resultsSetup.staffData);
+        if (Array.isArray(staffData.teachers)) {
+          staffData.teachers.forEach((teacher: any) => {
+            staffDataMap.set(teacher.classId, teacher.teacherName);
+          });
+        }
+      } catch (error) {
+        console.error('Error parsing staff data:', error);
+      }
+    }
+    
+    // Get student count for each class
+    const classesWithStudentCount = await Promise.all(
+      classes.map(async (c: any) => {
+        const studentCount = await prisma.student.count({
+          where: { classId: c.id },
+        });
+        return {
+          id: c.id,
+          name: c.name,
+          level: c.level,
+          formTutor: staffDataMap.get(c.id) || c.classTeacher || 'Unassigned',
+          numberOfStudents: studentCount,
+        };
+      })
+    );
+    
+    return classesWithStudentCount;
   }
 
   /**
@@ -620,6 +652,71 @@ export class OnboardingService {
     if (!school) throw new NotFoundException('School not found');
 
     return await this.onboardingRepo.markComplete(schoolId);
+  }
+
+  /**
+   * Update a single class
+   */
+  async updateClass(schoolId: string, classId: string, data: any) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) throw new NotFoundException('School not found');
+
+    const cls = await prisma.class.findFirst({
+      where: { id: classId, schoolId },
+    });
+    if (!cls) throw new NotFoundException('Class not found');
+
+    const updated = await prisma.class.update({
+      where: { id: classId },
+      data: {
+        name: data.name || cls.name,
+        level: data.level || cls.level,
+        maxCapacity: data.maxCapacity !== undefined ? data.maxCapacity : cls.maxCapacity,
+        classTeacher: data.classTeacher !== undefined ? data.classTeacher : cls.classTeacher,
+      },
+    });
+
+    return {
+      id: updated.id,
+      name: updated.name,
+      level: updated.level,
+      maxCapacity: updated.maxCapacity,
+      classTeacher: updated.classTeacher,
+    };
+  }
+
+  /**
+   * Delete a class
+   */
+  async deleteClass(schoolId: string, classId: string) {
+    const school = await prisma.school.findUnique({ where: { id: schoolId } });
+    if (!school) throw new NotFoundException('School not found');
+
+    const cls = await prisma.class.findFirst({
+      where: { id: classId, schoolId },
+    });
+    if (!cls) throw new NotFoundException('Class not found');
+
+    // Check if class has students
+    const studentCount = await prisma.student.count({
+      where: { classId },
+    });
+
+    if (studentCount > 0) {
+      throw new Error(`Cannot delete class with ${studentCount} student(s)`);
+    }
+
+    // Delete class subjects associations
+    await prisma.classSubject.deleteMany({
+      where: { classId },
+    });
+
+    // Delete the class
+    await prisma.class.delete({
+      where: { id: classId },
+    });
+
+    return { success: true };
   }
 }
 

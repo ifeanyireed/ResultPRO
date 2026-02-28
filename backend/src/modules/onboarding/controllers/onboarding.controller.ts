@@ -251,6 +251,8 @@ export class OnboardingController {
   static async getClasses(req: Request, res: Response) {
     try {
       const schoolId = req.user?.schoolId;
+      console.log('🔍 getClasses called - schoolId:', schoolId, 'user:', req.user);
+      
       if (!schoolId) {
         return res.status(401).json({
           success: false,
@@ -260,6 +262,7 @@ export class OnboardingController {
       }
 
       const classes = await onboardingService.getClasses(schoolId);
+      console.log('📚 Classes retrieved:', classes);
 
       res.json({
         success: true,
@@ -268,6 +271,7 @@ export class OnboardingController {
         },
       });
     } catch (error: any) {
+      console.error('❌ Error in getClasses:', error);
       const status = error.status || 500;
       res.status(status).json({
         success: false,
@@ -603,6 +607,90 @@ export class OnboardingController {
         data: {
           deletedSessionId: sessionId,
         },
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
+   * PATCH /api/onboarding/classes/:classId
+   * Update a single class
+   */
+  static async updateClass(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      const classId = req.params.classId;
+
+      if (!schoolId) {
+        return res.status(400).json({
+          success: false,
+          error: 'School ID is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      if (!classId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Class ID is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const result = await onboardingService.updateClass(schoolId, classId, req.body);
+
+      res.json({
+        success: true,
+        message: 'Class updated successfully',
+        data: result,
+      });
+    } catch (error: any) {
+      const status = error.status || 500;
+      res.status(status).json({
+        success: false,
+        error: error.message,
+        code: error.code || 'ERROR',
+      });
+    }
+  }
+
+  /**
+   * DELETE /api/onboarding/classes/:classId
+   * Delete a class
+   */
+  static async deleteClass(req: Request, res: Response) {
+    try {
+      const schoolId = req.user?.schoolId;
+      const classId = req.params.classId;
+
+      if (!schoolId) {
+        return res.status(400).json({
+          success: false,
+          error: 'School ID is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      if (!classId) {
+        return res.status(400).json({
+          success: false,
+          error: 'Class ID is required',
+          code: 'VALIDATION_ERROR',
+        });
+      }
+
+      const result = await onboardingService.deleteClass(schoolId, classId);
+
+      res.json({
+        success: true,
+        message: 'Class deleted successfully',
+        data: result,
       });
     } catch (error: any) {
       const status = error.status || 500;

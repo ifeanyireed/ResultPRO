@@ -51,7 +51,13 @@ router.post('/step/3', OnboardingController.createClasses);
 // Get all classes for the school
 router.get('/classes', OnboardingController.getClasses);
 
-// Partial update classes (real-time database writes)
+// Update a single class
+router.patch('/classes/:classId', OnboardingController.updateClass);
+
+// Delete a single class
+router.delete('/classes/:classId', OnboardingController.deleteClass);
+
+// Partial update classes (real-time database writes - bulk update)
 router.patch('/classes', OnboardingController.partialUpdateClasses);
 
 // Step 4: Create subjects

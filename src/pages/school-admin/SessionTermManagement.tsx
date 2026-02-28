@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit02, Trash01, Calendar, CheckCircle, AlertCircle } from '@hugeicons/react';
 import { Loader } from 'lucide-react';
-import axios from 'axios';
+import axiosInstance from '@/lib/axiosConfig';
 import { SessionFormModal } from './components/SessionFormModal';
 import { useToast } from '@/hooks/use-toast';
 
@@ -58,7 +58,7 @@ const SessionTermManagement: React.FC = () => {
       }
 
       // Fetch school data which should contain sessions and terms
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `http://localhost:5000/api/onboarding/school/${schoolId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -122,7 +122,7 @@ const SessionTermManagement: React.FC = () => {
       const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
 
       // Delete from backend (adjust endpoint as per your API)
-      await axios.delete(
+      await axiosInstance.delete(
         `http://localhost:5000/api/onboarding/academic-session/term/${termId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -149,7 +149,7 @@ const SessionTermManagement: React.FC = () => {
       const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
 
       // Delete session from backend (adjust endpoint as per your API)
-      await axios.delete(
+      await axiosInstance.delete(
         `http://localhost:5000/api/onboarding/academic-session/${sessionId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -183,7 +183,7 @@ const SessionTermManagement: React.FC = () => {
 
       if (isEditing && editingTermId) {
         // This is for editing a single session - use step/2 endpoint
-        await axios.post(
+        await axiosInstance.post(
           'http://localhost:5000/api/onboarding/step/2',
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -195,7 +195,7 @@ const SessionTermManagement: React.FC = () => {
         });
       } else {
         // Create new full session with terms - use step/2 endpoint
-        await axios.post(
+        await axiosInstance.post(
           'http://localhost:5000/api/onboarding/step/2',
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
