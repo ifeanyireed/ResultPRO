@@ -1,4 +1,4 @@
-import { CheckCircle, Building2, Calendar, Users, BookOpen, Zap, ShoppingCart } from '@hugeicons/react';
+import { CheckCircle, Building2, Calendar, Users, BookOpen, Zap, ShoppingCart, User } from '@hugeicons/react';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -13,6 +13,7 @@ const stepLabels = [
   'Subjects',
   'Grading System',
   'Select Plan',
+  'Add Students',
 ];
 
 const stepIcons = [
@@ -22,12 +23,13 @@ const stepIcons = [
   BookOpen,
   Zap,
   ShoppingCart,
+  User,
 ];
 
 export const StepIndicator = ({
   currentStep,
   completedSteps,
-  totalSteps = 6,
+  totalSteps = 7,
 }: StepIndicatorProps) => {
   return (
     <div className="w-full py-8 px-4">

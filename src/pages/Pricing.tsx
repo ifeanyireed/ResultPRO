@@ -78,7 +78,7 @@ const Pricing: React.FC = () => {
   const pricingPlans = [
     {
       name: 'Free',
-      studentCount: '0-200',
+      studentCount: '0-100',
       monthlyPrice: 0,
       annualPrice: 0,
       description: 'Perfect for testing Results Pro',
@@ -108,7 +108,7 @@ const Pricing: React.FC = () => {
     },
     {
       name: 'Pro',
-      studentCount: '201-2,000',
+      studentCount: '101-2,000',
       monthlyPrice: 50000,
       annualPrice: 150000,
       description: 'For growing schools',
@@ -401,7 +401,7 @@ const Pricing: React.FC = () => {
               },
               {
                 q: 'Is there a free trial?',
-                a: 'All plans include a 14-day free trial. The Free tier is literally free forever for up to 200 students. Enterprise plans include custom trial periods.'
+                a: 'All plans include a 14-day free trial. The Free tier is literally free forever for up to 100 students. Enterprise plans include custom trial periods.'
               },
               {
                 q: 'How do I get started with scratches cards?',

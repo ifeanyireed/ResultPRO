@@ -9,7 +9,9 @@ interface ResultsInstance {
   instanceName: string;
   className: string;
   sessionName: string;
+  sessionId: string;
   termName: string;
+  termId: string;
   status: 'active' | 'archived';
   totalStudents: number;
   createdAt: string;

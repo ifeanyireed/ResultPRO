@@ -9,8 +9,7 @@ import {
   Step3AffectiveDomain,
   Step4PsychomotorDomain,
   Step5StaffUploads,
-  Step6AssignStudents,
-  Step7ResultsCSV,
+  Step6ResultsCSV,
 } from './steps';
 
 const API_BASE = 'http://localhost:5000/api';
@@ -27,7 +26,6 @@ interface ResultsSetupState {
   step4Data: any;
   step5Data: any;
   step6Data: any;
-  step7Data: any;
 }
 
 export const ResultsSetupWizard = () => {
@@ -46,7 +44,6 @@ export const ResultsSetupWizard = () => {
     step4Data: null,
     step5Data: null,
     step6Data: null,
-    step7Data: null,
   });
 
   // Check authentication and fetch current setup status
@@ -117,7 +114,7 @@ export const ResultsSetupWizard = () => {
 
             // Restore all step data
             const newState: any = {
-              currentStep: nextStep > 7 ? 7 : nextStep,
+              currentStep: nextStep > 6 ? 6 : nextStep,
               completedSteps: completedSteps,
             };
 
@@ -151,13 +148,8 @@ export const ResultsSetupWizard = () => {
                 staffData: JSON.parse(session.staffData || '[]'),
               };
             }
-            if (session.assignedStudents) {
-              newState.step6Data = {
-                assignedStudents: JSON.parse(session.assignedStudents || '[]'),
-              };
-            }
             if (session.resultsFileUrl) {
-              newState.step7Data = {
+              newState.step6Data = {
                 resultsFileUrl: session.resultsFileUrl,
                 resultsFileName: session.resultsFileName,
               };
@@ -210,8 +202,6 @@ export const ResultsSetupWizard = () => {
       updateState({ step5Data: data });
     } else if (state.currentStep === 6) {
       updateState({ step6Data: data });
-    } else if (state.currentStep === 7) {
-      updateState({ step7Data: data });
       // All steps complete - mark results setup as complete
       try {
         const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
@@ -303,9 +293,7 @@ export const ResultsSetupWizard = () => {
       case 5:
         return <Step5StaffUploads {...stepProps} initialData={state.step5Data} />;
       case 6:
-        return <Step6AssignStudents {...stepProps} initialData={state.step6Data} />;
-      case 7:
-        return <Step7ResultsCSV {...stepProps} examConfig={state.step2Data} affectiveDomainData={state.step3Data} psychomotorDomainData={state.step4Data} initialData={state.step7Data} />;
+        return <Step6ResultsCSV {...stepProps} examConfig={state.step2Data} affectiveDomainData={state.step3Data} psychomotorDomainData={state.step4Data} initialData={state.step6Data} />;
       default:
         return null;
     }
@@ -347,7 +335,7 @@ export const ResultsSetupWizard = () => {
           <ResultsSetupStepIndicator
             currentStep={state.currentStep}
             completedSteps={state.completedSteps}
-            totalSteps={7}
+            totalSteps={6}
           />
         </div>
       </div>

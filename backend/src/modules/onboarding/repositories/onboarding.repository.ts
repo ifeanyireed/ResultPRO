@@ -147,6 +147,10 @@ export class OnboardingRepository {
         description: s.description,
         classIds: s.classes.map(cs => cs.class.id),
       })),
+      // Subscription Info
+      subscriptionTier: school.subscriptionTier,
+      subscriptionStartDate: school.subscriptionStartDate,
+      subscriptionEndDate: school.subscriptionEndDate,
       stepData: {},
     };
   }

@@ -1,34 +1,192 @@
-import React from 'react';
-import { TrendingUp, TrendingDown, Users, BookOpen, CheckCircle } from '@hugeicons/react';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, TrendingDown, Users, BookOpen, CheckCircle } from '@/lib/hugeicons-compat';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { toast } from 'sonner';
+import axios from 'axios';
+
+const API_BASE = 'http://localhost:5000/api';
+
+interface DashboardData {
+  totalStudents: number;
+  totalClasses: number;
+  totalSubjects: number;
+  gradedPercentage: number;
+  recentActivities: Array<{
+    action: string;
+    time: string;
+    status: string;
+  }>;
+  currentSession: {
+    year: string;
+    term: string;
+    resultStatus: string;
+  };
+  recentResults: Array<{
+    student: string;
+    class: string;
+    subject: string;
+    score: number;
+    date: string;
+  }>;
+}
 
 const Overview: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const token = localStorage.getItem('authToken');
+      const schoolId = localStorage.getItem('schoolId');
+
+      if (!token || !schoolId) {
+        setError('Authentication required');
+        return;
+      }
+
+      // Fetch school dashboard analytics
+      const dashboardRes = await axios.get(`${API_BASE}/analytics/school-dashboard`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fetch session info
+      const sessionRes = await axios.get(`${API_BASE}/results-setup/session`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fetch classes count
+      const classesRes = await axios.get(`${API_BASE}/onboarding/classes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fetch students count
+      const studentsRes = await axios.get(`${API_BASE}/results-setup/students`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      // Fetch results instances (recent entries)
+      const resultsRes = await axios.get(`${API_BASE}/results-setup/instances`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { limit: 3 },
+      });
+
+      const dashData = dashboardRes.data.data || {};
+      const sessionData = sessionRes.data.data || {};
+      const classesData = classesRes.data.data || [];
+      const studentsData = studentsRes.data.data || [];
+      const resultsData = resultsRes.data.data || [];
+
+      setData({
+        totalStudents: studentsData.length || 0,
+        totalClasses: classesData.length || 0,
+        totalSubjects: dashData.subjectCount || 0,
+        gradedPercentage: dashData.gradedPercentage || 0,
+        recentActivities: [
+          {
+            action: 'Dashboard Loaded',
+            time: 'Just now',
+            status: 'completed',
+          },
+          {
+            action: 'Session Active',
+            time: `${sessionData.year || '2025/2026'}`,
+            status: 'completed',
+          },
+        ],
+        currentSession: {
+          year: sessionData.year || '2025/2026',
+          term: sessionData.term || 'First Term',
+          resultStatus: dashData.resultStatus || 'In Progress',
+        },
+        recentResults: resultsData.slice(0, 3).map((result: any) => ({
+          student: result.studentName || 'N/A',
+          class: result.className || 'N/A',
+          subject: result.subjectName || 'N/A',
+          score: result.score || 0,
+          date: new Date(result.createdAt).toLocaleDateString(),
+        })),
+      });
+    } catch (err) {
+      console.error('Error fetching dashboard data:', err);
+      // If API fails, fall back to default values
+      setData({
+        totalStudents: 0,
+        totalClasses: 0,
+        totalSubjects: 0,
+        gradedPercentage: 0,
+        recentActivities: [
+          { action: 'Dashboard Ready', time: 'Just now', status: 'completed' },
+        ],
+        currentSession: {
+          year: '2025/2026',
+          term: 'First Term',
+          resultStatus: 'Awaiting Data',
+        },
+        recentResults: [],
+      });
+      setError('Unable to load some data, showing defaults');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <LoadingSpinner size="lg" text="Loading dashboard..." />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-400">Failed to load dashboard data</p>
+        <button
+          onClick={fetchDashboardData}
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
+
   const stats = [
     {
       label: 'Total Students',
-      value: '843',
-      trend: '+12',
-      trendDir: 'up' as const,
+      value: data.totalStudents.toString(),
+      trend: '+0',
+      trendDir: 'neutral' as const,
       color: 'from-blue-400 to-cyan-400',
     },
     {
       label: 'Active Classes',
-      value: '28',
-      trend: '+2',
-      trendDir: 'up' as const,
+      value: data.totalClasses.toString(),
+      trend: '+0',
+      trendDir: 'neutral' as const,
       color: 'from-purple-400 to-pink-400',
     },
     {
       label: 'Subjects',
-      value: '52',
+      value: data.totalSubjects.toString(),
       trend: '0',
       trendDir: 'neutral' as const,
       color: 'from-amber-400 to-orange-400',
     },
     {
       label: 'Graded',
-      value: '78%',
-      trend: '+5%',
-      trendDir: 'up' as const,
+      value: `${data.gradedPercentage}%`,
+      trend: '+0%',
+      trendDir: 'neutral' as const,
       color: 'from-green-400 to-emerald-400',
     },
   ];
@@ -74,11 +232,7 @@ const Overview: React.FC = () => {
         <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] border border-[rgba(255,255,255,0.07)] p-8 hover:bg-white/5 transition-colors">
           <h3 className="text-lg font-semibold text-white mb-6">Recent Activities</h3>
           <div className="space-y-4">
-            {[
-              { action: 'CSV Upload', time: '2 hours ago', status: 'completed' },
-              { action: 'Results Published', time: '1 day ago', status: 'completed' },
-              { action: 'Class Created', time: '3 days ago', status: 'completed' },
-            ].map((item, i) => (
+            {data.recentActivities.map((item, i) => (
               <div key={i} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-0">
                 <div>
                   <p className="text-white text-sm font-medium">{item.action}</p>
@@ -97,15 +251,15 @@ const Overview: React.FC = () => {
           <div className="space-y-4">
             <div className="flex justify-between items-center pb-4 border-b border-white/5">
               <span className="text-gray-400">Session</span>
-              <span className="text-white font-medium">2025/2026</span>
+              <span className="text-white font-medium">{data.currentSession.year}</span>
             </div>
             <div className="flex justify-between items-center pb-4 border-b border-white/5">
               <span className="text-gray-400">Term</span>
-              <span className="text-white font-medium">First Term</span>
+              <span className="text-white font-medium">{data.currentSession.term}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-400">Result Status</span>
-              <span className="text-amber-400 font-medium">In Progress</span>
+              <span className="text-amber-400 font-medium">{data.currentSession.resultStatus}</span>
             </div>
           </div>
         </div>
@@ -125,19 +279,23 @@ const Overview: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {[
-              { student: 'Chioma Okafor', class: 'SS3A', subject: 'Mathematics', score: '87', date: 'Today' },
-              { student: 'Tunde Adeyemi', class: 'SS3B', subject: 'English', score: '92', date: 'Today' },
-              { student: 'Amara Nwosu', class: 'SS2A', subject: 'Physics', score: '78', date: 'Yesterday' },
-            ].map((row, i) => (
-              <tr key={i} className="border-b border-white/5 hover:bg-white/5">
-                <td className="py-3 px-4 text-white">{row.student}</td>
-                <td className="py-3 px-4 text-gray-400">{row.class}</td>
-                <td className="py-3 px-4 text-gray-400">{row.subject}</td>
-                <td className="py-3 px-4 text-white font-medium">{row.score}</td>
-                <td className="py-3 px-4 text-gray-500 text-xs">{row.date}</td>
+            {data.recentResults.length > 0 ? (
+              data.recentResults.map((row, i) => (
+                <tr key={i} className="border-b border-white/5 hover:bg-white/5">
+                  <td className="py-3 px-4 text-white">{row.student}</td>
+                  <td className="py-3 px-4 text-gray-400">{row.class}</td>
+                  <td className="py-3 px-4 text-gray-400">{row.subject}</td>
+                  <td className="py-3 px-4 text-white font-medium">{row.score}</td>
+                  <td className="py-3 px-4 text-gray-500 text-xs">{row.date}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="py-8 text-center text-gray-500">
+                  No recent result entries found
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

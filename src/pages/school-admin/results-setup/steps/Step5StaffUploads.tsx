@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
-import { Upload, Loader } from 'lucide-react';
+import { Upload } from 'lucide-react';
+import { LoadingSpinner, InlineLoadingSpinner } from '@/components/LoadingSpinner';
 
 interface TeacherSignature {
   classId: string;
@@ -341,7 +342,7 @@ export const Step5StaffUploads = ({
               >
                 {uploading === 'principal' ? (
                   <>
-                    <Loader className="w-4 h-4 animate-spin" />
+                    <InlineLoadingSpinner size="sm" />
                     Uploading...
                   </>
                 ) : (
@@ -362,7 +363,7 @@ export const Step5StaffUploads = ({
             >
               {uploading === 'principal' ? (
                 <>
-                  <Loader className="w-5 h-5 animate-spin" />
+                  <InlineLoadingSpinner size="md" />
                   Uploading...
                 </>
               ) : (
@@ -470,7 +471,7 @@ export const Step5StaffUploads = ({
                   >
                     {uploading === teacher.classId ? (
                       <>
-                        <Loader className="w-4 h-4 animate-spin" />
+                        <InlineLoadingSpinner size="sm" />
                         Uploading...
                       </>
                     ) : (
@@ -491,7 +492,7 @@ export const Step5StaffUploads = ({
                 >
                   {uploading === teacher.classId ? (
                     <>
-                      <Loader className="w-5 h-5 animate-spin" />
+                      <InlineLoadingSpinner size="md" />
                       Uploading...
                     </>
                   ) : (

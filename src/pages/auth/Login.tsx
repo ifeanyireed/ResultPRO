@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight01, Eye, EyeOff, Loading01 } from '@hugeicons/react';
+import { ArrowRight01, Eye, EyeOff } from '@hugeicons/react';
+import { InlineLoadingSpinner } from '@/components/LoadingSpinner';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
 
@@ -218,7 +219,7 @@ const Login: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loading01 className="w-5 h-5 animate-spin" />
+                    <InlineLoadingSpinner size="sm" />
                     <span>Signing in...</span>
                   </>
                 ) : (

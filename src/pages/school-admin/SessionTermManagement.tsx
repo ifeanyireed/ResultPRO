@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit02, Trash01, Calendar, CheckCircle, AlertCircle } from '@hugeicons/react';
-import { Loader } from 'lucide-react';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import axiosInstance from '@/lib/axiosConfig';
 import { SessionFormModal } from './components/SessionFormModal';
 import { useToast } from '@/hooks/use-toast';
@@ -240,7 +240,7 @@ const SessionTermManagement: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader className="w-6 h-6 text-blue-400 animate-spin" />
+        <LoadingSpinner size="lg" />
         <span className="ml-2 text-gray-400">Loading sessions...</span>
       </div>
     );

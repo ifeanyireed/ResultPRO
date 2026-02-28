@@ -28,8 +28,13 @@ import FinancialDashboard from "./pages/super-admin/FinancialDashboard";
 import ScratchCardManagement from "./pages/super-admin/ScratchCardMgmt";
 import SubscriptionsManagement from "./pages/super-admin/Subscriptions";
 import Analytics from "./pages/super-admin/Analytics";
+import MultiSchoolDashboard from "./pages/MultiSchoolDashboard";
 import SupportTickets from "./pages/super-admin/Support";
 import SystemSettings from "./pages/super-admin/Settings";
+import Support from "./pages/Support";
+import SuperAdminSupportDashboard from "./pages/super-admin/SupportDashboard";
+import SupportAgentDashboard from "./pages/SupportAgentDashboard";
+import NotificationsPage from "./pages/Notifications";
 import SuperAdminProfile from "./pages/super-admin/Profile";
 import SuperAdminNotifications from "./pages/super-admin/Notifications";
 import SchoolAdminLayout from "./components/SchoolAdminLayout";
@@ -70,6 +75,7 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/support" element={<Support />} />
           <Route path="/results" element={<ResultsLookup />} />
           <Route path="/scratch-card" element={<ScratchCardValidation />} />
           <Route path="/auth/login" element={<Login />} />
@@ -89,10 +95,19 @@ const App = () => (
           <Route path="/super-admin/scratch-cards" element={<ProtectedSuperAdminRoute><ScratchCardManagement /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/subscriptions" element={<ProtectedSuperAdminRoute><SubscriptionsManagement /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/analytics" element={<ProtectedSuperAdminRoute><Analytics /></ProtectedSuperAdminRoute>} />
-          <Route path="/super-admin/support" element={<ProtectedSuperAdminRoute><SupportTickets /></ProtectedSuperAdminRoute>} />
+          <Route path="/super-admin/support" element={<ProtectedSuperAdminRoute><SuperAdminSupportDashboard /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/settings" element={<ProtectedSuperAdminRoute><SystemSettings /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/profile" element={<ProtectedSuperAdminRoute><SuperAdminProfile /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/notifications" element={<ProtectedSuperAdminRoute><SuperAdminNotifications /></ProtectedSuperAdminRoute>} />
+          
+          {/* Support Agent Routes */}
+          <Route path="/support-agent/dashboard" element={<ProtectedSuperAdminRoute><SupportAgentDashboard /></ProtectedSuperAdminRoute>} />
+          
+          {/* Notifications Page */}
+          <Route path="/notifications" element={<ProtectedSuperAdminRoute><NotificationsPage /></ProtectedSuperAdminRoute>} />
+          
+          {/* Enterprise Multi-School Management - For Enterprise Subscribers */}
+          <Route path="/enterprise/multi-school" element={<ProtectedSuperAdminRoute><MultiSchoolDashboard /></ProtectedSuperAdminRoute>} />
           
           {/* School Admin Routes */}
           <Route path="/school-admin/overview" element={<SchoolAdminLayout><SchoolOverview /></SchoolAdminLayout>} />
@@ -111,6 +126,7 @@ const App = () => (
           <Route path="/school-admin/billing" element={<SchoolAdminLayout><BillingSubscription /></SchoolAdminLayout>} />
           <Route path="/school-admin/profile" element={<SchoolAdminLayout><SchoolAdminProfile /></SchoolAdminLayout>} />
           <Route path="/school-admin/notifications" element={<SchoolAdminLayout><SchoolAdminNotifications /></SchoolAdminLayout>} />
+          <Route path="/school-admin/onboarding" element={<SchoolAdminLayout><OnboardingWizard /></SchoolAdminLayout>} />
           <Route path="/school-admin/results-setup" element={<ResultsSetupWizard />} />
           <Route path="/school-admin/school-rejected" element={<SchoolRejected />} />
           

@@ -107,7 +107,7 @@ const Landing = () => {
 
           {/* Subheading */}
           <p className="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed max-w-xl">
-            The all-in-one platform that makes publishing, sharing, and analyzing student results effortless. Join thousands of schools already using Results Pro by Scholars.ng. Free for first 200 students!
+            The all-in-one platform that makes publishing, sharing, and analyzing student results effortless. Join thousands of schools already using Results Pro by Scholars.ng. Free for first 100 students!
           </p>
 
           {/* CTA Buttons */}
@@ -123,7 +123,7 @@ const Landing = () => {
 
           {/* Social proof */}
           <div className="text-sm text-gray-400">
-            Free for first 200 students • No credit card required
+            Free for first 100 students • No credit card required
           </div>
         </div>
 

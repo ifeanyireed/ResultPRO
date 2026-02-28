@@ -16,7 +16,9 @@ import {
   Bell,
   LogOut,
   Zap,
-} from '@hugeicons/react';
+  Building2,
+} from '@/lib/hugeicons-compat';
+import NotificationBell from './NotificationBell';
 
 interface NavItem {
   label: string;
@@ -95,6 +97,7 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const navItems: NavItem[] = [
     { label: 'Overview', icon: LayoutDashboard, href: '/school-admin/overview' },
+    { label: 'School Setup', icon: Building2, href: '/school-admin/onboarding' },
     { label: 'Results Setup', icon: Zap, href: '/school-admin/results-setup' },
     { label: 'Sessions', icon: Calendar, href: '/school-admin/sessions' },
     { label: 'Classes', icon: BookOpen, href: '/school-admin/classes' },
@@ -176,13 +179,9 @@ const SchoolAdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }
               >
                 <User size={20} strokeWidth={1.5} />
               </button>
-              <button
-                onClick={() => navigate('/school-admin/notifications')}
-                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 border border-transparent hover:border-white/20 transition-all duration-200 text-gray-400 hover:text-white"
-                title="Notifications"
-              >
-                <Bell size={20} strokeWidth={1.5} />
-              </button>
+              <div className="text-white">
+                <NotificationBell />
+              </div>
               <button
                 onClick={handleLogout}
                 className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all duration-200 text-gray-400 hover:text-red-400"

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowRight01, Mail, RotateCcw, Loading01 } from '@hugeicons/react';
+import { ArrowRight01, Mail, RotateCcw } from '@hugeicons/react';
+import { InlineLoadingSpinner } from '@/components/LoadingSpinner';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
 
@@ -182,7 +183,7 @@ const VerifyEmail: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loading01 className="w-5 h-5 animate-spin" />
+                    <InlineLoadingSpinner size="sm" />
                     <span>Verifying...</span>
                   </>
                 ) : (

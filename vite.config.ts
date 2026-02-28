@@ -14,6 +14,8 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "@hugeicons/react": path.resolve(__dirname, "./src/lib/hugeicons-compat.tsx"),
+      "@/lib/hugeicons-compat": path.resolve(__dirname, "./src/lib/hugeicons-compat.tsx"),
     },
+    extensions: ['.tsx', '.ts', '.jsx', '.js'],
   },
 }));

@@ -10,7 +10,7 @@ export const config = {
   // Server
   PORT: parseInt(process.env.PORT || '5000', 10),
   API_URL: process.env.API_URL || 'http://localhost:5000',
-  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
+  FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:8082',
 
   // Database
   database: {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SuperAdminLayout from '@/components/SuperAdminLayout';
-import { Plus, Download01, Copy, Eye, X, Play, Pause, Trash2, Loading01 } from '@hugeicons/react';
+import { Plus, Download01, Copy, Eye, X, Play, Pause, Trash2 } from '@hugeicons/react';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface Batch {
   id: string;
@@ -185,7 +186,7 @@ const ScratchCardManagement: React.FC = () => {
   if (loading) return (
     <SuperAdminLayout>
       <div className="flex items-center justify-center h-full">
-        <Loading01 className="w-8 h-8 animate-spin text-blue-400" />
+        <LoadingSpinner size="lg" />
       </div>
     </SuperAdminLayout>
   );

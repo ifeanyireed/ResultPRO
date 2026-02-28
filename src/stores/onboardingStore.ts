@@ -52,6 +52,17 @@ export interface Step6Data {
   paymentMethod?: 'paystack'; // Can add more payment methods later
 }
 
+export interface Step7Data {
+  students?: Array<{
+    id: string;
+    classId: string;
+    className: string;
+    name: string;
+    admissionNumber: string;
+    parentEmail?: string;
+  }>;
+}
+
 interface OnboardingState {
   // Step data
   step1Data: Step1Data | null;
@@ -60,8 +71,9 @@ interface OnboardingState {
   step4Data: Step4Data | null;
   step5Data: Step5Data | null;
   step6Data: Step6Data | null;
+  step7Data: Step7Data | null;
 
-  // Current step (1-6)
+  // Current step (1-7)
   currentStep: number;
 
   // Completed steps
@@ -80,6 +92,7 @@ interface OnboardingState {
   setStep4Data: (data: Step4Data) => void;
   setStep5Data: (data: Step5Data) => void;
   setStep6Data: (data: Step6Data) => void;
+  setStep7Data: (data: Step7Data) => void;
 
   // Navigation
   goToStep: (step: number) => void;
@@ -102,6 +115,7 @@ interface OnboardingState {
     step4: Step4Data | null;
     step5: Step5Data | null;
     step6: Step6Data | null;
+    step7: Step7Data | null;
   };
 }
 
@@ -112,6 +126,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
   step4Data: null,
   step5Data: null,
   step6Data: null,
+  step7Data: null,
   currentStep: 1,
   completedSteps: [],
   error: null,
@@ -129,12 +144,14 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
     set({ step5Data: data }),
   setStep6Data: (data) =>
     set({ step6Data: data }),
+  setStep7Data: (data) =>
+    set({ step7Data: data }),
 
   goToStep: (step) =>
-    set({ currentStep: Math.max(1, Math.min(6, step)) }),
+    set({ currentStep: Math.max(1, Math.min(7, step)) }),
   nextStep: () => {
     const { currentStep } = get();
-    set({ currentStep: Math.min(6, currentStep + 1) });
+    set({ currentStep: Math.min(7, currentStep + 1) });
   },
   previousStep: () => {
     const { currentStep } = get();
@@ -157,6 +174,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       step4Data: null,
       step5Data: null,
       step6Data: null,
+      step7Data: null,
       currentStep: 1,
       completedSteps: [],
       error: null,
@@ -172,6 +190,7 @@ export const useOnboardingStore = create<OnboardingState>((set, get) => ({
       step4: state.step4Data,
       step5: state.step5Data,
       step6: state.step6Data,
+      step7: state.step7Data,
     };
   },
 }));

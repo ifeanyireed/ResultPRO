@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '@/lib/axiosConfig';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { StepIndicator } from './StepIndicator';
 import { Step1SchoolProfile } from './steps/Step1SchoolProfile';
@@ -9,9 +9,8 @@ import { Step3Classes } from './steps/Step3Classes';
 import { Step4Subjects } from './steps/Step4Subjects';
 import { Step5GradingSystem } from './steps/Step5GradingSystem';
 import { Step6PaymentPlans } from './steps/Step6PaymentPlans';
+import { Step7AddStudents } from './steps/Step7AddStudents';
 import { useToast } from '@/hooks/use-toast';
-
-const API_BASE = 'http://localhost:5000/api';
 
 export const OnboardingWizard = () => {
   const navigate = useNavigate();
@@ -31,6 +30,7 @@ export const OnboardingWizard = () => {
     setStep4Data,
     setStep5Data,
     setStep6Data,
+    setStep7Data,
     nextStep,
     previousStep,
     goToStep,
@@ -43,6 +43,7 @@ export const OnboardingWizard = () => {
     step4Data,
     step5Data,
     step6Data,
+    step7Data,
     reset,
   } = useOnboardingStore();
 
@@ -61,16 +62,14 @@ export const OnboardingWizard = () => {
         console.log('🔐 Auth token found, checking API...');
 
         // Check API health
-        const healthRes = await axios.get(`${API_BASE}/health`);
+        const healthRes = await axiosInstance.get('/api/health');
         if (healthRes.status === 200) {
           console.log('✅ API is healthy');
           setApiStatus('ready');
 
           // Fetch current onboarding status
           console.log('📡 Fetching onboarding status with token:', token.substring(0, 20) + '...');
-          const statusRes = await axios.get(`${API_BASE}/onboarding/status`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const statusRes = await axiosInstance.get('/api/onboarding/status');
 
           const statusData = statusRes.data.data;
           console.log('✅ Current server step:', statusData.currentStep);
@@ -185,16 +184,14 @@ export const OnboardingWizard = () => {
     };
 
     checkApi();
-  }, [navigate, toast]);
+  }, []); // Only run once on component mount
 
   const handleStep1Next = async (data: any) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        `${API_BASE}/onboarding/step/1`,
-        data,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await axiosInstance.post(
+        '/api/onboarding/step/1',
+        data
       );
 
       if (response.data.success) {
@@ -224,11 +221,9 @@ export const OnboardingWizard = () => {
   const handleStep2Next = async (data: any) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        `${API_BASE}/onboarding/step/2`,
-        data,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await axiosInstance.post(
+        '/api/onboarding/step/2',
+        data
       );
 
       if (response.data.success) {
@@ -258,11 +253,9 @@ export const OnboardingWizard = () => {
   const handleStep3Next = async (data: any) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        `${API_BASE}/onboarding/step/3`,
-        data,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await axiosInstance.post(
+        '/api/onboarding/step/3',
+        data
       );
 
       if (response.data.success) {
@@ -292,11 +285,9 @@ export const OnboardingWizard = () => {
   const handleStep4Next = async (data: any) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        `${API_BASE}/onboarding/step/4`,
-        data,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await axiosInstance.post(
+        '/api/onboarding/step/4',
+        data
       );
 
       if (response.data.success) {
@@ -326,11 +317,9 @@ export const OnboardingWizard = () => {
   const handleStep5Next = async (data: any) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        `${API_BASE}/onboarding/step/5`,
-        data,
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await axiosInstance.post(
+        '/api/onboarding/step/5',
+        data
       );
 
       if (response.data.success) {
@@ -360,67 +349,98 @@ export const OnboardingWizard = () => {
   const handleStep6Next = async (data: any) => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('authToken');
-      
-      // Check if selected plan is free
-      const isFreeplan = data.selectedPlanId === 'free';
-      
-      if (isFreeplan) {
-        // For free plan, just save and complete onboarding
+      const response = await axiosInstance.post(
+        '/api/onboarding/step/6',
+        data
+      );
+
+      if (response.data.success) {
         setStep6Data(data);
         markStepComplete(6);
-        
-        // Complete the onboarding
-        const completeRes = await axios.post(
-          `${API_BASE}/onboarding/complete`,
-          {},
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        
-        setIsLoading(false);
-        
-        // Redirect to overview
-        navigate('/school-admin/overview', { replace: true });
+        nextStep();
         toast({
           title: 'Success',
-          description: 'Onboarding completed! Welcome to Results Pro',
+          description: 'Plan selected successfully',
         });
-      } else {
-        // For paid plans, initialize payment with Paystack
-        setStep6Data(data);
-        markStepComplete(6);
-        
-        // Get plan details
-        const planName = data.selectedPlanId.includes('pro-term') || data.selectedPlanId === 'pro-term' 
-          ? 'Pro' 
-          : data.selectedPlanId.includes('pro-year') 
-          ? 'Pro' 
-          : 'Enterprise';
-        
-        const amount = data.selectedPlanId.includes('pro-term') || data.selectedPlanId === 'pro-term'
-          ? 50000
-          : data.selectedPlanId.includes('pro-year')
-          ? 150000
-          : data.selectedPlanId.includes('enterprise-term') || data.selectedPlanId === 'enterprise-term'
-          ? 200000
-          : 600000; // enterprise-year
+      }
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.error ||
+        'Failed to save plan selection';
+      setError(msg);
+      toast({
+        title: 'Error',
+        description: msg,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        // Initialize payment with backend (tax will be added server-side)
-        const initPaymentRes = await axios.post(
-          `${API_BASE}/payment/initialize`,
-          {
-            planId: data.selectedPlanId,
-            planName,
-            amount, // Base amount, tax will be added by backend
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+  const handleStep7Next = async (data: any) => {
+    setIsLoading(true);
+    try {
+      const response = await axiosInstance.post(
+        '/api/onboarding/step/7',
+        data
+      );
 
-        if (initPaymentRes.data?.success && initPaymentRes.data?.data?.authorizationUrl) {
-          // Redirect to Paystack payment page
-          window.location.href = initPaymentRes.data.data.authorizationUrl;
+      if (response.data.success) {
+        setStep7Data(data);
+        markStepComplete(7);
+
+        // Check if selected plan is free
+        const isFreeplan = step6Data?.selectedPlanId === 'free';
+        
+        if (isFreeplan) {
+          // For free plan, complete onboarding immediately
+          const completeRes = await axiosInstance.post(
+            '/api/onboarding/complete',
+            {}
+          );
+          
+          setIsLoading(false);
+          
+          // Redirect to overview
+          navigate('/school-admin/overview', { replace: true });
+          toast({
+            title: 'Success',
+            description: 'Onboarding completed! Welcome to Results Pro',
+          });
         } else {
-          throw new Error(initPaymentRes.data?.error || 'Failed to initialize payment');
+          // For paid plans, initialize payment with Paystack
+          // Get plan details
+          const planName = step6Data?.selectedPlanId?.includes('pro-term') || step6Data?.selectedPlanId === 'pro-term' 
+            ? 'Pro' 
+            : step6Data?.selectedPlanId?.includes('pro-year') 
+            ? 'Pro' 
+            : 'Enterprise';
+          
+          const amount = step6Data?.selectedPlanId?.includes('pro-term') || step6Data?.selectedPlanId === 'pro-term'
+            ? 50000
+            : step6Data?.selectedPlanId?.includes('pro-year')
+            ? 150000
+            : step6Data?.selectedPlanId?.includes('enterprise-term') || step6Data?.selectedPlanId === 'enterprise-term'
+            ? 200000
+            : 600000; // enterprise-year
+
+          // Initialize payment with backend (tax will be added server-side)
+          const initPaymentRes = await axiosInstance.post(
+            '/api/payment/initialize',
+            {
+              planId: step6Data?.selectedPlanId,
+              planName,
+              amount, // Base amount, tax will be added by backend
+            }
+          );
+
+          if (initPaymentRes.data?.success && initPaymentRes.data?.data?.authorizationUrl) {
+            // Redirect to Paystack payment page
+            window.location.href = initPaymentRes.data.data.authorizationUrl;
+          } else {
+            throw new Error(initPaymentRes.data?.error || 'Failed to initialize payment');
+          }
         }
       }
     } catch (err: any) {
@@ -428,7 +448,7 @@ export const OnboardingWizard = () => {
       const msg =
         err?.response?.data?.error ||
         err?.message ||
-        'Failed to process payment';
+        'Failed to complete setup';
       setError(msg);
       toast({
         title: 'Error',
@@ -440,11 +460,9 @@ export const OnboardingWizard = () => {
 
   const handleCompleteOnboarding = async () => {
     try {
-      const token = localStorage.getItem('authToken');
-      const response = await axios.post(
-        `${API_BASE}/onboarding/complete`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
+      const response = await axiosInstance.post(
+        '/api/onboarding/complete',
+        {}
       );
 
       if (response.data.success) {
@@ -545,7 +563,7 @@ export const OnboardingWizard = () => {
           <StepIndicator
             currentStep={currentStep}
             completedSteps={completedSteps}
-            totalSteps={6}
+            totalSteps={7}
           />
         </div>
       </div>
@@ -608,6 +626,15 @@ export const OnboardingWizard = () => {
                 onNext={handleStep6Next}
                 onPrevious={handlePrevious}
                 initialData={step6Data || undefined}
+                isLoading={isLoading}
+              />
+            )}
+
+            {currentStep === 7 && (
+              <Step7AddStudents
+                onNext={handleStep7Next}
+                onPrevious={handlePrevious}
+                initialData={step7Data || undefined}
                 isLoading={isLoading}
               />
             )}

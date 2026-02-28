@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight01, Loading01 } from '@hugeicons/react';
+import { ArrowRight01 } from '@hugeicons/react';
+import { InlineLoadingSpinner } from '@/components/LoadingSpinner';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
 
@@ -209,7 +210,7 @@ const PasswordReset: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loading01 className="w-5 h-5 animate-spin" />
+                    <InlineLoadingSpinner size="sm" />
                     <span>Sending...</span>
                   </>
                 ) : (

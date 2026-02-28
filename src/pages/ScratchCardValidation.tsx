@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { ArrowRight01, CheckSquare, Loading01, Check, AlertCircle } from '@hugeicons/react';
+import { ArrowRight01, CheckSquare, Check, AlertCircle } from '@hugeicons/react';
+import { InlineLoadingSpinner } from '@/components/LoadingSpinner';
 import Navigation from '@/components/Navigation';
 
 interface StudentResult {
@@ -276,7 +277,7 @@ const ScratchCardValidation: React.FC = () => {
               >
                 {loading ? (
                   <>
-                    <Loading01 className="w-5 h-5 animate-spin" />
+                    <InlineLoadingSpinner size="sm" />
                     Validating...
                   </>
                 ) : (

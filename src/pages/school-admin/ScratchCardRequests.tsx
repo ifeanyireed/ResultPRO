@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Send, X, AlertCircle, CheckCircle } from '@hugeicons/react';
+import { Plus, Send, X, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface BatchRequest {
   id: string;

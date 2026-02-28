@@ -1,4 +1,4 @@
-import { CheckCircle, Calendar, Settings, Heart, Zap, Users, Upload, FileText } from 'lucide-react';
+import { CheckCircle, Calendar, Settings, Heart, Zap, Upload, FileText } from 'lucide-react';
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -12,7 +12,6 @@ const stepLabels = [
   'Affective Domain',
   'Psychomotor Domain',
   'Staff Uploads',
-  'Add Students',
   'Results CSV',
 ];
 
@@ -22,14 +21,13 @@ const stepIcons = [
   Heart,
   Zap,
   Upload,
-  Users,
   FileText,
 ];
 
 export const ResultsSetupStepIndicator = ({
   currentStep,
   completedSteps,
-  totalSteps = 7,
+  totalSteps = 6,
 }: StepIndicatorProps) => {
   return (
     <div className="w-full py-8 px-4">

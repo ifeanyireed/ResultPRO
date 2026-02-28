@@ -1,5 +1,6 @@
 import { paystackService } from './paystack.service';
 import { paymentRepository } from '../repositories/payment.repository';
+import { subscriptionService } from './subscription.service';
 import { prisma } from '@config/database';
 import { config } from '@config/environment';
 
@@ -144,8 +145,13 @@ export class PaymentService {
         where: { id: payment.schoolId },
         data: {
           subscriptionTier: payment.plan.name,
+          subscriptionStartDate: now,
+          subscriptionEndDate: endDate,
         },
       });
+
+      // Create invoice
+      await subscriptionService.createInvoice(updatedPayment.id, updatedPayment, payment.plan);
 
       return {
         success: true,

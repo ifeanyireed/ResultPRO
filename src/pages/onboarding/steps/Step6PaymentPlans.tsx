@@ -25,7 +25,7 @@ const AVAILABLE_PLANS: Plan[] = [
     price: 0,
     currency: 'NGN',
     duration: 'forever',
-    studentCount: '0-200',
+    studentCount: '0-100',
     features: [
       'CSV result upload',
       'Basic result publishing',
@@ -43,7 +43,7 @@ const AVAILABLE_PLANS: Plan[] = [
     price: 50000,
     currency: 'NGN',
     duration: 'per term',
-    studentCount: '201-2,000',
+    studentCount: '101-2,000',
     features: [
       'All Free features',
       'Result checker with scratch cards',
@@ -65,7 +65,7 @@ const AVAILABLE_PLANS: Plan[] = [
     price: 150000,
     currency: 'NGN',
     duration: 'per year',
-    studentCount: '201-2,000',
+    studentCount: '101-2,000',
     features: [
       'All Free features',
       'Result checker with scratch cards',
@@ -146,10 +146,38 @@ export const Step6PaymentPlans = ({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [currentSubscription, setCurrentSubscription] = useState<{
+    tier: string;
+    startDate: Date;
+    endDate: Date;
+  } | null>(null);
   const { setError } = useOnboardingStore();
 
   // Load available plans on mount
   useEffect(() => {
+    const fetchSubscriptionData = async () => {
+      try {
+        const token = localStorage.getItem('authToken') || localStorage.getItem('accessToken');
+        if (token) {
+          const response = await axios.get(`${API_BASE}/onboarding/status`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          
+          const data = response.data.data;
+          if (data.subscriptionTier && data.subscriptionEndDate) {
+            setCurrentSubscription({
+              tier: data.subscriptionTier,
+              startDate: new Date(data.subscriptionStartDate),
+              endDate: new Date(data.subscriptionEndDate),
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch subscription data:', error);
+      }
+    };
+    
+    fetchSubscriptionData();
     setLoadingPlans(false);
   }, []);
 
@@ -216,6 +244,24 @@ export const Step6PaymentPlans = ({
             Select a subscription plan that works best for your school
           </p>
         </div>
+
+        {/* Current Subscription Info */}
+        {currentSubscription && (
+          <div className="mb-8 p-4 rounded-lg bg-green-500/10 border border-green-500/30">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <p className="text-sm font-medium text-green-400">Current Plan: {currentSubscription.tier}</p>
+                <p className="text-xs text-green-300 mt-1">
+                  Expires on {currentSubscription.endDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {submitError && (
           <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex gap-3">

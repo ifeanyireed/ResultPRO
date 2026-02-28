@@ -12,10 +12,25 @@ export async function createApp(): Promise<Express> {
   // Security middleware
   app.use(helmet());
 
-  // CORS middleware
+  // CORS middleware - allow multiple frontend addresses
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:8080',
+    'http://localhost:8081',
+    'http://localhost:8082',
+    config.FRONTEND_URL,
+  ];
+  
   app.use(
     cors({
-      origin: config.FRONTEND_URL,
+      origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true,
     })
   );
@@ -65,6 +80,14 @@ export async function createApp(): Promise<Express> {
   const paymentRoutes = await import('@modules/payment/routes/payment.routes');
   app.use('/api/payment', paymentRoutes.default);
 
+  // Support routes (protected)
+  const supportRoutes = await import('@modules/support/routes/support.routes');
+  app.use('/api/support/tickets', supportRoutes.default);
+
+  // Notification routes (protected)
+  const notificationRoutes = await import('@modules/support/routes/notifications.routes');
+  app.use('/api/notifications', notificationRoutes.default);
+
   // Super Admin routes (auth protection handled within routes)
   const superAdminRoutes = await import('@modules/super-admin/routes/super-admin.routes');
   app.use('/api/super-admin', superAdminRoutes.default);
@@ -76,6 +99,14 @@ export async function createApp(): Promise<Express> {
   const adminScratchCardRoutes = await import('@modules/scratch-cards/routes/admin-scratch-cards.routes');
   app.use('/api/admin/scratch-cards', adminScratchCardRoutes.default);
 
+  // Admin Payment/Subscription routes (protected - for SuperAdmin)
+  const adminPaymentRoutes = await import('@modules/payment/routes/admin-payment.routes');
+  app.use('/api/admin/payment', adminPaymentRoutes.default);
+
+  // Admin Schools/Network Management routes (protected - for SuperAdmin)
+  const adminSchoolsRoutes = await import('@modules/super-admin/routes/admin-schools.routes');
+  app.use('/api/admin/schools', authMiddleware, adminSchoolsRoutes.default);
+
   // School Scratch Card routes (protected - for SchoolAdmin)
   const schoolScratchCardRoutes = await import('@modules/scratch-cards/routes/school-scratch-cards.routes');
   app.use('/api/school/scratch-cards', schoolScratchCardRoutes.default);
@@ -83,6 +114,18 @@ export async function createApp(): Promise<Express> {
   // Public Scratch Card routes (no authentication required)
   const publicScratchCardRoutes = await import('@modules/scratch-cards/routes/public-scratch-cards.routes');
   app.use('/api/scratch-cards', publicScratchCardRoutes.default);
+
+  // Analytics routes (protected - for Teachers, Principals, Students)
+  const analyticsRoutes = await import('@modules/analytics/routes/analytics.routes');
+  app.use('/api/analytics', analyticsRoutes.default);
+
+  // Parent Analytics routes (protected - for Parents)
+  const parentAnalyticsRoutes = await import('@modules/analytics/routes/parentAnalytics.routes');
+  app.use('/api/parent-analytics', parentAnalyticsRoutes.default);
+
+  // Agent routes (protected - for Agents)
+  const agentRoutes = await import('@modules/agent/routes');
+  app.use('/api/agent', agentRoutes.default);
 
   // 404 handler
   app.use((req: Request, res: Response) => {

@@ -5,6 +5,8 @@ import * as LucideIcons from 'lucide-react';
 // Map icon names to Lucide icons
 const iconMap: Record<string, React.ComponentType<any>> = {
   AlertCircle: LucideIcons.AlertCircle,
+  AlertTriangle: LucideIcons.AlertTriangle,
+  Target: LucideIcons.Target,
   ArrowDown: LucideIcons.ArrowDown,
   ArrowLeft: LucideIcons.ArrowLeft,
   ArrowRight: LucideIcons.ArrowRight,
@@ -93,6 +95,8 @@ export const createIcon = (name: string) => {
 
 // Export all icons
 export const AlertCircle = iconMap.AlertCircle || LucideIcons.AlertCircle;
+export const AlertTriangle = iconMap.AlertTriangle || LucideIcons.AlertTriangle;
+export const Target = iconMap.Target || LucideIcons.Target;
 export const ArrowDown = iconMap.ArrowDown || LucideIcons.ArrowDown;
 export const ArrowLeft = iconMap.ArrowLeft || LucideIcons.ArrowLeft;
 export const ArrowRight = iconMap.ArrowRight || LucideIcons.ArrowRight;

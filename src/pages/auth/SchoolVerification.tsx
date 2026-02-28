@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Upload01, CheckCircle, Loading01 } from '@hugeicons/react';
+import { Upload01, CheckCircle } from '@hugeicons/react';
+import { InlineLoadingSpinner } from '@/components/LoadingSpinner';
 import Navigation from '@/components/Navigation';
 import axios from 'axios';
 
@@ -298,7 +299,7 @@ const SchoolVerification: React.FC = () => {
                   >
                     {loading ? (
                       <>
-                        <Loading01 className="w-5 h-5 animate-spin" />
+                        <InlineLoadingSpinner size="sm" />
                         <span>Submitting...</span>
                       </>
                     ) : (

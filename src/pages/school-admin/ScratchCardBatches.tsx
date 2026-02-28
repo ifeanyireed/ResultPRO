@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, Download01, Edit, X, AlertCircle } from '@hugeicons/react';
+import { Eye, Download, Edit, X, AlertCircle } from 'lucide-react';
 
 interface Card {
   id: string;
@@ -181,7 +181,7 @@ const ScratchCardBatches: React.FC = () => {
                 onClick={() => handleExportBatch(batch.id, batch.batchCode)}
                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-green-600/20 hover:bg-green-600/30 text-green-300 transition-colors text-sm font-medium"
               >
-                <Download01 className="w-4 h-4" />
+                <Download className="w-4 h-4" />
                 Export
               </button>
             </div>

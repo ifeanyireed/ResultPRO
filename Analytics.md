@@ -12,10 +12,11 @@ Based on the detailed schema (rich student data with subjects, scores, attendanc
 - **Intervention Scoring**: Rank students by probability of improvement with tutoring
 - **Early Warning System**: Flag students when CA2 < CA1 (declining trend)
 
-## **2. Subject-Level Deep Insights**
+## **2. Subject-LevLevelel Deep Insights**
 - **Subject Strength Matrix**: Identify the strongest/weakest subject per student and per class
 - **Subject Difficulty Index**: Calculate class difficulty by comparing:
-  - Average exam scores vs cumulative scores
+  - Average exam scores v- **Subject Mastery Pathways**: Recommend subject combinations for advanced students
+s cumulative scores
   - % of students scoring below passing threshold
   - Subject-specific pass rates across terms
 - **Learning Velocity by Subject**: How quickly students improve (CA1 vs CA2 vs Exam growth)
@@ -34,8 +35,8 @@ Based on the detailed schema (rich student data with subjects, scores, attendanc
 - **Correlation Analysis**: Calculate attendance impact on grades by subject
 - **Absence Impact Scoring**: Quantify how many days absent = grade drop
 - **Attendance Trend Alerts**: Identify students with declining attendance patterns
-- **Attendance-to-Excellence**: Find optimal attendance thresholds for different grades
-
+- **Attendance-to-Excellence**: Find optimal attendance thresholgradesds for different grades
+grades
 ## **5. Assessment Component Analysis**
 - **CA vs Exam Predictor**: Does CA1+CA2 reliably predict Exam scores?
 - **Project Impact Analysis**: How much does project score boost overall grade?

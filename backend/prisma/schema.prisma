@@ -60,6 +60,8 @@ model School {
   onboardingState OnboardingState[]
   payments Payment[]
   subscriptions Subscription[]
+  invoices Invoice[] @relation("InvoicesToSchool")
+  supportTickets SupportTicket[] @relation("TicketsToSchool")
   resultsSetupSession ResultsSetupSession?
   resultsInstances ResultsInstance[]
   students Student[]
@@ -68,6 +70,9 @@ model School {
   scratchCards ScratchCard[] @relation("CardsToSchool")
   scratchCardUsages ScratchCardUsage[] @relation("UsagesToSchool")
   batchRequests BatchRequest[] @relation("RequestsToSchool")
+  parents Parent[]
+  agentAssignments AgentSchoolAssignment[]
+  referrals Referral[]
 
   @@index([status])
   @@index([verificationStatus])
@@ -195,13 +200,20 @@ model User {
   passwordHash                String   @map("password_hash")
   passwordResetToken          String?  @map("password_reset_token")
   passwordResetTokenExpiry    DateTime? @map("password_reset_token_expiry")
-  role                        String   @default("ADMIN")  // SUPER_ADMIN, FINANCE_ADMIN, SUPPORT_ADMIN, etc.
+  role                        String   @default("ADMIN")  // SUPER_ADMIN, SUPPORT_AGENT, FINANCE_ADMIN, SUPPORT_ADMIN, PARENT, etc.
   status                      String   @default("ACTIVE")
   firstLogin                  Boolean  @default(true) @map("first_login")
   lastLoginAt                 DateTime? @map("last_login_at")
   createdAt                   DateTime @default(now()) @map("created_at")
   updatedAt                   DateTime @updatedAt @map("updated_at")
   deletedAt                   DateTime? @map("deleted_at")
+
+  parent Parent?
+  agent Agent?
+  ticketsCreated SupportTicket[] @relation("TicketsCreatedBy")
+  ticketsAssigned SupportTicket[] @relation("TicketsAssignedTo")
+  messages TicketMessage[] @relation("TicketMessages")
+  notifications Notification[] @relation("NotificationsForUser")
 
   @@index([role])
   @@map("users")
@@ -270,17 +282,209 @@ model Student {
   name              String
   admissionNumber   String   @map("admission_number")
   parentEmail       String?  @map("parent_email")
+  parentId          String?  @map("parent_id")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  parent Parent? @relation(fields: [parentId], references: [id], onDelete: SetNull)
   results StudentResult[]
 
   @@unique([classId, admissionNumber])
   @@index([schoolId])
   @@index([classId])
+  @@index([parentId])
   @@map("students")
+}
+
+model Parent {
+  id                String   @id @default(cuid())
+  userId            String   @unique @map("user_id")
+  schoolId          String   @map("school_id")
+  phoneNumber       String?  @map("phone_number")
+  occupation        String?
+  address           String?
+  city              String?
+  state             String?
+  country           String?
+  notificationPreferences String? @map("notification_preferences") // JSON: { emailNotifications: bool, smsNotifications: bool, ... }
+  profilePhotoUrl   String?  @map("profile_photo_url")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  students Student[]
+
+  @@index([userId])
+  @@index([schoolId])
+  @@map("parents")
+}
+
+model Agent {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique @map("user_id")
+  specialization            String   @default("Full-Stack")  // Setup, Training, Maintenance, Full-Stack
+  subscriptionTier          String   @default("Free")  // Free, Pro, Premium
+  subscriptionStartDate     DateTime? @map("subscription_start_date")
+  subscriptionEndDate       DateTime? @map("subscription_end_date")
+  bio                       String?
+  credentials               String?  // JSON: { certifications: [...], experience: X years, etc }
+  avatarUrl                 String?  @map("avatar_url")
+  verificationStatus        String   @default("PENDING")  // PENDING, APPROVED, REJECTED
+  verifiedAt                DateTime? @map("verified_at")
+  verifiedBy                String?  @map("verified_by")  // userId of verifier
+  rejectionReason           String?  @map("rejection_reason")
+  
+  // Referral tracking
+  uniqueReferralCode        String   @unique @map("unique_referral_code")
+  referralLinkClicks        Int      @default(0) @map("referral_link_clicks")
+  
+  // Commission tracking
+  totalCommissionEarned     Float    @default(0) @map("total_commission_earned")
+  pendingCommission         Float    @default(0) @map("pending_commission")
+  
+  // Gamification
+  pointsBalance             Int      @default(0) @map("points_balance")
+  lifetimePoints            Int      @default(0) @map("lifetime_points")
+  leaderboardRank           Int?     @map("leaderboard_rank")
+  
+  status                    String   @default("ACTIVE")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  schoolAssignments AgentSchoolAssignment[]
+  referrals Referral[]
+  rewards AgentReward[]
+  badges AgentBadge[]
+  withdrawals RewardWithdrawal[]
+
+  @@index([userId])
+  @@index([verificationStatus])
+  @@index([subscriptionTier])
+  @@map("agents")
+}
+
+model AgentSchoolAssignment {
+  id                        String   @id @default(cuid())
+  agentId                   String   @map("agent_id")
+  schoolId                  String   @map("school_id")
+  role                      String   @default("Technical Lead")  // Technical Lead, Support Specialist, Setup Specialist
+  commissionRate            Float    @default(7)  // Base commission percentage
+  status                    String   @default("ACTIVE")  // ACTIVE, INACTIVE, SUSPENDED
+  assignedAt                DateTime @default(now()) @map("assigned_at")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, schoolId])
+  @@index([agentId])
+  @@index([schoolId])
+  @@map("agent_school_assignments")
+}
+
+model Referral {
+  id                        String   @id @default(cuid())
+  agentId                   String   @map("agent_id")
+  referredSchoolId          String   @map("referred_school_id")
+  referredByEmail           String   @map("referred_by_email")  // School contact email
+  referralCode              String   @map("referral_code")
+  
+  // Tracking
+  clickedAt                 DateTime? @map("clicked_at")
+  signupCompletedAt         DateTime? @map("signup_completed_at")
+  
+  // Commission
+  commissionRate            Float    @default(7)
+  commissionAmount          Float    @default(0) @map("commission_amount")
+  status                    String   @default("PENDING")  // PENDING, APPROVED, PAID
+  approvedAt                DateTime? @map("approved_at")
+  paidAt                    DateTime? @map("paid_at")
+  paymentMethod             String?   @map("payment_method")  // BANK_TRANSFER, PAYPAL, CRYPTOCURRENCY, etc
+  
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  school School @relation(fields: [referredSchoolId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, referredSchoolId])
+  @@index([agentId])
+  @@index([referredSchoolId])
+  @@index([status])
+  @@map("referrals")
+}
+
+model AgentReward {
+  id                        String   @id @default(cuid())
+  agentId                   String   @map("agent_id")
+  eventType                 String   // SCHOOL_SIGNUP, MONTHLY_BONUS, MILESTONE, CUSTOM
+  pointsEarned              Int      @default(0) @map("points_earned")
+  description               String?
+  metadata                  String?   // JSON: { schoolId, amount, reason, etc }
+  
+  createdAt                 DateTime @default(now()) @map("created_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([eventType])
+  @@map("agent_rewards")
+}
+
+model AgentBadge {
+  id                        String   @id @default(cuid())
+  agentId                   String   @map("agent_id")
+  badgeType                 String   // FIRST_SCHOOL, SCHOOL_BUILDER, TOP_PERFORMER, TRUSTED_EXPERT, AMBASSADOR, etc
+  description               String?
+  iconUrl                   String?   @map("icon_url")
+  earnedAt                  DateTime @default(now()) @map("earned_at")
+  
+  createdAt                 DateTime @default(now()) @map("created_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, badgeType])
+  @@index([agentId])
+  @@map("agent_badges")
+}
+
+model RewardWithdrawal {
+  id                        String   @id @default(cuid())
+  agentId                   String   @map("agent_id")
+  amount                    Float
+  status                    String   @default("PENDING")  // PENDING, APPROVED, REJECTED, PAID
+  paymentMethod             String   @map("payment_method")  // BANK_TRANSFER, PAYPAL, CRYPTOCURRENCY
+  
+  // Bank details
+  bankAccountName           String?   @map("bank_account_name")
+  bankCode                  String?   @map("bank_code")
+  accountNumber             String?   @map("account_number")
+  
+  // Crypto details
+  walletAddress             String?   @map("wallet_address")
+  
+  notes                     String?
+  rejectionReason           String?   @map("rejection_reason")
+  
+  requestedAt               DateTime @default(now()) @map("requested_at")
+  approvedAt                DateTime? @map("approved_at")
+  approvedBy                String?   @map("approved_by")  // userId
+  paidAt                    DateTime? @map("paid_at")
+  txHash                    String?   @map("tx_hash")  // Transaction hash for tracking
+  
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
+
+  agent Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agentId])
+  @@index([status])
+  @@map("reward_withdrawals")
 }
 
 model Subject {
@@ -442,6 +646,7 @@ model Plan {
 
   payments Payment[]
   subscriptions Subscription[]
+  invoices Invoice[] @relation("InvoicesToPlan")
 
   @@index([name])
   @@map("plans")
@@ -487,11 +692,50 @@ model Payment {
 
   school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   plan Plan @relation(fields: [planId], references: [id])
+  invoices Invoice[]
 
   @@index([schoolId])
   @@index([status])
   @@index([paystackReference])
   @@map("payments")
+}
+
+model Invoice {
+  id                  String   @id @default(cuid())
+  invoiceNumber       String   @unique @map("invoice_number")
+  schoolId            String   @map("school_id")
+  paymentId           String   @map("payment_id")
+  planId              String   @map("plan_id")
+  
+  // Billing period
+  billingPeriod       String   @map("billing_period") // term or year
+  periodStartDate     DateTime @map("period_start_date")
+  periodEndDate       DateTime @map("period_end_date")
+  
+  // Amount details
+  baseAmount          Float    @map("base_amount")
+  taxAmount           Float    @map("tax_amount")
+  totalAmount         Float    @map("total_amount")
+  currency            String   @default("NGN") @map("currency")
+  
+  // Invoice status
+  status              String   @default("ISSUED") @map("status") // ISSUED, PAID, OVERDUE, CANCELLED
+  
+  // Payment tracking
+  paidAt              DateTime? @map("paid_at")
+  dueDate             DateTime? @map("due_date")
+  
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+
+  school School @relation("InvoicesToSchool", fields: [schoolId], references: [id], onDelete: Cascade)
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  plan Plan @relation("InvoicesToPlan", fields: [planId], references: [id])
+
+  @@index([schoolId])
+  @@index([status])
+  @@index([paymentId])
+  @@map("invoices")
 }
 
 // ============================================================================
@@ -614,4 +858,81 @@ model BatchRequest {
   @@index([schoolId])
   @@index([status])
   @@map("batch_requests")
+}
+
+// Support Ticket System Models
+model SupportTicket {
+  id                    String   @id @default(cuid())
+  ticketNumber          String   @unique @map("ticket_number")  // e.g., TICKET-001
+  schoolId              String?  @map("school_id")
+  createdBy             String   @map("created_by")  // User ID who created
+  assignedToAgent       String?  @map("assigned_to_agent")  // Support Agent ID
+  
+  // Ticket details
+  title                 String
+  description           String
+  category              String   // BILLING, TECHNICAL, ACCOUNT, FEATURE_REQUEST, OTHER
+  priority              String   @default("MEDIUM")  // LOW, MEDIUM, HIGH, CRITICAL
+  status                String   @default("OPEN")  // OPEN, PENDING, IN_PROGRESS, RESOLVED, CLOSED
+  
+  // Metadata
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  resolvedAt            DateTime? @map("resolved_at")
+  closedAt              DateTime? @map("closed_at")
+  
+  school School? @relation("TicketsToSchool", fields: [schoolId], references: [id], onDelete: SetNull)
+  createdByUser User @relation("TicketsCreatedBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  assignedAgent User? @relation("TicketsAssignedTo", fields: [assignedToAgent], references: [id], onDelete: SetNull)
+  messages TicketMessage[]
+  notifications Notification[]
+  
+  @@index([schoolId])
+  @@index([assignedToAgent])
+  @@index([status])
+  @@index([priority])
+  @@index([createdBy])
+  @@map("support_tickets")
+}
+
+model TicketMessage {
+  id                String   @id @default(cuid())
+  ticketId          String   @map("ticket_id")
+  senderId          String   @map("sender_id")
+  content           String
+  attachmentUrl     String?  @map("attachment_url")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  sender User @relation("TicketMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  @@index([ticketId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@map("ticket_messages")
+}
+
+model Notification {
+  id                String   @id @default(cuid())
+  userId            String   @map("user_id")
+  ticketId          String?  @map("ticket_id")
+  type              String   // TICKET_CREATED, TICKET_ASSIGNED, MESSAGE_RECEIVED, TICKET_RESOLVED, STATUS_CHANGED
+  title             String
+  message           String
+  relatedId         String?  @map("related_id")  // ID of related entity (ticketId, etc.)
+  isRead            Boolean  @default(false) @map("is_read")
+  actionUrl         String?  @map("action_url")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  readAt            DateTime? @map("read_at")
+  
+  user User @relation("NotificationsForUser", fields: [userId], references: [id], onDelete: Cascade)
+  ticket SupportTicket? @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
 }
