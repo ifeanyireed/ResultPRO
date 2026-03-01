@@ -144,4 +144,259 @@ export class SuperAdminController {
       });
     }
   }
+
+  /**
+   * GET /api/super-admin/agents
+   * Get all agents with pagination and filters
+   */
+  static async listAgents(req: Request, res: Response) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const search = req.query.search as string | undefined;
+      const status = req.query.status as string | undefined;
+      const tier = req.query.tier as string | undefined;
+
+      const result = await superAdminService.listAgents(page, limit, { search, status, tier });
+
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * GET /api/super-admin/agents/:agentId
+   * Get agent details
+   */
+  static async getAgent(req: Request, res: Response) {
+    try {
+      const { agentId } = req.params;
+      const agent = await superAdminService.getAgent(agentId);
+
+      res.json({ success: true, data: agent });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * POST /api/super-admin/agents
+   * Create new agent
+   */
+  static async createAgent(req: Request, res: Response) {
+    try {
+      const { email, firstName, lastName, specialization } = req.body;
+      const agent = await superAdminService.createAgent({ email, firstName, lastName, specialization });
+
+      res.json({ success: true, data: agent });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/super-admin/agents/:agentId
+   * Update agent
+   */
+  static async updateAgent(req: Request, res: Response) {
+    try {
+      const { agentId } = req.params;
+      const agent = await superAdminService.updateAgent(agentId, req.body);
+
+      res.json({ success: true, data: agent });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/super-admin/agents/:agentId/status
+   * Toggle agent status
+   */
+  static async toggleAgentStatus(req: Request, res: Response) {
+    try {
+      const { agentId } = req.params;
+      const { status } = req.body;
+      const agent = await superAdminService.updateAgentStatus(agentId, status);
+
+      res.json({ success: true, data: agent });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * DELETE /api/super-admin/agents/:agentId
+   * Delete agent
+   */
+  static async deleteAgent(req: Request, res: Response) {
+    try {
+      const { agentId } = req.params;
+      await superAdminService.deleteAgent(agentId);
+
+      res.json({ success: true, message: 'Agent deleted' });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * POST /api/super-admin/agents/bulk/invite
+   * Bulk invite agents
+   */
+  static async bulkInviteAgents(req: Request, res: Response) {
+    try {
+      const { emails, department, message } = req.body;
+      const result = await superAdminService.bulkInviteUsers(emails, 'AGENT', { department, message });
+
+      res.json({ success: true, data: result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * GET /api/super-admin/support-staff
+   * Get all support staff
+   */
+  static async listSupportStaff(req: Request, res: Response) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 20;
+      const search = req.query.search as string | undefined;
+      const department = req.query.department as string | undefined;
+      const permissionLevel = req.query.permissionLevel as string | undefined;
+
+      const result = await superAdminService.listSupportStaff(page, limit, {
+        search,
+        department,
+        permissionLevel,
+      });
+
+      res.json({ success: true, data: result.data, pagination: result.pagination });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * GET /api/super-admin/support-staff/:staffId
+   * Get support staff member details
+   */
+  static async getSupportStaff(req: Request, res: Response) {
+    try {
+      const { staffId } = req.params;
+      const staff = await superAdminService.getSupportStaff(staffId);
+
+      res.json({ success: true, data: staff });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * POST /api/super-admin/support-staff
+   * Create support staff
+   */
+  static async createSupportStaff(req: Request, res: Response) {
+    try {
+      const { email, firstName, lastName, department, permissionLevel } = req.body;
+      const staff = await superAdminService.createSupportStaff({
+        email,
+        firstName,
+        lastName,
+        department,
+        permissionLevel,
+      });
+
+      res.json({ success: true, data: staff });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/super-admin/support-staff/:staffId
+   * Update support staff
+   */
+  static async updateSupportStaff(req: Request, res: Response) {
+    try {
+      const { staffId } = req.params;
+      const staff = await superAdminService.updateSupportStaff(staffId, req.body);
+
+      res.json({ success: true, data: staff });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/super-admin/support-staff/:staffId/permission-level
+   * Update staff permission level
+   */
+  static async updateStaffPermissionLevel(req: Request, res: Response) {
+    try {
+      const { staffId } = req.params;
+      const { permissionLevel } = req.body;
+      const staff = await superAdminService.updateStaffPermissionLevel(staffId, permissionLevel);
+
+      res.json({ success: true, data: staff });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * PATCH /api/super-admin/support-staff/:staffId/status
+   * Toggle staff status
+   */
+  static async toggleStaffStatus(req: Request, res: Response) {
+    try {
+      const { staffId } = req.params;
+      const { status } = req.body;
+      const staff = await superAdminService.updateStaffStatus(staffId, status);
+
+      res.json({ success: true, data: staff });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * DELETE /api/super-admin/support-staff/:staffId
+   * Delete support staff
+   */
+  static async deleteSupportStaff(req: Request, res: Response) {
+    try {
+      const { staffId } = req.params;
+      await superAdminService.deleteSupportStaff(staffId);
+
+      res.json({ success: true, message: 'Support staff deleted' });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  /**
+   * POST /api/super-admin/support-staff/bulk/invite
+   * Bulk invite support staff
+   */
+  static async bulkInviteSupportStaff(req: Request, res: Response) {
+    try {
+      const { emails, department, message } = req.body;
+      const result = await superAdminService.bulkInviteUsers(emails, 'SUPPORT_AGENT', {
+        department,
+        message,
+      });
+
+      res.json({ success: true, data: result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  }
 }

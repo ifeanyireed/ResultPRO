@@ -344,6 +344,324 @@ export class SuperAdminService {
   }
 
   /**
+   * List all agents with filters
+   */
+  async listAgents(page: number = 1, limit: number = 20, filters?: any) {
+    try {
+      const offset = (page - 1) * limit;
+      const where: any = { role: 'AGENT' };
+
+      if (filters?.search) {
+        where.OR = [
+          { email: { contains: filters.search, mode: 'insensitive' } },
+          { firstName: { contains: filters.search, mode: 'insensitive' } },
+          { lastName: { contains: filters.search, mode: 'insensitive' } },
+        ];
+      }
+
+      if (filters?.status) {
+        where.status = filters.status;
+      }
+
+      const [agents, count] = await Promise.all([
+        prisma.user.findMany({
+          where,
+          skip: offset,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.user.count({ where }),
+      ]);
+
+      return {
+        data: agents,
+        pagination: {
+          page,
+          limit,
+          total: count,
+          pages: Math.ceil(count / limit),
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Get agent details
+   */
+  async getAgent(agentId: string) {
+    try {
+      const agent = await prisma.user.findUnique({
+        where: { id: agentId },
+      });
+
+      if (!agent) throw new NotFoundException('Agent not found');
+      return agent;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Create new agent
+   */
+  async createAgent(data: { email: string; firstName?: string; lastName?: string; specialization?: string }) {
+    try {
+      const tempPassword = this.generateTempPassword();
+      const hashedPassword = await PasswordHelper.hashPassword(tempPassword);
+
+      const agent = await prisma.user.create({
+        data: {
+          email: data.email,
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          passwordHash: hashedPassword,
+          role: 'AGENT',
+          status: 'ACTIVE',
+          firstLogin: true,
+        },
+      });
+
+      // Send invitation email (optional)
+      // await this.emailService.sendInvitationEmail(data.email, tempPassword);
+
+      return agent;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Update agent
+   */
+  async updateAgent(agentId: string, data: any) {
+    try {
+      const agent = await prisma.user.update({
+        where: { id: agentId },
+        data,
+      });
+      return agent;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Update agent status
+   */
+  async updateAgentStatus(agentId: string, status: string) {
+    try {
+      const agent = await prisma.user.update({
+        where: { id: agentId },
+        data: { status },
+      });
+      return agent;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Delete agent
+   */
+  async deleteAgent(agentId: string) {
+    try {
+      await prisma.user.delete({
+        where: { id: agentId },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * List all support staff
+   */
+  async listSupportStaff(page: number = 1, limit: number = 20, filters?: any) {
+    try {
+      const offset = (page - 1) * limit;
+      const where: any = { role: 'SUPPORT_AGENT' };
+
+      if (filters?.search) {
+        where.OR = [
+          { email: { contains: filters.search, mode: 'insensitive' } },
+          { firstName: { contains: filters.search, mode: 'insensitive' } },
+          { lastName: { contains: filters.search, mode: 'insensitive' } },
+        ];
+      }
+
+      if (filters?.status) {
+        where.status = filters.status;
+      }
+
+      const [staff, count] = await Promise.all([
+        prisma.user.findMany({
+          where,
+          skip: offset,
+          take: limit,
+          orderBy: { createdAt: 'desc' },
+        }),
+        prisma.user.count({ where }),
+      ]);
+
+      return {
+        data: staff,
+        pagination: {
+          page,
+          limit,
+          total: count,
+          pages: Math.ceil(count / limit),
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Get support staff details
+   */
+  async getSupportStaff(staffId: string) {
+    try {
+      const staff = await prisma.user.findUnique({
+        where: { id: staffId },
+      });
+
+      if (!staff) throw new NotFoundException('Support staff member not found');
+      return staff;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Create support staff
+   */
+  async createSupportStaff(data: {
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    department?: string;
+    permissionLevel?: string;
+  }) {
+    try {
+      const tempPassword = this.generateTempPassword();
+      const hashedPassword = await PasswordHelper.hashPassword(tempPassword);
+
+      const staff = await prisma.user.create({
+        data: {
+          email: data.email,
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          passwordHash: hashedPassword,
+          role: 'SUPPORT_AGENT',
+          status: 'ACTIVE',
+          firstLogin: true,
+        },
+      });
+
+      return staff;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Update support staff
+   */
+  async updateSupportStaff(staffId: string, data: any) {
+    try {
+      const staff = await prisma.user.update({
+        where: { id: staffId },
+        data,
+      });
+      return staff;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Update staff permission level
+   */
+  async updateStaffPermissionLevel(staffId: string, permissionLevel: string) {
+    try {
+      const staff = await prisma.user.update({
+        where: { id: staffId },
+        data: { status: permissionLevel }, // Can be extended to use a separate permission table
+      });
+      return staff;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Update staff status
+   */
+  async updateStaffStatus(staffId: string, status: string) {
+    try {
+      const staff = await prisma.user.update({
+        where: { id: staffId },
+        data: { status },
+      });
+      return staff;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Delete support staff
+   */
+  async deleteSupportStaff(staffId: string) {
+    try {
+      await prisma.user.delete({
+        where: { id: staffId },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Bulk invite users
+   */
+  async bulkInviteUsers(emails: string[], role: string, options?: { department?: string; message?: string }) {
+    try {
+      const results = { success: 0, failed: 0, errors: [] as any[] };
+      const tempPassword = this.generateTempPassword();
+      const hashedPassword = await PasswordHelper.hashPassword(tempPassword);
+
+      for (const email of emails) {
+        try {
+          await prisma.user.create({
+            data: {
+              email,
+              passwordHash: hashedPassword,
+              role,
+              status: 'ACTIVE',
+              firstLogin: true,
+            },
+          });
+          results.success++;
+
+          // Send invitation email (optional)
+          // await this.emailService.sendInvitationEmail(email, tempPassword, { role, department: options?.department });
+        } catch (error: any) {
+          results.failed++;
+          results.errors.push({ email, error: error.message });
+        }
+      }
+
+      return results;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
    * Generate a temporary password
    */
   private generateTempPassword(): string {

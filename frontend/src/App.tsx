@@ -37,6 +37,12 @@ import SupportAgentDashboard from "./pages/SupportAgentDashboard";
 import NotificationsPage from "./pages/Notifications";
 import SuperAdminProfile from "./pages/super-admin/Profile";
 import SuperAdminNotifications from "./pages/super-admin/Notifications";
+import AgentsManagement from "./pages/super-admin/AgentsManagement";
+import SupportStaffManagement from "./pages/super-admin/SupportStaffManagement";
+import EmailManagement from "./pages/super-admin/EmailManagement";
+import BlogList from "./pages/blog/BlogList";
+import BlogPost from "./pages/blog/BlogPost";
+import BlogManagementCMS from "./pages/super-admin/BlogManagementCMS";
 import SchoolAdminLayout from "./components/SchoolAdminLayout";
 import SchoolRejected from "./pages/school-admin/SchoolRejected";
 import {
@@ -57,6 +63,7 @@ import {
   Profile as SchoolAdminProfile,
   Notifications as SchoolAdminNotifications,
   ResultsSetupWizard,
+  TeachersManagement,
 } from "./pages/school-admin";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -99,6 +106,10 @@ const App = () => (
           <Route path="/super-admin/settings" element={<ProtectedSuperAdminRoute><SystemSettings /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/profile" element={<ProtectedSuperAdminRoute><SuperAdminProfile /></ProtectedSuperAdminRoute>} />
           <Route path="/super-admin/notifications" element={<ProtectedSuperAdminRoute><SuperAdminNotifications /></ProtectedSuperAdminRoute>} />
+          <Route path="/super-admin/agents" element={<ProtectedSuperAdminRoute><AgentsManagement /></ProtectedSuperAdminRoute>} />
+          <Route path="/super-admin/support-staff" element={<ProtectedSuperAdminRoute><SupportStaffManagement /></ProtectedSuperAdminRoute>} />
+          <Route path="/super-admin/email-management" element={<ProtectedSuperAdminRoute><EmailManagement /></ProtectedSuperAdminRoute>} />
+          <Route path="/super-admin/blog-management" element={<ProtectedSuperAdminRoute><BlogManagementCMS /></ProtectedSuperAdminRoute>} />
           
           {/* Support Agent Routes */}
           <Route path="/support-agent/dashboard" element={<ProtectedSuperAdminRoute><SupportAgentDashboard /></ProtectedSuperAdminRoute>} />
@@ -122,6 +133,7 @@ const App = () => (
           <Route path="/school-admin/analytics" element={<SchoolAdminLayout><AnalyticsDashboard /></SchoolAdminLayout>} />
           <Route path="/school-admin/leaderboard" element={<SchoolAdminLayout><LeaderboardManagement /></SchoolAdminLayout>} />
           <Route path="/school-admin/parents" element={<SchoolAdminLayout><ParentAccountsManagement /></SchoolAdminLayout>} />
+          <Route path="/school-admin/teachers" element={<SchoolAdminLayout><TeachersManagement /></SchoolAdminLayout>} />
           <Route path="/school-admin/settings" element={<SchoolAdminLayout><SchoolSettings /></SchoolAdminLayout>} />
           <Route path="/school-admin/billing" element={<SchoolAdminLayout><BillingSubscription /></SchoolAdminLayout>} />
           <Route path="/school-admin/profile" element={<SchoolAdminLayout><SchoolAdminProfile /></SchoolAdminLayout>} />
@@ -129,6 +141,10 @@ const App = () => (
           <Route path="/school-admin/onboarding" element={<SchoolAdminLayout><OnboardingWizard /></SchoolAdminLayout>} />
           <Route path="/school-admin/results-setup" element={<ResultsSetupWizard />} />
           <Route path="/school-admin/school-rejected" element={<SchoolRejected />} />
+          
+          {/* Public Blog Routes */}
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           
           <Route path="/:schoolSlug/result-checker" element={<ResultChecker />} />
           <Route path="/original" element={<Index />} />

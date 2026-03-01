@@ -73,6 +73,7 @@ model School {
   parents Parent[]
   agentAssignments AgentSchoolAssignment[]
   referrals Referral[]
+  teacherParentMessages TeacherParentMessage[]
 
   @@index([status])
   @@index([verificationStatus])
@@ -214,6 +215,8 @@ model User {
   ticketsAssigned SupportTicket[] @relation("TicketsAssignedTo")
   messages TicketMessage[] @relation("TicketMessages")
   notifications Notification[] @relation("NotificationsForUser")
+  teacherMessagesAsSender TeacherParentMessage[] @relation("TeacherMessagesAsSender")
+  parentMessagesAsSender TeacherParentMessage[] @relation("ParentMessagesAsSender")
 
   @@index([role])
   @@map("users")
@@ -290,6 +293,7 @@ model Student {
   class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
   parent Parent? @relation(fields: [parentId], references: [id], onDelete: SetNull)
   results StudentResult[]
+  messages TeacherParentMessage[]
 
   @@unique([classId, admissionNumber])
   @@index([schoolId])
@@ -935,4 +939,327 @@ model Notification {
   @@index([isRead])
   @@index([createdAt])
   @@map("notifications")
+}
+
+model TeacherParentMessage {
+  id                String   @id @default(cuid())
+  schoolId          String   @map("school_id")
+  teacherId         String   @map("teacher_id")      // User ID of teacher (role: TEACHER)
+  parentId          String   @map("parent_id")       // User ID of parent
+  studentId         String   @map("student_id")      // The student being discussed
+  
+  senderRole        String   @map("sender_role")     // TEACHER or PARENT
+  senderUserId      String   @map("sender_user_id")  // Who sent this message
+  subject           String?
+  body              String
+  isRead            Boolean  @default(false) @map("is_read")
+  readAt            DateTime? @map("read_at")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  school School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  teacher User @relation("TeacherMessagesAsSender", fields: [teacherId], references: [id], onDelete: Cascade)
+  parent User @relation("ParentMessagesAsSender", fields: [parentId], references: [id], onDelete: Cascade)
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId])
+  @@index([teacherId])
+  @@index([parentId])
+  @@index([studentId])
+  @@index([createdAt])
+  @@index([isRead])
+  @@map("teacher_parent_messages")
+}
+
+// ==================== EMAIL MANAGEMENT SYSTEM ====================
+
+model EmailCampaign {
+  id                String   @id @default(cuid())
+  name              String
+  subject           String
+  body              String   @map("email_body")
+  htmlBody          String?  @map("html_body")
+  templateId        String?  @map("template_id")
+  
+  // Campaign metadata
+  status            String   @default("DRAFT")  // DRAFT, SCHEDULED, SENDING, SENT, FAILED
+  scheduledAt       DateTime? @map("scheduled_at")
+  sentAt            DateTime? @map("sent_at")
+  
+  // Tracking
+  totalRecipients   Int      @default(0) @map("total_recipients")
+  sentCount         Int      @default(0) @map("sent_count")
+  deliveredCount    Int      @default(0) @map("delivered_count")
+  failedCount       Int      @default(0) @map("failed_count")
+  openedCount       Int      @default(0) @map("opened_count")
+  clickedCount      Int      @default(0) @map("clicked_count")
+  unsubscribeCount  Int      @default(0) @map("unsubscribe_count")
+  
+  // Unsubscribe link and compliance
+  unsubscribeUrl    String?  @map("unsubscribe_url")
+  hasUnsubscribeLink Boolean @default(true) @map("has_unsubscribe_link")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  sends             CampaignSend[]
+  
+  @@index([status])
+  @@index([createdAt])
+  @@index([sentAt])
+  @@map("email_campaigns")
+}
+
+model EmailSubscriber {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  name              String?
+  
+  // Status and preferences
+  status            String   @default("ACTIVE")  // ACTIVE, INACTIVE, BOUNCED, COMPLAINED
+  isActive          Boolean  @default(true) @map("is_active")
+  unsubscribeToken  String   @unique @map("unsubscribe_token")
+  
+  // Tracking
+  lastEmailSentAt   DateTime? @map("last_email_sent_at")
+  lastEmailOpenedAt DateTime? @map("last_email_opened_at")
+  emailOpenCount    Int      @default(0) @map("email_open_count")
+  emailClickCount   Int      @default(0) @map("email_click_count")
+  
+  // Subscription metadata
+  source            String   @default("MANUAL")  // MANUAL, CSV_IMPORT, API
+  tags              String   @default("[]")  // JSON array of tags for segmentation
+  metadata          String?  @default("{}")  // JSON object for additional data
+  
+  unsubscribedAt    DateTime? @map("unsubscribed_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  sends             CampaignSend[]
+  unsubscribeTokens UnsubscribeToken[]
+  
+  @@index([email])
+  @@index([status])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("email_subscribers")
+}
+
+model CampaignSend {
+  id                String   @id @default(cuid())
+  campaignId        String   @map("campaign_id")
+  subscriberId      String   @map("subscriber_id")
+  
+  // Delivery tracking
+  status            String   @default("PENDING")  // PENDING, SENT, DELIVERED, OPENED, CLICKED, FAILED, BOUNCED, COMPLAINED
+  sendAttempt       Int      @default(0) @map("send_attempt")
+  maxAttempts       Int      @default(3) @map("max_attempts")
+  
+  // SES Message ID
+  sesMessageId      String?  @map("ses_message_id")
+  errorMessage      String?  @map("error_message")
+  
+  // Engagement tracking
+  openedAt          DateTime? @map("opened_at")
+  clickedAt         DateTime? @map("clicked_at")
+  clickedLink       String?  @map("clicked_link")
+  
+  sentAt            DateTime? @map("sent_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  campaign          EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscriber        EmailSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  
+  @@index([campaignId])
+  @@index([subscriberId])
+  @@index([status])
+  @@index([sentAt])
+  @@map("campaign_sends")
+}
+
+model EmailMetadata {
+  id                String   @id @default(cuid())
+  
+  // S3 Storage location
+  s3Key             String   @unique @map("s3_key")
+  s3Bucket          String   @map("s3_bucket")
+  
+  // Email content
+  subject           String
+  fromEmail         String   @map("from_email")
+  toEmail           String   @map("to_email")
+  ccEmails          String?  @map("cc_emails")  // JSON array as string
+  
+  // Email tracking
+  received          DateTime? @map("received")
+  readStatus        String   @default("UNREAD") @map("read_status")  // UNREAD, READ
+  readAt            DateTime? @map("read_at")
+  archivedStatus    String   @default("NOT_ARCHIVED") @map("archived_status")  // NOT_ARCHIVED, ARCHIVED
+  archivedAt        DateTime? @map("archived_at")
+  
+  // Content handling
+  hasAttachments    Boolean  @default(false) @map("has_attachments")
+  attachmentCount   Int      @default(0) @map("attachment_count")
+  
+  // Full text for searching
+  bodyPreview       String?  @map("body_preview")  // First 500 chars
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  @@index([fromEmail])
+  @@index([toEmail])
+  @@index([received])
+  @@index([readStatus])
+  @@index([archivedStatus])
+  @@map("email_metadata")
+}
+
+model UnsubscribeToken {
+  id                String   @id @default(cuid())
+  token             String   @unique
+  subscriberId      String   @map("subscriber_id")
+  
+  // Token validity
+  isValid           Boolean  @default(true) @map("is_valid")
+  usedAt            DateTime? @map("used_at")
+  expiresAt         DateTime? @map("expires_at")
+  
+  // Reason for unsubscribe
+  reason            String?  @default("USER_REQUEST")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  
+  subscriber        EmailSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  
+  @@index([token])
+  @@index([subscriberId])
+  @@index([isValid])
+  @@map("unsubscribe_tokens")
+}
+
+model EmailTemplate {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  subject           String
+  body              String   @map("email_body")
+  htmlBody          String?  @map("html_body")
+  
+  // Template variables
+  variables         String   @default("[]")  // JSON array of variable names
+  
+  // Template status
+  isActive          Boolean  @default(true) @map("is_active")
+  category          String?  // WELCOME, WEEKLY, PROMO, ANNOUNCEMENT, etc.
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  @@index([isActive])
+  @@index([category])
+  @@map("email_templates")
+}
+
+// ==================== BLOG MANAGEMENT SYSTEM ====================
+
+model BlogCategory {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  slug              String   @unique
+  description       String?
+  icon              String?   // Icon name from lucide-react
+  color             String?   // Hex color for category
+  displayOrder      Int      @default(0) @map("display_order")
+  isActive          Boolean  @default(true) @map("is_active")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  posts             BlogPost[]
+  
+  @@index([isActive])
+  @@index([displayOrder])
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id                String   @id @default(cuid())
+  categoryId        String   @map("category_id")
+  
+  // Content
+  title             String
+  slug              String   @unique
+  excerpt           String?
+  content           String   @map("post_content")
+  htmlContent       String?  @map("html_content")
+  
+  // Metadata
+  featuredImage     String?  @map("featured_image")
+  featuredImageUrl  String?  @map("featured_image_url")  // S3 URL
+  
+  // SEO
+  metaDescription   String?  @map("meta_description")
+  metaKeywords      String?  @map("meta_keywords")  // Comma-separated
+  
+  // Publishing
+  status            String   @default("DRAFT")  // DRAFT, PUBLISHED, SCHEDULED, ARCHIVED
+  publishedAt       DateTime? @map("published_at")
+  scheduledAt       DateTime? @map("scheduled_at")
+  archivedAt        DateTime? @map("archived_at")
+  
+  // Author & tracking
+  authorName        String   @map("author_name")
+  authorEmail       String   @map("author_email")
+  viewCount         Int      @default(0) @map("view_count")
+  
+  // Engagement
+  allowComments     Boolean  @default(true) @map("allow_comments")
+  commentCount      Int      @default(0) @map("comment_count")
+  likeCount         Int      @default(0) @map("like_count")
+  shareCount        Int      @default(0) @map("share_count")
+  
+  // Engagement tracking
+  likes             String   @default("[]")  // JSON array of emails who liked
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  category          BlogCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  comments          BlogComment[]
+  
+  @@index([categoryId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([slug])
+  @@index([createdAt])
+  @@map("blog_posts")
+}
+
+model BlogComment {
+  id                String   @id @default(cuid())
+  postId            String   @map("post_id")
+  
+  // Commenter info
+  authorName        String   @map("author_name")
+  authorEmail       String   @map("author_email")
+  
+  // Comment content
+  content           String
+  
+  // Moderation
+  status            String   @default("PENDING")  // PENDING, APPROVED, REJECTED, SPAM
+  approvedBy        String?  @map("approved_by")  // SuperAdmin ID who approved
+  approvedAt        DateTime? @map("approved_at")
+  
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+  
+  post              BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@index([postId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("blog_comments")
 }

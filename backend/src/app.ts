@@ -115,6 +115,10 @@ export async function createApp(): Promise<Express> {
   const publicScratchCardRoutes = await import('@modules/scratch-cards/routes/public-scratch-cards.routes');
   app.use('/api/scratch-cards', publicScratchCardRoutes.default);
 
+  // Teachers routes (protected - for SchoolAdmin)
+  const teachersRoutes = await import('@modules/school-admin/routes/teachers.routes');
+  app.use('/api/school/teachers', teachersRoutes.default);
+
   // Analytics routes (protected - for Teachers, Principals, Students)
   const analyticsRoutes = await import('@modules/analytics/routes/analytics.routes');
   app.use('/api/analytics', analyticsRoutes.default);
@@ -122,6 +126,10 @@ export async function createApp(): Promise<Express> {
   // Parent Analytics routes (protected - for Parents)
   const parentAnalyticsRoutes = await import('@modules/analytics/routes/parentAnalytics.routes');
   app.use('/api/parent-analytics', parentAnalyticsRoutes.default);
+
+  // Messaging routes (protected - for Teachers and Parents)
+  const messagingRoutes = await import('@modules/messaging/routes/messaging.routes');
+  app.use('/api/messages', messagingRoutes.default);
 
   // Agent routes (protected - for Agents)
   const agentRoutes = await import('@modules/agent/routes');

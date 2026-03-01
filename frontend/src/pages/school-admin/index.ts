@@ -10,6 +10,7 @@ export { default as ResultsPublishing } from './ResultsPublishing';
 export { default as AnalyticsDashboard } from './AnalyticsDashboard';
 export { default as LeaderboardManagement } from './LeaderboardManagement';
 export { default as ParentAccountsManagement } from './ParentAccountsManagement';
+export { default as TeachersManagement } from './TeachersManagement';
 export { default as SchoolSettings } from './SchoolSettings';
 export { default as BillingSubscription } from './BillingSubscription';
 export { default as Profile } from './Profile';
