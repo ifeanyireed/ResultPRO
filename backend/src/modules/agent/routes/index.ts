@@ -60,7 +60,11 @@ router.get('/:agentId/withdrawals/stats', (req, res) => {
   agentController.getWithdrawalStats(req, res);
 });
 
-// Dashboard
+// Dashboard - must come before :agentId routes
+router.get('/dashboard', (req, res) => {
+  agentController.getMyDashboardStats(req, res);
+});
+
 router.get('/:agentId/dashboard', (req, res) => {
   agentController.getDashboardStats(req, res);
 });

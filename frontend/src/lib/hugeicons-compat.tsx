@@ -15,6 +15,7 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   Award: LucideIcons.Award,
   BarChart01: LucideIcons.BarChart3,
   BookOpen: LucideIcons.BookOpen,
+  Briefcase: LucideIcons.Briefcase,
   Building2: LucideIcons.Building2,
   Calendar: LucideIcons.Calendar,
   Check: LucideIcons.Check,
@@ -81,6 +82,10 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   Bell: LucideIcons.Bell,
   User: LucideIcons.User,
   LogOut: LucideIcons.LogOut,
+  Wallet: LucideIcons.Wallet,
+  Crown: LucideIcons.Crown,
+  Star: LucideIcons.Star,
+  Medal: LucideIcons.Medal,
 };
 
 // Export icons using Lucide as fallback
@@ -171,3 +176,8 @@ export const Zap = iconMap.Zap || LucideIcons.Zap;
 export const Bell = iconMap.Bell || LucideIcons.Bell;
 export const User = iconMap.User || LucideIcons.User;
 export const LogOut = iconMap.LogOut || LucideIcons.LogOut;
+export const Briefcase = iconMap.Briefcase || LucideIcons.Briefcase;
+export const Wallet = iconMap.Wallet || LucideIcons.Wallet;
+export const Crown = iconMap.Crown || LucideIcons.Crown;
+export const Star = iconMap.Star || LucideIcons.Star;
+export const Medal = iconMap.Medal || LucideIcons.Medal;

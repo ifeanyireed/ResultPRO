@@ -1,0 +1,392 @@
+{
+  "user": [
+    {
+      "id": "cmm8lenkc000054lyuc2x07b7",
+      "email": "superadmin@resultspro.ng",
+      "firstName": "Super",
+      "lastName": "Admin",
+      "fullName": "Super Admin",
+      "passwordHash": "$2b$10$KLAkWVmfeIIM4yxiWh.FW.a99DY59hun.kdqmpvXsYmMWem.wKsHe",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "SUPER_ADMIN",
+      "status": "ACTIVE",
+      "firstLogin": false,
+      "lastLoginAt": null,
+      "createdAt": "2026-03-02T03:01:46.572Z",
+      "updatedAt": "2026-03-02T03:01:46.572Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmm8lennw000154lyvzhhf96u",
+      "email": "support@resultspro.ng",
+      "firstName": "Support",
+      "lastName": "Agent",
+      "fullName": "Support Agent",
+      "passwordHash": "$2b$10$A/qbBQ75pmfuMur1e3hOBeM9I905xsa1qUwg/LAZpKACm2gG5DEum",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "SUPPORT_AGENT",
+      "status": "ACTIVE",
+      "firstLogin": false,
+      "lastLoginAt": null,
+      "createdAt": "2026-03-02T03:01:46.700Z",
+      "updatedAt": "2026-03-02T03:01:46.700Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmm8lenr6000254lyn3vcuprt",
+      "email": "parent@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "fullName": "John Doe",
+      "passwordHash": "$2b$10$hcaWWjsq4E.oODIrD7orQOG0KTDYzc.NWwXIp5Ki9X4nlRtgpl6pK",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "PARENT",
+      "status": "ACTIVE",
+      "firstLogin": false,
+      "lastLoginAt": null,
+      "createdAt": "2026-03-02T03:01:46.819Z",
+      "updatedAt": "2026-03-02T03:01:46.819Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmm8leo84002k54lyaoht6oe9",
+      "email": "teacher@testacademy.edu.ng",
+      "firstName": "Mr.",
+      "lastName": "Smith",
+      "fullName": "Mr. Smith",
+      "passwordHash": "$2b$10$OifMlyB9oK3ZbQCvIcJCuu9EnrHucqJB9StPZ9Cid1GZHJhF0tx1G",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "TEACHER",
+      "status": "ACTIVE",
+      "firstLogin": false,
+      "lastLoginAt": null,
+      "createdAt": "2026-03-02T03:01:47.429Z",
+      "updatedAt": "2026-03-02T03:01:47.429Z",
+      "deletedAt": null
+    },
+    {
+      "id": "cmm96r5zw0000123pajrwcrs6",
+      "email": "agent@resultspro.ng",
+      "firstName": "David",
+      "lastName": "Okafor",
+      "fullName": "David Okafor",
+      "passwordHash": "$2b$10$0111jr6mFjFOrxgrMzjjE.nwNod6VM4NGmYY0fzdjGA7afwYRrQUK",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "AGENT",
+      "status": "ACTIVE",
+      "firstLogin": false,
+      "lastLoginAt": "2026-03-02T12:59:51.074Z",
+      "createdAt": "2026-03-02T12:59:22.260Z",
+      "updatedAt": "2026-03-02T12:59:51.080Z",
+      "deletedAt": null
+    }
+  ],
+  "school": [
+    {
+      "id": "cmm8lenrt000654lyq1235ngy",
+      "name": "Test Academy International",
+      "slug": "test-academy-international",
+      "motto": "Excellence in Education",
+      "logoUrl": null,
+      "logoEmoji": "🎓",
+      "primaryColor": "#1e40af",
+      "secondaryColor": "#0ea5e9",
+      "accentColor": "#f59e0b",
+      "contactEmail": "admin@testacademy.edu.ng",
+      "contactPhone": "08012345678",
+      "contactPersonName": "Dr. Alice Johnson",
+      "altContactEmail": "info@testacademy.edu.ng",
+      "altContactPhone": "08198765432",
+      "fullAddress": "123 Education Drive, Lagos",
+      "state": "Lagos",
+      "lga": "Ikeja",
+      "status": "APPROVED",
+      "verificationStatus": "EMAIL_VERIFIED",
+      "verifiedAt": "2026-03-02T03:01:46.838Z",
+      "verifiedBy": "super-admin",
+      "rejectionReason": null,
+      "documentVerificationType": null,
+      "documentVerificationUrl": null,
+      "documentVerificationSubmittedAt": null,
+      "onboardingStatus": "COMPLETE",
+      "onboardingCompletedAt": "2026-03-02T03:01:46.838Z",
+      "currentOnboardingStep": 0,
+      "resultsSetupStatus": "NOT_STARTED",
+      "resultsSetupCompletedAt": null,
+      "subscriptionTier": "Pro",
+      "subscriptionStartDate": null,
+      "subscriptionEndDate": null,
+      "maxStudents": 500,
+      "maxTeachers": 20,
+      "createdAt": "2026-03-02T03:01:46.841Z",
+      "updatedAt": "2026-03-02T03:01:46.841Z",
+      "deletedAt": null
+    }
+  ],
+  "schoolAdminUser": [
+    {
+      "id": "cmm8lenv3000854lyaiukukos",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "email": "admin@testacademy.edu.ng",
+      "firstName": "Alice",
+      "lastName": "Johnson",
+      "fullName": "Dr. Alice Johnson",
+      "passwordHash": "$2b$10$hyOWpaNRjjHqQI9MrqI5Uu3XxtqcVk62p1FVgu9Z7J2LoJsNKQR92",
+      "passwordResetToken": null,
+      "passwordResetTokenExpiry": null,
+      "role": "SCHOOL_ADMIN",
+      "status": "ACTIVE",
+      "firstLogin": false,
+      "lastLoginAt": null,
+      "createdAt": "2026-03-02T03:01:46.960Z",
+      "updatedAt": "2026-03-02T03:01:46.960Z",
+      "deletedAt": null
+    }
+  ],
+  "academicSession": [
+    {
+      "id": "cmm8lenv7000a54ly5xvua138",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "name": "2025/2026",
+      "startDate": "2025-09-15T00:00:00.000Z",
+      "endDate": "2026-07-24T00:00:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-03-02T03:01:46.964Z",
+      "updatedAt": "2026-03-02T03:01:46.964Z"
+    }
+  ],
+  "term": [
+    {
+      "id": "cmm8lenvb000c54lyaqnnohvd",
+      "sessionId": "cmm8lenv7000a54ly5xvua138",
+      "name": "1st Term",
+      "startDate": "2025-09-15T00:00:00.000Z",
+      "endDate": "2025-12-20T00:00:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-03-02T03:01:46.968Z",
+      "updatedAt": "2026-03-02T03:01:46.968Z"
+    },
+    {
+      "id": "cmm8lenvg000e54ly7xbq91sp",
+      "sessionId": "cmm8lenv7000a54ly5xvua138",
+      "name": "2nd Term",
+      "startDate": "2026-01-12T00:00:00.000Z",
+      "endDate": "2026-03-20T00:00:00.000Z",
+      "isActive": false,
+      "createdAt": "2026-03-02T03:01:46.972Z",
+      "updatedAt": "2026-03-02T03:01:46.972Z"
+    },
+    {
+      "id": "cmm8lenvk000g54ly9e62i2xe",
+      "sessionId": "cmm8lenv7000a54ly5xvua138",
+      "name": "3rd Term",
+      "startDate": "2026-04-06T00:00:00.000Z",
+      "endDate": "2026-07-24T00:00:00.000Z",
+      "isActive": false,
+      "createdAt": "2026-03-02T03:01:46.976Z",
+      "updatedAt": "2026-03-02T03:01:46.976Z"
+    }
+  ],
+  "class": [
+    {
+      "id": "cmm8lenvp000i54lymyx9nkou",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "name": "JSS 1A",
+      "level": "7",
+      "maxCapacity": 50,
+      "classTeacher": "Mr. Smith",
+      "createdAt": "2026-03-02T03:01:46.982Z",
+      "updatedAt": "2026-03-02T03:01:46.982Z"
+    },
+    {
+      "id": "cmm8lenvu000k54lynwpvjx9e",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "name": "JSS 2A",
+      "level": "8",
+      "maxCapacity": 50,
+      "classTeacher": "Mrs. Williams",
+      "createdAt": "2026-03-02T03:01:46.986Z",
+      "updatedAt": "2026-03-02T03:01:46.986Z"
+    }
+  ],
+  "subject": [
+    {
+      "id": "cmm8lenvz000m54lydhmlhog3",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "name": "English Language",
+      "code": "ENG",
+      "description": "English Language and Literature",
+      "createdAt": "2026-03-02T03:01:46.992Z",
+      "updatedAt": "2026-03-02T03:01:46.992Z"
+    },
+    {
+      "id": "cmm8lenw3000o54lyxvh0f1iz",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "name": "Mathematics",
+      "code": "MAT",
+      "description": "Pure and Applied Mathematics",
+      "createdAt": "2026-03-02T03:01:46.995Z",
+      "updatedAt": "2026-03-02T03:01:46.995Z"
+    },
+    {
+      "id": "cmm8lenw7000q54ly399ewade",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "name": "Integrated Science",
+      "code": "SCI",
+      "description": "Physics, Chemistry, and Biology",
+      "createdAt": "2026-03-02T03:01:46.999Z",
+      "updatedAt": "2026-03-02T03:01:46.999Z"
+    }
+  ],
+  "gradingSystem": [
+    {
+      "id": "cmm8lenx2000y54lygdc38aii",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "name": "WASSCE Scale",
+      "description": "West African Senior School Certificate Examination scale",
+      "isDefault": true,
+      "createdAt": "2026-03-02T03:01:47.031Z",
+      "updatedAt": "2026-03-02T03:01:47.031Z"
+    }
+  ],
+  "grade": [
+    {
+      "id": "cmm8lenx6000z54lyricrqgm9",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "subjectId": null,
+      "gradingSystemId": "cmm8lenx2000y54lygdc38aii",
+      "gradeName": "A1",
+      "minScore": 80,
+      "maxScore": 100,
+      "description": "Excellent",
+      "createdAt": "2026-03-02T03:01:47.035Z",
+      "updatedAt": "2026-03-02T03:01:47.035Z"
+    },
+    {
+      "id": "cmm8lenx6001054lyf8c3r1n3",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "subjectId": null,
+      "gradingSystemId": "cmm8lenx2000y54lygdc38aii",
+      "gradeName": "B2",
+      "minScore": 70,
+      "maxScore": 79,
+      "description": "Very Good",
+      "createdAt": "2026-03-02T03:01:47.035Z",
+      "updatedAt": "2026-03-02T03:01:47.035Z"
+    },
+    {
+      "id": "cmm8lenx7001154ly8y6vq7qs",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "subjectId": null,
+      "gradingSystemId": "cmm8lenx2000y54lygdc38aii",
+      "gradeName": "C3",
+      "minScore": 60,
+      "maxScore": 69,
+      "description": "Good",
+      "createdAt": "2026-03-02T03:01:47.035Z",
+      "updatedAt": "2026-03-02T03:01:47.035Z"
+    },
+    {
+      "id": "cmm8lenx7001254lyhfpu5on2",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "subjectId": null,
+      "gradingSystemId": "cmm8lenx2000y54lygdc38aii",
+      "gradeName": "D7",
+      "minScore": 50,
+      "maxScore": 59,
+      "description": "Pass",
+      "createdAt": "2026-03-02T03:01:47.035Z",
+      "updatedAt": "2026-03-02T03:01:47.035Z"
+    },
+    {
+      "id": "cmm8lenx7001354lyjf9253le",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "subjectId": null,
+      "gradingSystemId": "cmm8lenx2000y54lygdc38aii",
+      "gradeName": "E8",
+      "minScore": 40,
+      "maxScore": 49,
+      "description": "Pass",
+      "createdAt": "2026-03-02T03:01:47.035Z",
+      "updatedAt": "2026-03-02T03:01:47.035Z"
+    },
+    {
+      "id": "cmm8lenx7001454lya5pyw9qy",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "subjectId": null,
+      "gradingSystemId": "cmm8lenx2000y54lygdc38aii",
+      "gradeName": "F9",
+      "minScore": 0,
+      "maxScore": 39,
+      "description": "Fail",
+      "createdAt": "2026-03-02T03:01:47.035Z",
+      "updatedAt": "2026-03-02T03:01:47.035Z"
+    }
+  ],
+  "onboardingState": [
+    {
+      "id": "cmm8leo0a002054lylmdnraxi",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "completedSteps": "[1,2,3,4,5]",
+      "currentStep": 6,
+      "isComplete": true,
+      "createdAt": "2026-03-02T03:01:47.146Z",
+      "updatedAt": "2026-03-02T03:01:47.146Z"
+    }
+  ],
+  "resultsSetupSession": [
+    {
+      "id": "cmm8lenyw001g54lyv35ckmmb",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "currentStep": 2,
+      "completedSteps": "[1]",
+      "sessionId": "cmm8lenv7000a54ly5xvua138",
+      "termId": "cmm8lenvb000c54lyaqnnohvd",
+      "sessionName": "2025/2026",
+      "termName": "1st Term",
+      "examConfigComponents": "[{\"name\":\"CA 1\",\"score\":15,\"order\":1},{\"name\":\"CA 2\",\"score\":15,\"order\":2},{\"name\":\"Exam\",\"score\":70,\"order\":3}]",
+      "totalExamScore": 100,
+      "affectiveTraits": "[\"Attentiveness\",\"Honesty\",\"Cooperation\",\"Responsibility\"]",
+      "psychomotorSkills": "[\"Handling of Tools\",\"Laboratory Skills\",\"Artistic Expression\"]",
+      "principalName": null,
+      "principalSignatureUrl": null,
+      "principalS3Key": null,
+      "staffData": "[]",
+      "assignedStudents": "[]",
+      "resultsFileUrl": null,
+      "resultsFileName": null,
+      "createdAt": "2026-03-02T03:01:47.096Z",
+      "updatedAt": "2026-03-02T03:01:47.096Z"
+    }
+  ],
+  "resultsInstance": [
+    {
+      "id": "cmm8lenz1001i54lywuiwmtvs",
+      "schoolId": "cmm8lenrt000654lyq1235ngy",
+      "classId": "cmm8lenvp000i54lymyx9nkou",
+      "sessionId": "cmm8lenv7000a54ly5xvua138",
+      "termId": "cmm8lenvb000c54lyaqnnohvd",
+      "instanceName": "JSS 1A Term 1 2025/26",
+      "sessionName": "2025/2026",
+      "termName": "1st Term",
+      "status": "active",
+      "examConfigComponents": "[{\"name\":\"CA 1\",\"score\":15},{\"name\":\"CA 2\",\"score\":15},{\"name\":\"Exam\",\"score\":70}]",
+      "affectiveTraits": "[\"Attentiveness\",\"Honesty\",\"Cooperation\"]",
+      "psychomotorSkills": "[\"Handling of Tools\",\"Laboratory Skills\"]",
+      "csvFileName": null,
+      "csvFileUrl": null,
+      "gradebookData": "[]",
+      "totalStudents": 2,
+      "createdAt": "2026-03-02T03:01:47.101Z",
+      "createdBy": null,
+      "updatedAt": "2026-03-02T03:01:47.101Z",
+      "archivedAt": null,
+      "archivedBy": null
+    }
+  ]
+}

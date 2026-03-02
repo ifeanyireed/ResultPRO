@@ -212,17 +212,11 @@ const ScratchCardValidation: React.FC = () => {
 
         <div className="relative z-10 max-w-2xl mx-auto w-full">
           <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.3)]">
-                <CheckSquare className="w-10 h-10 text-white" />
-              </div>
-            </div>
-
             <h1 className="text-5xl md:text-6xl font-bold mb-6 tracking-tight leading-tight text-white">
               Validate Your <span className="text-blue-400">Scratch Card</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Enter your scratch card PIN and admission number to access your exam results
+              Enter your scratch cards PIN to access its validity and usage
             </p>
           </div>
 

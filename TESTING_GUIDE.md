@@ -949,44 +949,62 @@ These 3 pages are newly built with complete backend integration:
 
 ---
 
-## 👤 Test Credentials
+## 👤 Test Credentials (Extract for Testing)
 
-### SuperAdmin Account (Pre-Created)
-```
-Email:    superadmin@resultspro.ng
-Password: superadmin_password_123
-Role:     SUPER_ADMIN
-```
+| Role | Email | Password | Purpose |
+|------|-------|----------|---------|
+| **SUPER_ADMIN** | `superadmin@resultspro.ng` | `SuperAdmin@123456` | System administrator with full access |
+| **SCHOOL_ADMIN** | `admin@testacademy.edu.ng` | `SchoolAdmin@123456` | School administrator |
+| **TEACHER** | `teacher@testacademy.edu.ng` | `Teacher@123456` | Class teacher |
+| **PARENT** | `parent@example.com` | `Parent@123456` | Parent/Guardian |
+| **SUPPORT_AGENT** | `support@resultspro.ng` | `Support@123456` | Customer support |
+| **AGENT/PARTNER** | `agent@resultspro.ng` | `Agent@123456` | Partner for onboarding |
 
-### Sample Seeded Users (45 Support Staff)
-All with password: `Test@123456`
+## 📊 Test Data Summary
 
-**Support Staff Emails:**
-```
-support1@resultspro.ng
-support2@resultspro.ng
-support3@resultspro.ng
-(... 45 total - check database for full list)
-```
+**Core Models:**
+- ✅ 5 Users (all roles)
+- ✅ 1 School (Test Academy International - Pro tier)
+- ✅ 1 School Admin
+- ✅ 3 Subscription Plans (Free, Pro, Enterprise)
+- ✅ 1 Academic Session + 3 Terms
+- ✅ 2 Classes (JSS 1A, JSS 2A)
+- ✅ 3 Subjects + Grading System (A1-F9 scale)
 
-### Sample School Admin Accounts (3)
-```
-1. school1@example.com (Password: School123!)
-2. school2@example.com (Password: School123!)
-3. school3@example.com (Password: School123!)
-```
+**People & Data:**
+- ✅ 2 Students (with detailed results)
+- ✅ 1 Parent with student relations
+- ✅ 1 Teacher with messages to parent
+- ✅ 1 Agent with commission tracking
 
-### Sample Agent Accounts (10)
-```
-agent1@example.com - agent10@example.com
-(Password varies per user - check database)
-```
+**Academic Records:**
+- ✅ 2 Student Results (with subjects, grades, affective/psychomotor domains)
+- ✅ 1 Results Setup Session
+- ✅ 1 Results Instance
+- ✅ 1 Onboarding State
 
-### Sample Parent Accounts (30)
-```
-parent1@example.com - parent30@example.com
-(Password varies per user - check database)
-```
+**Billing & Payment:**
+- ✅ 1 Subscription (active, Pro plan)
+- ✅ 1 Payment (completed)
+- ✅ 1 Invoice
+
+**Scratch Cards & Support:**
+- ✅ 1 Batch (100 cards)
+- ✅ 2 Scratch Cards with usage
+- ✅ 1 Batch Request
+- ✅ 1 Support Ticket with message
+- ✅ 1 Notification
+
+**Agent Commissions:**
+- ✅ 1 Agent with assignments
+- ✅ 1 Referral (paid)
+- ✅ 1 Reward + Badge
+- ✅ 1 Withdrawal (paid)
+
+**Email & Blog:**
+- ✅ 1 Email Template + Campaign
+- ✅ 1 Email Subscriber with campaign send
+- ✅ 1 Blog Category, Post & Comment
 
 ---
 

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Crown, Check, XClose } from '@/lib/hugeicons-compat';
+import { Crown, Check, X, BarChart01, Users, Building2, TrendingUp, DollarSign, Calendar, User, LogOut } from '@/lib/hugeicons-compat';
 import { useAgentSubscription } from '@/hooks/useAgentAnalytics';
+import { useNavigate } from 'react-router-dom';
 
 export const SubscriptionPlans: React.FC = () => {
+  const navigate = useNavigate();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const { pricing, loading, fetchPricing, upgradePlan } = useAgentSubscription();
   const [upgrading, setUpgrading] = useState(false);
 
@@ -86,9 +89,21 @@ export const SubscriptionPlans: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="w-full bg-black text-white min-h-screen flex flex-col relative">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img
+          src="/Hero.png"
+          className="w-full h-full object-cover"
+          alt="Background"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      </div>
+
+      <main className="relative z-10 flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+          <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg p-6 text-white">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] p-6 text-white border border-[rgba(255,255,255,0.07)]">
         <h1 className="text-3xl font-bold mb-2">Subscription Plans</h1>
         <p className="text-gray-300">Choose the perfect plan for your business</p>
       </div>
@@ -98,10 +113,10 @@ export const SubscriptionPlans: React.FC = () => {
         {plans.map((plan) => (
           <div
             key={plan.tier}
-            className={`relative rounded-lg border p-6 transition ${
+            className={`relative rounded-[20px] border p-6 transition ${
               plan.highlighted
-                ? 'bg-blue-900 border-blue-500 ring-2 ring-blue-500'
-                : 'bg-slate-800 border-slate-700 hover:border-slate-600'
+                ? 'bg-[rgba(255,255,255,0.05)] border-[rgba(59,130,246,0.50)] hover:border-[rgba(59,130,246,0.70)]'
+                : 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.07)] hover:bg-white/5'
             }`}
           >
             {/* Highlighted Badge */}
@@ -121,7 +136,7 @@ export const SubscriptionPlans: React.FC = () => {
             </div>
 
             {/* Pricing */}
-            <div className="mb-6 pb-6 border-b border-slate-700">
+            <div className="mb-6 pb-6 border-b border-[rgba(255,255,255,0.07)]">
               <div className="text-4xl font-bold text-white mb-1">
                 ${plan.monthlyFee.toFixed(2)}
               </div>
@@ -132,7 +147,7 @@ export const SubscriptionPlans: React.FC = () => {
             </div>
 
             {/* Key Stats */}
-            <div className="mb-6 pb-6 border-b border-slate-700">
+            <div className="mb-6 pb-6 border-b border-[rgba(255,255,255,0.07)]">
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-white">{plan.maxSchools}</div>
@@ -165,7 +180,7 @@ export const SubscriptionPlans: React.FC = () => {
               className={`w-full py-3 rounded font-semibold transition ${
                 plan.highlighted
                   ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-slate-700 hover:bg-slate-600 text-gray-300'
+                  : 'bg-[rgba(255,255,255,0.05)] hover:bg-[rgba(255,255,255,0.10)] text-white'
               } disabled:opacity-50`}
             >
               {upgrading ? 'Processing...' : plan.monthlyFee === 0 ? 'Current' : 'Upgrade'}
@@ -175,14 +190,14 @@ export const SubscriptionPlans: React.FC = () => {
       </div>
 
       {/* Comparison Table */}
-      <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-        <div className="p-6 border-b border-slate-700">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] border border-[rgba(255,255,255,0.07)] overflow-hidden">
+        <div className="p-6 border-b border-[rgba(255,255,255,0.07)]">
           <h2 className="text-lg font-semibold text-white">Detailed Comparison</h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-900">
+            <thead className="bg-[rgba(0,0,0,0.40)]">
               <tr>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">
                   Feature
@@ -198,7 +213,7 @@ export const SubscriptionPlans: React.FC = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-700">
+            <tbody className="divide-y divide-[rgba(255,255,255,0.07)]">
               {[
                 'Referral Tracking',
                 'Commission Calculation',
@@ -209,7 +224,7 @@ export const SubscriptionPlans: React.FC = () => {
                 'Custom Branding',
                 'Dedicated Manager',
               ].map((feature, idx) => (
-                <tr key={idx} className="hover:bg-slate-900/50">
+                <tr key={idx} className="hover:bg-white/5 transition-colors">
                   <td className="px-6 py-4 text-gray-300 font-semibold">{feature}</td>
                   <td className="px-6 py-4 text-center">
                     {idx < 2 ? (
@@ -236,7 +251,7 @@ export const SubscriptionPlans: React.FC = () => {
       </div>
 
       {/* FAQ Section */}
-      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] p-6 border border-[rgba(255,255,255,0.07)]">
         <h2 className="text-lg font-semibold text-white mb-4">FAQs</h2>
         <div className="space-y-4">
           <div>
@@ -256,6 +271,64 @@ export const SubscriptionPlans: React.FC = () => {
             <p className="text-sm text-gray-300">
               No long-term contracts. Cancel anytime. Your data is yours to keep.
             </p>
+          </div>
+        </div>
+      </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 backdrop-blur-md border-t border-white/10" style={{
+        background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.2) 100%)'
+      }}>
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-center gap-2 py-4 flex-wrap">
+            {[
+              { label: 'Dashboard', icon: BarChart01, href: '/agent/dashboard' },
+              { label: 'Schools', icon: Users, href: '/agent/schools' },
+              { label: 'Referrals', icon: TrendingUp, href: '/agent/referrals' },
+              { label: 'Rewards', icon: Crown, href: '/agent/rewards' },
+              { label: 'Withdrawals', icon: DollarSign, href: '/agent/withdrawals' },
+              { label: 'Plans', icon: Calendar, href: '/agent/subscription-plans' },
+              { label: 'Profile', icon: User, href: '/agent/profile' },
+              { label: 'Logout', icon: LogOut, href: '#logout' },
+            ].map((item) => {
+              const Icon = item.icon;
+              const active = window.location.pathname === item.href;
+              const isLogout = item.href === '#logout';
+              
+              return (
+                <div key={item.href} className="relative group">
+                  <button
+                    onClick={() => {
+                      if (isLogout) {
+                        localStorage.clear();
+                        navigate('/auth/login');
+                      } else {
+                        navigate(item.href);
+                      }
+                    }}
+                    onMouseEnter={() => setHoveredItem(item.href)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 ${
+                      active && !isLogout
+                        ? 'text-white bg-white/15 border border-white/30 shadow-lg shadow-blue-500/20'
+                        : isLogout
+                        ? 'text-red-400 hover:text-red-300 hover:bg-red-500/5 border border-transparent'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    }`}
+                  >
+                    <Icon size={24} strokeWidth={1.5} />
+                  </button>
+                  {hoveredItem === item.href && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black/90 text-white text-xs py-1 px-2 rounded whitespace-nowrap pointer-events-none border border-white/10">
+                      {item.label}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

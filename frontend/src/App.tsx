@@ -45,6 +45,8 @@ import BlogPost from "./pages/blog/BlogPost";
 import BlogManagementCMS from "./pages/super-admin/BlogManagementCMS";
 import SchoolAdminLayout from "./components/SchoolAdminLayout";
 import SchoolRejected from "./pages/school-admin/SchoolRejected";
+import { Dashboard as AgentDashboard, Profile as AgentProfile, SchoolsManaged, Referrals, Rewards, Withdrawals, SubscriptionPlans } from "./pages/agent";
+import { ParentDashboard, ChildDetailPage } from "./pages/parent";
 import {
   Overview as SchoolOverview,
   SessionTermManagement,
@@ -113,6 +115,19 @@ const App = () => (
           
           {/* Support Agent Routes */}
           <Route path="/support-agent/dashboard" element={<ProtectedSuperAdminRoute><SupportAgentDashboard /></ProtectedSuperAdminRoute>} />
+          
+          {/* Agent Routes */}
+          <Route path="/agent/dashboard" element={<AgentDashboard />} />
+          <Route path="/agent/profile" element={<AgentProfile />} />
+          <Route path="/agent/schools" element={<SchoolsManaged />} />
+          <Route path="/agent/referrals" element={<Referrals />} />
+          <Route path="/agent/rewards" element={<Rewards />} />
+          <Route path="/agent/withdrawals" element={<Withdrawals />} />
+          <Route path="/agent/subscription-plans" element={<SubscriptionPlans />} />
+          
+          {/* Parent Routes */}
+          <Route path="/parent/dashboard" element={<ParentDashboard />} />
+          <Route path="/parent/child/:childId" element={<ChildDetailPage />} />
           
           {/* Notifications Page */}
           <Route path="/notifications" element={<ProtectedSuperAdminRoute><NotificationsPage /></ProtectedSuperAdminRoute>} />

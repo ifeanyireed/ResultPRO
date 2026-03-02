@@ -25,6 +25,8 @@ import {
   Send,
   X,
 } from 'lucide-react';
+import { User, LogOut, BarChart01 } from '@/lib/hugeicons-compat';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -52,6 +54,7 @@ interface Message {
 }
 
 const SupportAgentDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
@@ -60,6 +63,7 @@ const SupportAgentDashboard: React.FC = () => {
   const [sendingMessage, setSendingMessage] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [filterPriority, setFilterPriority] = useState<string>('ALL');
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTickets();
@@ -186,7 +190,76 @@ const SupportAgentDashboard: React.FC = () => {
   const stats = getTicketStats();
 
   return (
-    <div className="space-y-6">
+    <div className="w-full bg-black text-white min-h-screen flex flex-col relative pb-20">
+      <style>{`
+        .nav-tooltip {
+          position: absolute;
+          bottom: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.9);
+          color: white;
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 500;
+          white-space: nowrap;
+          margin-bottom: 8px;
+          pointer-events: none;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+      `}</style>
+      {/* Background Effects - Fixed/Static */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img
+          src="/Hero.png"
+          className="w-full h-full object-cover"
+          alt="Background"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      </div>
+
+      {/* Header with Logo and User Actions */}
+      <div className="sticky top-0 z-20 backdrop-blur-md px-4 md:px-8" style={{
+        background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0) 100%)'
+      }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between py-4 relative">
+            {/* Left Section - Logo */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <img src="/logo.png" alt="Results Pro" className="h-10 w-auto" />
+              <div>
+                <div className="text-xs uppercase tracking-wider text-gray-500 font-semibold">Results Pro</div>
+                <div className="text-sm font-semibold text-white">Support Agent</div>
+              </div>
+            </div>
+
+            {/* Center Section */}
+            <div className="flex-1 flex flex-col items-center justify-center px-4">
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">Support Tickets</div>
+                <div className="text-xs text-gray-400 italic mt-1">Manage and resolve support requests</div>
+              </div>
+            </div>
+
+            {/* Right Section - User Actions */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <button
+                onClick={() => navigate('/support-agent/dashboard')}
+                className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/10 border border-transparent hover:border-white/20 transition-all duration-200 text-gray-400 hover:text-white"
+                title="Profile"
+              >
+                <User size={20} strokeWidth={1.5} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="relative z-10 flex-1 overflow-auto pb-20">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+          <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">My Support Tickets</h1>
@@ -502,6 +575,59 @@ const SupportAgentDashboard: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+          </div>
+        </div>
+      </main>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 backdrop-blur-md border-t border-white/10" style={{
+        background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.2) 100%)'
+      }}>
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-center gap-2 py-4 flex-wrap">
+            {[
+              { label: 'Dashboard', icon: BarChart01, href: '/support-agent/dashboard' },
+              { label: 'Profile', icon: User, href: '/support-agent/dashboard' },
+              { label: 'Logout', icon: LogOut, href: '#logout' },
+            ].map((item) => {
+              const Icon = item.icon;
+              const active = window.location.pathname === item.href;
+              const isLogout = item.href === '#logout';
+              
+              return (
+                <div key={item.href} className="relative group">
+                  <button
+                    onClick={() => {
+                      if (isLogout) {
+                        localStorage.clear();
+                        navigate('/auth/login');
+                      } else {
+                        navigate(item.href);
+                      }
+                    }}
+                    onMouseEnter={() => setHoveredItem(item.href)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 ${
+                      active && !isLogout
+                        ? 'text-white bg-white/15 border border-white/30 shadow-lg shadow-blue-500/20'
+                        : isLogout
+                        ? 'text-red-400 hover:text-red-300 hover:bg-red-500/5 border border-transparent'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    }`}
+                  >
+                    <Icon size={24} strokeWidth={1.5} />
+                  </button>
+                  {hoveredItem === item.href && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black/90 text-white text-xs py-1 px-2 rounded whitespace-nowrap pointer-events-none border border-white/10">
+                      {item.label}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

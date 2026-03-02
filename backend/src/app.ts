@@ -133,7 +133,7 @@ export async function createApp(): Promise<Express> {
 
   // Agent routes (protected - for Agents)
   const agentRoutes = await import('@modules/agent/routes');
-  app.use('/api/agent', agentRoutes.default);
+  app.use('/api/agent', authMiddleware, agentRoutes.default);
 
   // 404 handler
   app.use((req: Request, res: Response) => {

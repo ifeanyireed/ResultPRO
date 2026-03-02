@@ -49,7 +49,9 @@ export const useAgentDashboard = (agentId: string) => {
   const fetchDashboard = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get(`/agent/${agentId}/dashboard`);
+      // Use /agent/dashboard for current user, or /agent/{agentId}/dashboard for specific agent
+      const endpoint = agentId ? `/agent/${agentId}/dashboard` : '/agent/dashboard';
+      const response = await apiClient.get(endpoint);
       setData(response.data.data);
       setError(null);
     } catch (err: any) {

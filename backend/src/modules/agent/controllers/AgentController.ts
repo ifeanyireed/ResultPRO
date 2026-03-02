@@ -333,12 +333,47 @@ export class AgentController {
     }
   }
 
-  // Get dashboard stats
+  // Get dashboard stats for specific agent
   async getDashboardStats(req: Request, res: Response) {
     try {
       const { agentId } = req.params;
 
       const agent = await agentService.getAgent(agentId);
+      const referralStats = await referralService.getReferralStats(agentId);
+      const rewards = await rewardService.getRewardSummary(agentId);
+      const withdrawalStats = await withdrawalService.getWithdrawalStats(
+        agentId
+      );
+
+      res.json({
+        success: true,
+        data: {
+          agent,
+          referralStats,
+          rewards,
+          withdrawalStats,
+        },
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Get dashboard stats for current agent (authenticated user)
+  async getMyDashboardStats(req: Request, res: Response) {
+    try {
+      const userId = (req.user as any)?.id;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const agent = await agentService.getAgentByUserId(userId);
+      if (!agent) {
+        return res.status(404).json({ error: 'Agent profile not found' });
+      }
+
+      const agentId = agent.id;
       const referralStats = await referralService.getReferralStats(agentId);
       const rewards = await rewardService.getRewardSummary(agentId);
       const withdrawalStats = await withdrawalService.getWithdrawalStats(

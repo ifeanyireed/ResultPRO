@@ -15,7 +15,7 @@ const Navigation = () => {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-2">
-          {['Features', 'Pricing', 'About', 'Contact', 'Results', 'Scratch Card'].map((item, index) => (
+          {['Features', 'Pricing', 'About', 'Contact', 'Support', 'Results', 'Scratch Card'].map((item, index) => (
             <Link 
               key={item}
               to={`/${item.toLowerCase().replace(/\s+/g, '-')}`}

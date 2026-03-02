@@ -51,15 +51,46 @@ const Login: React.FC = () => {
 
       console.log('✅ Login successful for user:', user.email, 'Role:', user.role, 'Type:', typeof user.role);
 
-      // Check if user is a super admin - redirect to super admin dashboard
-      if (user.role === 'SUPER_ADMIN' || user.role?.toUpperCase() === 'SUPER_ADMIN') {
+      const userRole = user.role?.toUpperCase() || '';
+
+      // Route users based on their role
+      if (userRole === 'SUPER_ADMIN') {
         console.log('🔐 Super admin detected, redirecting to /super-admin/verifications');
         setLoading(false);
         navigate('/super-admin/verifications');
         return;
       }
 
-      console.log('📋 User role is:', user.role, '- checking other conditions...');
+      if (userRole === 'AGENT') {
+        console.log('🤝 Agent detected, redirecting to /agent/dashboard');
+        setLoading(false);
+        navigate('/agent/dashboard');
+        return;
+      }
+
+      if (userRole === 'PARENT') {
+        console.log('👨‍👩‍👧 Parent detected, redirecting to /parent/dashboard');
+        setLoading(false);
+        navigate('/parent/dashboard');
+        return;
+      }
+
+      if (userRole === 'SUPPORT_AGENT') {
+        console.log('💬 Support agent detected, redirecting to /support-agent/dashboard');
+        setLoading(false);
+        navigate('/support-agent/dashboard');
+        return;
+      }
+
+      if (userRole === 'TEACHER') {
+        console.log('👨‍🏫 Teacher detected, redirecting to /school-admin/overview');
+        setLoading(false);
+        navigate('/school-admin/overview');
+        return;
+      }
+
+      // For SCHOOL_ADMIN role or unrecognized roles, apply school-level checks
+      console.log('📋 User role is:', user.role, '- checking school conditions...');
 
       // Check if school is awaiting approval after document submission
       if (user.awaitingApproval) {
@@ -117,7 +148,7 @@ const Login: React.FC = () => {
       }
       
       // Otherwise redirect to school admin dashboard
-      console.log('✅ All checks passed, redirecting to dashboard');
+      console.log('✅ All checks passed, redirecting to /school-admin/overview');
       setLoading(false);
       navigate('/school-admin/overview');
     } catch (err: any) {

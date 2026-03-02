@@ -43,9 +43,17 @@ const ChildDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Header */}
-      <div className="bg-slate-800/50 backdrop-blur-md border-b border-slate-700/50">
+    <div className="w-full bg-black text-white min-h-screen flex flex-col relative">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img
+          src="/Hero.png"
+          className="w-full h-full object-cover"
+          alt="Background"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      </div>
+
+      <div className="sticky top-0 z-20 backdrop-blur-md bg-[rgba(0,0,0,0.40)] border-b border-[rgba(255,255,255,0.07)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <button
             onClick={() => navigate('/parent')}
@@ -59,9 +67,9 @@ const ChildDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* KPI Cards */}
+      <main className="relative z-10 flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <KPICard
             label="Overall Average"
@@ -124,7 +132,7 @@ const ChildDetailPage: React.FC = () => {
             <>
               {/* Strengths and Weaknesses */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-slate-800/40 backdrop-blur border border-slate-700/50 rounded-lg p-6">
+                <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
                   <h3 className="text-lg font-bold text-green-400 mb-4 flex items-center gap-2">
                     <Award className="w-5 h-5" />
                     Strengths
@@ -145,7 +153,7 @@ const ChildDetailPage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-slate-800/40 backdrop-blur border border-slate-700/50 rounded-lg p-6">
+                <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
                   <h3 className="text-lg font-bold text-red-400 mb-4 flex items-center gap-2">
                     <AlertTriangle className="w-5 h-5" />
                     Areas for Improvement
@@ -168,7 +176,7 @@ const ChildDetailPage: React.FC = () => {
               </div>
 
               {/* Recommendations */}
-              <div className="bg-slate-800/40 backdrop-blur border border-slate-700/50 rounded-lg p-6">
+              <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
                 <h3 className="text-lg font-bold text-white mb-4">Recommendations</h3>
                 <div className="space-y-3">
                   {summary.recommendations && summary.recommendations.length > 0 ? (
@@ -186,14 +194,14 @@ const ChildDetailPage: React.FC = () => {
 
               {/* Progress Trend */}
               {!progressLoading && progress.length > 0 && (
-                <div className="bg-slate-800/40 backdrop-blur border border-slate-700/50 rounded-lg p-6">
+                <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
                   <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                     <Award className="w-5 h-5 text-blue-400" />
                     Progress Trend
                   </h3>
                   <div className="space-y-3">
                     {progress.map((p, idx) => (
-                      <div key={idx} className="bg-slate-700/30 rounded-lg p-4">
+                      <div key={idx} className="bg-[rgba(0,0,0,0.40)] rounded-[15px] p-4 border border-[rgba(255,255,255,0.07)]">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-semibold text-white">{p.term}</span>
                           <span className="text-blue-400 font-bold">{p.average.toFixed(1)}%</span>
@@ -217,7 +225,7 @@ const ChildDetailPage: React.FC = () => {
                 summary.subjectBreakdown.map((subject, idx) => (
                   <div
                     key={idx}
-                    className="bg-slate-800/40 backdrop-blur border border-slate-700/50 rounded-lg p-6"
+                    className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6"
                   >
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -256,22 +264,22 @@ const ChildDetailPage: React.FC = () => {
           )}
 
           {activeTab === 'attendance' && (
-            <div className="bg-slate-800/40 backdrop-blur border border-slate-700/50 rounded-lg p-6">
+            <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
               <h3 className="text-lg font-bold text-white mb-6">Attendance Analysis</h3>
 
               {attendance ? (
                 <div className="space-y-6">
                   {/* Current Attendance */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-slate-700/30 rounded-lg p-4">
+                    <div className="bg-[rgba(0,0,0,0.40)] rounded-[15px] p-4 border border-[rgba(255,255,255,0.07)]">
                       <p className="text-slate-400 text-sm mb-1">Days Present</p>
                       <p className="text-2xl font-bold text-blue-400">{attendance.current.daysPresent}</p>
                     </div>
-                    <div className="bg-slate-700/30 rounded-lg p-4">
+                    <div className="bg-[rgba(0,0,0,0.40)] rounded-[15px] p-4 border border-[rgba(255,255,255,0.07)]">
                       <p className="text-slate-400 text-sm mb-1">Days School Opened</p>
                       <p className="text-2xl font-bold text-slate-300">{attendance.current.daysSchoolOpen}</p>
                     </div>
-                    <div className="bg-slate-700/30 rounded-lg p-4">
+                    <div className="bg-[rgba(0,0,0,0.40)] rounded-[15px] p-4 border border-[rgba(255,255,255,0.07)]">
                       <p className="text-slate-400 text-sm mb-1">Attendance Rate</p>
                       <p className="text-2xl font-bold text-green-400">{attendance.current.percentage}%</p>
                     </div>
@@ -282,7 +290,7 @@ const ChildDetailPage: React.FC = () => {
                     <h4 className="font-semibold text-white mb-4">Attendance History</h4>
                     <div className="space-y-3">
                       {attendance.history.map((histItem: any, idx: number) => (
-                        <div key={idx} className="bg-slate-700/30 rounded-lg p-4">
+                        <div key={idx} className="bg-[rgba(0,0,0,0.40)] rounded-[15px] p-4 border border-[rgba(255,255,255,0.07)]">
                           <div className="flex justify-between items-center mb-2">
                             <span className="font-semibold text-white">{histItem.term}</span>
                             <span className="text-green-400 font-bold">{histItem.percentage}%</span>
@@ -326,7 +334,8 @@ const ChildDetailPage: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+        </div>
+      </main>
     </div>
   );
 };

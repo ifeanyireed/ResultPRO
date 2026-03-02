@@ -1,6 +1,10 @@
-import { prisma } from './src/config/database';
+// @ts-nocheck
+import { prisma } from './src/config/database.ts';
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function seedFromBackup() {
   try {

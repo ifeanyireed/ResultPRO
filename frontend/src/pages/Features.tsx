@@ -17,12 +17,24 @@ const Features: React.FC = () => {
       name: 'Core Features',
     },
     {
+      id: 'analytics',
+      name: 'Analytics',
+    },
+    {
       id: 'engagement',
       name: 'Engagement',
     },
     {
-      id: 'analytics',
-      name: 'Analytics',
+      id: 'payments',
+      name: 'Payments',
+    },
+    {
+      id: 'security',
+      name: 'Security',
+    },
+    {
+      id: 'support',
+      name: 'Support',
     },
     {
       id: 'integration',
@@ -31,69 +43,266 @@ const Features: React.FC = () => {
   ];
 
   const allFeatures = [
+    // CORE FEATURES
     {
       category: 'core',
       title: 'Zero Teacher Login',
-      description: 'CSV upload system means teachers never need an account. Simple, fast, secure. Streamline your workflow.',
+      description: 'Teachers upload results via CSV in 2 minutes. No passwords, no login portals. Admin burden reduced by 75%.',
       icon: null,
       image: '/Score.png',
-      features: ['CSV Import', 'Auto-processing', 'Secure upload', 'Bulk operations'],
+      features: ['CSV import', 'Auto-validation', 'Error reporting', 'Bulk uploads'],
     },
     {
       category: 'core',
-      title: 'Result Management',
-      description: 'Comprehensive results system with publishing, archiving, and version control built-in.',
+      title: 'Result Publishing',
+      description: 'One-click publishing. Auto-formatted result slips, PDFs generated instantly, email distribution handled automatically.',
       icon: null,
       image: '/Results.png',
-      features: ['Publish instantly', 'Archive results', 'Version control', 'Backup options'],
+      features: ['Auto-formatting', 'PDF generation', 'Email distribution', 'Archive management'],
     },
     {
-      category: 'engagement',
-      title: 'Social-First Design',
-      description: 'Auto-generated shareable achievement graphics that parents love. Transform success into celebration.',
+      category: 'core',
+      title: 'Gradebook Management',
+      description: 'Dynamic gradebooks that adapt to your grading system. Support for multiple templates: WASSCE, NABTEB, NECO, and custom.',
       icon: null,
-      image: '/Social.png',
-      features: ['Auto-graphics', 'Shareable cards', 'Social media ready', 'Custom branding'],
+      image: '/Results.png',
+      features: ['Dynamic columns', 'Multiple templates', 'Versioning', 'Paper templates'],
     },
     {
-      category: 'engagement',
-      title: 'Mobile App',
-      description: 'Real-time academic monitoring. Parents stay engaged on the go with push notifications.',
+      category: 'core',
+      title: 'Flexible Grading Systems',
+      description: 'Support for Nigerian standardized systems or create custom grading templates. Configure grades, scales, and remarks.',
       icon: null,
-      image: '/video.png',
-      features: ['Real-time updates', 'Push notifications', 'Offline access', 'Native apps'],
+      image: '/Payment.png',
+      features: ['WASSCE/NABTEB/NECO', 'Custom systems', 'Grade scales', 'Weighted components'],
+    },
+    
+    // ANALYTICS FEATURES
+    {
+      category: 'analytics',
+      title: 'Student Performance Analytics',
+      description: 'Track class averages, pass rates, subject performance. Identify at-risk students automatically with AI-powered risk scoring.',
+      icon: null,
+      image: '/LessonDashboard.png',
+      features: ['Risk scoring', 'Pass rates', 'Subject analysis', 'Grade distribution'],
     },
     {
       category: 'analytics',
-      title: 'Beautiful Analytics',
-      description: 'Disney-inspired glassomorphic dashboards with engaging visualizations and insights.',
+      title: 'At-Risk Student Detection',
+      description: 'Automatic risk assessment (0-100 scale). Identifies students below 50% average, poor attendance, or declining trends.',
       icon: null,
-      image: '/LessonDashboard.png',
-      features: ['Performance tracking', 'Trend analysis', 'Custom reports', 'Data export'],
+      image: '/Results.png',
+      features: ['Risk levels', 'Personalized alerts', 'Intervention plans', 'Trend analysis'],
     },
     {
       category: 'analytics',
       title: 'Advanced Reporting',
-      description: 'Generate comprehensive reports instantly. Track metrics, trends, and student progress.',
+      description: 'Generate 20+ report types instantly. Subject analysis, class comparison, attendance impact, student progress tracking.',
       icon: null,
       image: '/Payment.png',
-      features: ['Instant reports', 'Scheduled exports', 'PDF generation', 'Email reports'],
+      features: ['20+ report types', 'PDF export', 'Scheduled reports', 'Email distribution'],
+    },
+    {
+      category: 'analytics',
+      title: 'Parent Analytics Portal',
+      description: 'Parents track multiple children, view detailed progress reports, subject performance, class rankings, and personalized recommendations.',
+      icon: null,
+      image: '/LessonDashboard.png',
+      features: ['Multi-child tracking', 'Progress reports', 'Strength analysis', 'Recommendations'],
+    },
+    {
+      category: 'analytics',
+      title: 'Class Comparison Dashboard',
+      description: 'Compare performance across multiple classes. Benchmark against averages, identify strongest/weakest classes by subject.',
+      icon: null,
+      image: '/Payment.png',
+      features: ['Multi-class comparison', 'Subject benchmarking', 'Performance ranking', 'Trend visualization'],
+    },
+    {
+      category: 'analytics',
+      title: 'Attendance Impact Analysis',
+      description: 'Correlate attendance with grades. See the cost of absences by subject. Identify attendance-performance patterns.',
+      icon: null,
+      image: '/Results.png',
+      features: ['Correlation analysis', 'Per-class tracking', 'Trend alerts', 'Impact scoring'],
+    },
+
+    // ENGAGEMENT FEATURES
+    {
+      category: 'engagement',
+      title: 'Shareable Achievement Graphics',
+      description: 'Auto-generate branded achievement cards. Parents love sharing success on social media. Reduce result anxiety with celebration.',
+      icon: null,
+      image: '/Social.png',
+      features: ['Auto-generation', 'Social-ready', 'Custom branding', 'Download & share'],
     },
     {
       category: 'engagement',
-      title: 'Result Checker',
-      description: 'Innovative scratch card system for result verification. Gamify the result-checking experience.',
+      title: 'Mobile App',
+      description: 'Native iOS/Android apps. Parents get push notifications when results publish, can track progress in real-time, offline access.',
+      icon: null,
+      image: '/video.png',
+      features: ['iOS & Android', 'Push notifications', 'Real-time updates', 'Offline access'],
+    },
+    {
+      category: 'engagement',
+      title: 'Scratch Card Verification',
+      description: 'Students verify results via scratch cards. Gamified experience reduces admin queries. Secure PIN verification system included.',
       icon: null,
       image: '/Results.png',
-      features: ['Scratch cards', 'Gamification', 'Verification', 'Engagement tracking'],
+      features: ['Gamified verification', 'PIN security', 'Reduces queries', 'Engagement tracking'],
+    },
+    {
+      category: 'engagement',
+      title: 'Real-Time Notifications',
+      description: 'Parents notified instantly when results publish. Push notifications, SMS, and email alerts. Customizable notification preferences.',
+      icon: null,
+      image: '/Results.png',
+      features: ['Instant alerts', 'Multi-channel', 'Customizable', 'Delivery tracking'],
+    },
+
+    // PAYMENT FEATURES
+    {
+      category: 'payments',
+      title: 'Paystack Integration',
+      description: 'Secure payment processing. Support for card payments, bank transfers, mobile money. Auto-subscription renewal with invoice generation.',
+      icon: null,
+      image: '/Payment.png',
+      features: ['Card payments', 'Bank transfers', 'Auto-renewal', 'Receipt generation'],
+    },
+    {
+      category: 'payments',
+      title: '3-Tier Subscription Plans',
+      description: 'Free tier (100 students), Pro ($29.99/month, 2000 students), Enterprise (unlimited). Scale as you grow.',
+      icon: null,
+      image: '/Payment.png',
+      features: ['Flexible tiers', 'Student limits', 'Feature scaling', 'Custom pricing'],
+    },
+    {
+      category: 'payments',
+      title: 'Billing & Invoicing',
+      description: 'Auto-generated invoices (INV-SCHOOL-ID), tax calculation (7.5% GST), usage tracking, overdue alerts, payment history.',
+      icon: null,
+      image: '/Payment.png',
+      features: ['Auto-invoicing', 'Tax calculation', 'Usage limits', 'Payment history'],
+    },
+    {
+      category: 'payments',
+      title: 'Usage Tracking',
+      description: 'Monitor student/teacher count vs plan limits. Capacity alerts at 80%. Transparent usage display and upgrade recommendations.',
+      icon: null,
+      image: '/Payment.png',
+      features: ['Real-time limits', '80% alerts', 'Upgrade prompts', 'Usage reports'],
+    },
+
+    // SECURITY FEATURES
+    {
+      category: 'security',
+      title: 'Authentication & OTP',
+      description: 'Email verification with 6-digit OTP. JWT tokens (24-hour expiry), refresh tokens (7-day), 2FA support built-in.',
+      icon: null,
+      image: '/LessonDashboard.png',
+      features: ['OTP verification', 'JWT tokens', '2FA support', 'Session management'],
+    },
+    {
+      category: 'security',
+      title: 'Role-Based Access Control',
+      description: 'SuperAdmin, School Admin, Teacher, Parent, Support Agent, Agent roles. Each role has specific permissions and data access.',
+      icon: null,
+      image: '/Results.png',
+      features: ['5+ role types', 'Permission control', 'Data isolation', 'Audit logs'],
+    },
+    {
+      category: 'security',
+      title: 'Data Security & Encryption',
+      description: 'End-to-end encryption for sensitive data. Bcrypt password hashing, HTTPS everywhere, GDPR compliant, daily backups.',
+      icon: null,
+      image: '/LessonDashboard.png',
+      features: ['E2E encryption', 'Bcrypt hashing', 'GDPR compliant', 'Daily backups'],
+    },
+    {
+      category: 'security',
+      title: 'Database Backup & Restore',
+      description: 'Automatic daily backups. One-click restoration. Data export to CSV. Migration tools included. Your data is always recoverable.',
+      icon: null,
+      image: '/Results.png',
+      features: ['Auto backups', 'One-click restore', 'CSV export', 'Migration tools'],
+    },
+
+    // SUPPORT FEATURES
+    {
+      category: 'support',
+      title: 'Support Ticket System',
+      description: 'Public ticket submission (no login required). Auto-numbering, categorization, priority levels, message threading, audit trails.',
+      icon: null,
+      image: '/Social.png',
+      features: ['Auto-numbering', 'Categorization', 'Priority levels', 'Message history'],
+    },
+    {
+      category: 'support',
+      title: 'Support Agent Dashboard',
+      description: 'Assign support agents, track metrics, manage ticket queues. Admin view of all tickets across network.',
+      icon: null,
+      image: '/Results.png',
+      features: ['Agent assignment', 'Metrics tracking', 'Queue management', 'Admin overview'],
+    },
+    {
+      category: 'support',
+      title: 'Real-Time Notifications',
+      description: 'Notification bell with unread count. Filter by type (system, support, subscription, analytics). Notification history and management.',
+      icon: null,
+      image: '/video.png',
+      features: ['Unread badges', 'Type filtering', 'History tracking', 'Management tools'],
+    },
+
+    // INTEGRATION & ENTERPRISE
+    {
+      category: 'integration',
+      title: 'Multi-School Management',
+      description: 'SuperAdmin dashboard for managing multiple schools. Network analytics, alerts, bulk actions, staff directory, cross-school reporting.',
+      icon: null,
+      image: '/LessonDashboard.png',
+      features: ['Network overview', 'Bulk operations', 'Cross-school alerts', 'Staff directory'],
     },
     {
       category: 'integration',
-      title: 'Built-In Monetization',
-      description: 'Premium features that generate revenue while helping schools. Create income streams.',
+      title: 'Agent Referral Program',
+      description: 'Earn 15-25% commission per school. Unique referral codes, attribution tracking, approval workflow, payment via bank/PayPal/crypto.',
       icon: null,
       image: '/Payment.png',
-      features: ['Premium tiers', 'Payment gateway', 'Subscription mgmt', 'Revenue tracking'],
+      features: ['15-25% commission', 'Referral codes', 'Attribution tracking', 'Multiple payouts'],
+    },
+    {
+      category: 'integration',
+      title: 'Gamification & Leaderboard',
+      description: 'Points system (50-150 per action), 7 achievement badges, top 100 leaderboard. Unlock premium perks through achievements.',
+      icon: null,
+      image: '/Score.png',
+      features: ['Points system', '7 badge types', 'Leaderboard', 'Achievement rewards'],
+    },
+    {
+      category: 'integration',
+      title: 'Agent Subscription Tiers',
+      description: 'Free ($0, 3 schools), Pro ($29.99/mo, 15 schools), Premium ($99.99/mo, 100 schools). Commission varies by tier.',
+      icon: null,
+      image: '/Payment.png',
+      features: ['Flexible tiers', 'School limits', 'Commission scaling', 'API access'],
+    },
+    {
+      category: 'integration',
+      title: 'Professional Email Service',
+      description: 'AWS SES integration for bulk emails. Custom templates, S3 logo hosting, responsive design, verified sender domains.',
+      icon: null,
+      image: '/Results.png',
+      features: ['AWS SES', 'Custom templates', 'Logo hosting', 'Bulk sending'],
+    },
+    {
+      category: 'integration',
+      title: 'TypeScript API',
+      description: 'Full TypeScript implementation. RESTful API with comprehensive documentation. Type-safe data validation. Integration-ready.',
+      icon: null,
+      image: '/LessonDashboard.png',
+      features: ['RESTful API', 'Type safety', 'API docs', 'Integration examples'],
     },
   ];
 
@@ -119,10 +328,10 @@ const Features: React.FC = () => {
         {/* Content */}
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-tight text-white">
-            Powerful Features
+            Everything Schools Need
           </h1>
           <p className="text-lg md:text-xl text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto">
-            Everything you need to manage, publish, and engage with student results. Built for modern schools.
+            Result publishing, analytics, parent engagement, secure payments, support tools, and agent programs. All in one platform built for Nigerian schools.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/auth/register" className="glow-button items-center border shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] flex gap-2 overflow-hidden px-6 py-3 rounded-lg border-solid border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors text-white text-sm font-medium inline-flex">
@@ -215,10 +424,10 @@ const Features: React.FC = () => {
                     Instant Result Publishing
                   </h3>
                   <p className="text-gray-400 mb-6 leading-relaxed">
-                    Publish student results instantly with auto-formatted documents. One-click PDF generation, email distribution, and archive management.
+                    Upload CSV files → Auto-formatted result slips → One-click PDFs → Email to all parents. What used to take 3 hours now takes 5 minutes.
                   </p>
                   <ul className="space-y-3">
-                    {['Auto-formatting', 'Batch processing', 'Email integration', 'Archive management'].map((item, idx) => (
+                    {['CSV auto-validation', 'PDF generation', 'Bulk email', 'Archive management', 'Version control', 'Batch processing'].map((item, idx) => (
                       <li key={idx} className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-blue-400" />
                         <span className="text-gray-300">{item}</span>
@@ -248,13 +457,13 @@ const Features: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-3xl font-bold mb-4 text-white">
-                    Parent Engagement Hub
+                    Advanced Student Analytics
                   </h3>
                   <p className="text-gray-400 mb-6 leading-relaxed">
-                    Keep parents in the loop with real-time notifications, shared achievements, and progress tracking on mobile and web.
+                    Not just grades. Get AI-powered at-risk detection, attendance impact analysis, subject performance benchmarking, and personalized improvement recommendations.
                   </p>
                   <ul className="space-y-3">
-                    {['Push notifications', 'Achievement sharing', 'Progress tracking', 'Mobile app'].map((item, idx) => (
+                    {['At-risk scoring (0-100)', 'Class comparison', 'Attendance correlation', '20+ report types', 'Trend visualization', 'Personalized alerts'].map((item, idx) => (
                       <li key={idx} className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-purple-400" />
                         <span className="text-gray-300">{item}</span>
@@ -270,13 +479,13 @@ const Features: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                   <h3 className="text-3xl font-bold mb-4 text-white">
-                    Advanced Security
+                    Enterprise Security & Compliance
                   </h3>
                   <p className="text-gray-400 mb-6 leading-relaxed">
-                    Enterprise-grade security with encryption, role-based access, audit trails, and compliance certifications.
+                    End-to-end encryption, GDPR compliant, role-based access control, audit trails, daily automatic backups, and one-click data restoration.
                   </p>
                   <ul className="space-y-3">
-                    {['End-to-end encryption', 'Role-based access', 'Audit logging', 'GDPR compliant'].map((item, idx) => (
+                    {['E2E encryption', 'GDPR compliant', 'Role-based access', 'Audit logging', 'Daily backups', 'Data export'].map((item, idx) => (
                       <li key={idx} className="flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-green-400" />
                         <span className="text-gray-300">{item}</span>
@@ -289,6 +498,64 @@ const Features: React.FC = () => {
                     src="/LessonDashboard.png" 
                     alt="Security"
                     className="h-auto rounded-md object-cover w-full"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Feature Detail 4 - NEW */}
+            <div className="relative rounded-[30px] border shadow-[0_1px_3px_0_rgba(199,220,255,0.60)_inset,0_0_60px_0_rgba(198,204,255,0.45)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.05)] p-8 overflow-hidden hover:bg-white/10 transition-all duration-300 border-solid border-[rgba(255,255,255,0.07)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="flex items-center justify-center rounded-2xl min-h-[300px]">
+                  <img 
+                    src="/Payment.png" 
+                    alt="Monetization"
+                    className="h-auto rounded-md object-cover w-full"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-3xl font-bold mb-4 text-white">
+                    Built-In Monetization
+                  </h3>
+                  <p className="text-gray-400 mb-6 leading-relaxed">
+                    3-tier subscription plans (Free/Pro/Enterprise). Paystack integration, auto-invoicing, tax calculation, and agent referral program with 15-25% commissions.
+                  </p>
+                  <ul className="space-y-3">
+                    {['3-tier pricing', 'Paystack payments', 'Auto-invoicing', 'Commission tracking', 'Multi-currency', 'Referral program'].map((item, idx) => (
+                      <li key={idx} className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                        <span className="text-gray-300">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Feature Detail 5 - NEW */}
+            <div className="relative rounded-[30px] border shadow-[0_1px_3px_0_rgba(199,220,255,0.60)_inset,0_0_60px_0_rgba(198,204,255,0.45)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.05)] p-8 overflow-hidden hover:bg-white/10 transition-all duration-300 border-solid border-[rgba(255,255,255,0.07)]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-3xl font-bold mb-4 text-white">
+                    Multi-School Enterprise Management
+                  </h3>
+                  <p className="text-gray-400 mb-6 leading-relaxed">
+                    Manage unlimited schools from one dashboard. Network alerts, bulk operations, cross-school analytics, staff directory, and consolidated reporting.
+                  </p>
+                  <ul className="space-y-3">
+                    {['Network overview', 'Bulk operations', 'Cross-school analytics', 'Network alerts', 'Staff directory', 'Consolidated reporting'].map((item, idx) => (
+                      <li key={idx} className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-red-400" />
+                        <span className="text-gray-300">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="flex items-center justify-center rounded-2xl min-h-[300px]">
+                  <img 
+                    src="/Score.png" 
+                    alt="Enterprise"
+                    className="h-auto rounded-md object-cover w-1/2 mx-auto"
                   />
                 </div>
               </div>
@@ -312,43 +579,54 @@ const Features: React.FC = () => {
               <thead>
                 <tr className="border-b border-white/10">
                   <th className="text-left py-4 px-6 text-white font-semibold">Feature</th>
-                  <th className="text-center py-4 px-6 text-gray-300 font-semibold">Starter</th>
+                  <th className="text-center py-4 px-6 text-gray-300 font-semibold">Free</th>
                   <th className="text-center py-4 px-6 text-gray-300 font-semibold">Pro</th>
                   <th className="text-center py-4 px-6 text-gray-300 font-semibold">Enterprise</th>
                 </tr>
               </thead>
               <tbody>
                 {[
-                  { name: 'Result Publishing', starter: true, pro: true, enterprise: true },
-                  { name: 'CSV Import', starter: true, pro: true, enterprise: true },
-                  { name: 'Mobile App', starter: false, pro: true, enterprise: true },
-                  { name: 'Advanced Analytics', starter: false, pro: true, enterprise: true },
-                  { name: 'Social Sharing', starter: false, pro: true, enterprise: true },
+                  { name: 'Result Publishing & CSV Import', starter: true, pro: true, enterprise: true },
+                  { name: 'Student Analytics (5 reports)', starter: true, pro: true, enterprise: true },
+                  { name: 'Mobile App Access', starter: false, pro: true, enterprise: true },
+                  { name: 'Advanced Analytics (20+ reports)', starter: false, pro: true, enterprise: true },
+                  { name: 'At-Risk Student Detection', starter: false, pro: true, enterprise: true },
+                  { name: 'Achievement Graphics & Sharing', starter: false, pro: true, enterprise: true },
                   { name: 'Scratch Card Verification', starter: false, pro: false, enterprise: true },
+                  { name: 'Multi-School Management', starter: false, pro: false, enterprise: true },
+                  { name: 'Agent Referral Program', starter: false, pro: false, enterprise: true },
                   { name: 'API Access', starter: false, pro: false, enterprise: true },
-                  { name: 'Premium Support', starter: false, pro: false, enterprise: true },
+                  { name: 'Priority Support (SLA)', starter: false, pro: false, enterprise: true },
+                  { name: 'Dedicated Account Manager', starter: false, pro: false, enterprise: true },
+                  { name: 'Student Limit', starter: '100', pro: '2,000', enterprise: 'Unlimited' },
                 ].map((item, idx) => (
                   <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="py-4 px-6 text-gray-300">{item.name}</td>
                     <td className="text-center py-4 px-6">
-                      {item.starter ? (
+                      {item.starter === true ? (
                         <Check className="w-5 h-5 text-green-400 mx-auto" />
-                      ) : (
+                      ) : item.starter === false ? (
                         <div className="w-5 h-5 border border-gray-600 rounded mx-auto" />
+                      ) : (
+                        <span className="text-sm text-gray-300">{item.starter}</span>
                       )}
                     </td>
                     <td className="text-center py-4 px-6">
-                      {item.pro ? (
+                      {item.pro === true ? (
                         <Check className="w-5 h-5 text-green-400 mx-auto" />
-                      ) : (
+                      ) : item.pro === false ? (
                         <div className="w-5 h-5 border border-gray-600 rounded mx-auto" />
+                      ) : (
+                        <span className="text-sm text-gray-300">{item.pro}</span>
                       )}
                     </td>
                     <td className="text-center py-4 px-6">
-                      {item.enterprise ? (
+                      {item.enterprise === true ? (
                         <Check className="w-5 h-5 text-green-400 mx-auto" />
-                      ) : (
+                      ) : item.enterprise === false ? (
                         <div className="w-5 h-5 border border-gray-600 rounded mx-auto" />
+                      ) : (
+                        <span className="text-sm text-gray-300">{item.enterprise}</span>
                       )}
                     </td>
                   </tr>
@@ -377,21 +655,39 @@ const Features: React.FC = () => {
             {[
               {
                 title: 'Publishing Term Results',
-                description: 'Upload CSV files, auto-generate result slips, and distribute to parents in one click. What takes hours now takes minutes.',
-                steps: ['Upload results CSV', 'Auto-format documents', 'Email to parents', 'Archive for records'],
+                description: 'Upload CSV, auto-generate result slips in your school format, email to 500+ parents instantly. Zero manual work.',
+                steps: ['Upload results CSV', 'Select grading template', 'Auto-format documents', 'Email to parents'],
                 image: '/Results.png'
               },
               {
-                title: 'Parent Achievement Sharing',
-                description: 'Create branded achievement graphics automatically. Parents love sharing their child\'s success on social media.',
-                steps: ['Generate graphics', 'Customize branding', 'Parents share online', 'Track engagement'],
+                title: 'Identifying At-Risk Students',
+                description: 'System automatically flags students at-risk. See who needs help before they fall behind. Get intervention recommendations.',
+                steps: ['View risk dashboard', 'See 0-100 risk scores', 'Read recommendations', 'Plan interventions'],
+                image: '/LessonDashboard.png'
+              },
+              {
+                title: 'Parent Engagement',
+                description: 'Parents get push notifications when results publish. They can check child performance, see achievements, and download graphics for social media.',
+                steps: ['Parents get alerts', 'View analytics', 'Share achievements', 'Track progress'],
                 image: '/Social.png'
               },
               {
                 title: 'Result Verification',
-                description: 'Students use innovative scratch cards to check results. Gamified experience reduces anxious queries to admin.',
-                steps: ['Student login', 'Scratch virtual card', 'View results securely', 'Share with parents'],
+                description: 'Students scratch cards to check results. Gamified experience reduces admin burden by 80%. No more result queries.',
+                steps: ['Student login', 'Scratch virtual card', 'View results', 'Share with parents'],
                 image: '/video.png'
+              },
+              {
+                title: 'Financial Reporting',
+                description: 'Auto-generated invoices, tax calculations, usage tracking. Know exactly how many students you have vs plan limits.',
+                steps: ['View dashboard', 'Check usage vs limits', 'Download invoices', 'Track revenue'],
+                image: '/Payment.png'
+              },
+              {
+                title: 'Multi-School Operations',
+                description: 'Manage 10+ schools. Send network alerts, compare performance across schools, bulk operations in seconds.',
+                steps: ['SuperAdmin overview', 'View all schools', 'Compare performance', 'Bulk actions'],
+                image: '/Score.png'
               }
             ].map((useCase, idx) => (
               <div
@@ -441,50 +737,50 @@ const Features: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                title: 'Video Tutorials',
-                description: 'Step-by-step guides for every feature. Watch at your own pace.',
-                icon: '🎥',
-                image: '/video.png'
-              },
-              {
-                title: 'Live Support',
-                description: 'Chat with our team. Real people, real help. Available 9am-5pm GMT.',
+                title: 'Live Chat Support',
+                description: 'Chat with our team during business hours. Real people answering real questions about your setup.',
                 icon: '💬',
                 image: '/Social.png'
               },
               {
+                title: 'Video Tutorials',
+                description: 'Step-by-step video guides for CSV upload, analytics setup, parent engagement, and more.',
+                icon: '🎥',
+                image: '/video.png'
+              },
+              {
                 title: 'Knowledge Base',
-                description: 'Browse our extensive documentation and searchable article library.',
+                description: 'Browse 100+ articles covering every feature. Searchable, organized by topic, always updated.',
                 icon: '📚',
                 image: '/LessonDashboard.png'
               },
               {
-                title: 'Webinars & Training',
-                description: 'Weekly live sessions covering best practices and new features.',
+                title: 'Weekly Webinars',
+                description: 'Live sessions every week covering best practices, new features, and advanced use cases.',
                 icon: '🎓',
                 image: '/Results.png'
               },
               {
                 title: 'Email Support',
-                description: '24-hour response time for all support inquiries. Detailed solutions.',
+                description: '24-hour response time for all inquiries. Detailed solutions and personalized help.',
                 icon: '✉️',
                 image: '/Payment.png'
               },
               {
                 title: 'Community Forum',
-                description: 'Connect with other schools. Share tips and learn from peers.',
+                description: 'Connect with other schools. Share tips, ask questions, learn from peers.',
                 icon: '👥',
                 image: '/Score.png'
               },
               {
                 title: 'Onboarding Sessions',
-                description: 'Get personalized setup assistance from our implementation team.',
+                description: 'Get personalized setup help from our implementation team. We walk you through everything.',
                 icon: '🚀',
                 image: '/Results.png'
               },
               {
-                title: 'Dedicated Account Manager',
-                description: 'Enterprise clients get a dedicated point of contact for everything.',
+                title: 'Dedicated Manager',
+                description: 'Enterprise clients get a dedicated account manager for all your needs.',
                 icon: '⭐',
                 image: '/Social.png'
               }
@@ -530,36 +826,52 @@ const Features: React.FC = () => {
           <div className="space-y-4">
             {[
               {
-                q: 'How long does it take to set up Results Pro?',
-                a: 'Most schools are up and running within 24-48 hours. Our implementation team handles the CSV import and customization. You can start publishing results on day one.'
+                q: 'How do I upload results?',
+                a: 'Download the CSV template (adapts to your grading system automatically). Upload in bulk for all classes at once. The system validates everything and flags errors. No coding needed.'
               },
               {
-                q: 'Is Results Pro secure? What about data privacy?',
-                a: 'Yes. We use end-to-end encryption, role-based access controls, and maintain full GDPR compliance. All data is backed up daily and stored securely on enterprise-grade servers.'
+                q: 'Can I use my own grading system?',
+                a: 'Yes! We support WASSCE, NABTEB, NECO, and custom systems. Configure once during setup, and it auto-applies to all future uploads.'
               },
               {
-                q: 'Can teachers upload results themselves?',
-                a: 'Yes! Teachers can use our intuitive CSV template or upload directly through the dashboard. No coding knowledge needed. Our system validates data automatically.'
+                q: 'Do teachers need accounts?',
+                a: 'Nope. Teachers upload CSV files, that\'s it. No password resets, no login issues, no admin burden managing teacher accounts.'
               },
               {
-                q: 'What if we have an issue during result publishing?',
-                a: 'Our support team is available 24/7. Enterprise clients get priority support with a 1-hour response guarantee. We also have automated failover systems to prevent interruptions.'
+                q: 'How are at-risk students identified?',
+                a: 'Our AI analyzes scores below 50%, attendance below 70%, declining trends, and weak subjects. Gives each student a 0-100 risk score. Includes intervention recommendations.'
               },
               {
-                q: 'Can we integrate Results Pro with our school\'s existing system?',
-                a: 'Yes. We offer API access and integrations with popular LMS platforms, attendance systems, and payment gateways. Contact us for custom integration options.'
+                q: 'Is the mobile app free?',
+                a: 'Yes. Available on iOS and Android for free. Parents get push notifications when results publish, offline access, and full analytics.'
               },
               {
-                q: 'What happens to our data if we stop using Results Pro?',
-                a: 'Your data is always yours. We can export everything to CSV format at any time. You have full control and can migrate away anytime without penalties.'
+                q: 'What payment methods do you accept?',
+                a: 'Paystack integration handles cards, bank transfers, and mobile money. All Nigerian payment methods supported.'
               },
               {
-                q: 'Do you offer discounts for multiple schools?',
-                a: 'Yes. School districts and education groups qualify for volume discounts. Contact our sales team for a custom quote.'
+                q: 'Can we use this for multiple schools?',
+                a: 'Yes! Enterprise plan allows unlimited schools on one dashboard. Network alerts, bulk operations, cross-school analytics all included.'
               },
               {
-                q: 'Can parents check results on mobile?',
-                a: 'Absolutely. We have native iOS and Android apps plus a responsive mobile web version. Parents can check results, view analytics, and share achievements from anywhere.'
+                q: 'What if we have payment issues?',
+                a: 'Enterprise clients get dedicated account managers with 1-hour response SLA. For other plans, our support team responds within 24 hours.'
+              },
+              {
+                q: 'Is data secure?',
+                a: 'End-to-end encryption, GDPR compliant, role-based access control, daily automatic backups, and one-click data export. Your data is always yours.'
+              },
+              {
+                q: 'Can agents earn commissions?',
+                a: 'Yes! Join our referral program and earn 15-25% per school. Get points, badges, and access a leaderboard. Multiple payout options.'
+              },
+              {
+                q: 'What support do you offer?',
+                a: 'Live chat during business hours, email (24-hour response), knowledge base with 100+ articles, weekly webinars, and video tutorials.'
+              },
+              {
+                q: 'Can we integrate with our existing system?',
+                a: 'Yes! RESTful API with full documentation, type-safe TypeScript, and integration examples. Custom integrations available for Enterprise.'
               }
             ].map((faq, idx) => (
               <div
@@ -587,10 +899,10 @@ const Features: React.FC = () => {
       <section className="relative py-20 px-4 md:px-8 bg-gradient-to-b from-black to-blue-950/20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to Experience All Features?
+            Ready to Transform Result Management?
           </h2>
           <p className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto">
-            Start your free trial today. No credit card required. Full access to all features for 30 days.
+            Publish results faster, identify at-risk students, engage parents, earn commissions. All in one unified platform.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/auth/register" className="glow-button items-center border shadow-[0_1px_3px_0_rgba(199,220,255,0.35)_inset,0_0_20px_0_rgba(198,204,255,0.20)_inset,0_1px_22px_0_rgba(255,255,255,0.10),0_4px_4px_0_rgba(0,0,0,0.05),0_10px_10px_0_rgba(0,0,0,0.10)] backdrop-blur-[10px] bg-[rgba(255,255,255,0.02)] flex gap-2 overflow-hidden px-6 py-3 rounded-lg border-solid border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors text-white text-sm font-medium inline-flex">

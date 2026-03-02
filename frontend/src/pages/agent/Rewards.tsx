@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Trophy, Star, Medal, Award, Zap, Crown } from '@/lib/hugeicons-compat';
+import { Trophy, Star, Medal, Award, Zap, Crown, BarChart01, Users, TrendingUp, DollarSign, Calendar, User, LogOut } from '@/lib/hugeicons-compat';
 import { useAgentRewards } from '@/hooks/useAgentAnalytics';
+import { useNavigate } from 'react-router-dom';
 
 const BADGE_ICONS: Record<string, React.ReactNode> = {
   FIRST_SCHOOL: <Star className="w-8 h-8 text-yellow-400" />,
@@ -13,6 +14,8 @@ const BADGE_ICONS: Record<string, React.ReactNode> = {
 };
 
 export const Rewards: React.FC = () => {
+  const navigate = useNavigate();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const { rewards, leaderboard, loading, fetchRewards, fetchLeaderboard } = useAgentRewards('');
   const [leaderboardLoading, setLeaderboardLoading] = useState(false);
 
@@ -23,9 +26,21 @@ export const Rewards: React.FC = () => {
   }, [fetchRewards, fetchLeaderboard]);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full bg-black text-white min-h-screen flex flex-col relative">
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <img
+          src="/Hero.png"
+          className="w-full h-full object-cover"
+          alt="Background"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black" />
+      </div>
+
+      <main className="relative z-10 flex-1 overflow-auto">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 py-12">
+          <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg p-6 text-white">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] p-6 text-white border border-[rgba(255,255,255,0.07)]">
         <h1 className="text-3xl font-bold mb-2">Rewards & Gamification</h1>
         <p className="text-gray-300">Track your points, badges, and ranking</p>
       </div>
@@ -34,29 +49,29 @@ export const Rewards: React.FC = () => {
         <>
           {/* Points Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg p-6 text-white border border-blue-700">
-              <div className="text-sm text-blue-200 mb-2">Current Balance</div>
+            <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] p-6 text-white border border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors">
+              <div className="text-sm text-gray-400 mb-2">Current Balance</div>
               <div className="text-4xl font-bold mb-4">{rewards.pointsBalance}</div>
-              <div className="text-xs text-blue-200">Points</div>
+              <div className="text-xs text-gray-400">Points</div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-lg p-6 text-white border border-purple-700">
-              <div className="text-sm text-purple-200 mb-2">Lifetime Points</div>
+            <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] p-6 text-white border border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors">
+              <div className="text-sm text-gray-400 mb-2">Lifetime Points</div>
               <div className="text-4xl font-bold mb-4">{rewards.lifetimePoints}</div>
-              <div className="text-xs text-purple-200">All Time</div>
+              <div className="text-xs text-gray-400">All Time</div>
             </div>
 
-            <div className="bg-gradient-to-br from-yellow-900 to-yellow-800 rounded-lg p-6 text-white border border-yellow-700">
-              <div className="text-sm text-yellow-200 mb-2">Leaderboard Rank</div>
+            <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] p-6 text-white border border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors">
+              <div className="text-sm text-gray-400 mb-2">Leaderboard Rank</div>
               <div className="text-4xl font-bold mb-4">
                 {rewards.leaderboardRank ? `#${rewards.leaderboardRank}` : '—'}
               </div>
-              <div className="text-xs text-yellow-200">Top Agents</div>
+              <div className="text-xs text-gray-400">Top Agents</div>
             </div>
           </div>
 
           {/* Badges Section */}
-          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+          <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] p-6 border border-[rgba(255,255,255,0.07)]">
             <h2 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-400" />
               Your Badges ({rewards.badges?.length || 0})
@@ -67,7 +82,7 @@ export const Rewards: React.FC = () => {
                 {rewards.badges.map((badge: any, idx: number) => (
                   <div
                     key={idx}
-                    className="text-center bg-slate-900 rounded p-4 border border-slate-700 hover:border-slate-600 transition"
+                    className="text-center bg-[rgba(0,0,0,0.40)] rounded-[20px] p-4 border border-[rgba(255,255,255,0.07)] hover:bg-white/5 transition-colors"
                   >
                     <div className="flex justify-center mb-2">
                       {BADGE_ICONS[badge.badgeType] || <Award className="w-8 h-8 text-gray-400" />}
@@ -85,22 +100,22 @@ export const Rewards: React.FC = () => {
           </div>
 
           {/* Points Breakdown */}
-          <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+          <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] p-6 border border-[rgba(255,255,255,0.07)]">
             <h2 className="text-lg font-semibold text-white mb-4">How Points Work</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-slate-900 rounded p-4 border border-slate-700">
+              <div className="bg-[rgba(0,0,0,0.40)] rounded-[20px] p-4 border border-[rgba(255,255,255,0.07)]">
                 <div className="text-blue-400 font-semibold text-sm mb-1">School Signup</div>
                 <div className="text-2xl font-bold text-white">50 pts</div>
               </div>
-              <div className="bg-slate-900 rounded p-4 border border-slate-700">
+              <div className="bg-[rgba(0,0,0,0.40)] rounded-[20px] p-4 border border-[rgba(255,255,255,0.07)]">
                 <div className="text-green-400 font-semibold text-sm mb-1">Referral Completed</div>
                 <div className="text-2xl font-bold text-white">100 pts</div>
               </div>
-              <div className="bg-slate-900 rounded p-4 border border-slate-700">
+              <div className="bg-[rgba(0,0,0,0.40)] rounded-[20px] p-4 border border-[rgba(255,255,255,0.07)]">
                 <div className="text-yellow-400 font-semibold text-sm mb-1">Referral Approved</div>
                 <div className="text-2xl font-bold text-white">150 pts</div>
               </div>
-              <div className="bg-slate-900 rounded p-4 border border-slate-700">
+              <div className="bg-[rgba(0,0,0,0.40)] rounded-[20px] p-4 border border-[rgba(255,255,255,0.07)]">
                 <div className="text-purple-400 font-semibold text-sm mb-1">Monthly Goal Hit</div>
                 <div className="text-2xl font-bold text-white">300 pts</div>
               </div>
@@ -110,8 +125,8 @@ export const Rewards: React.FC = () => {
       )}
 
       {/* Leaderboard */}
-      <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden">
-        <div className="p-6 border-b border-slate-700">
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[30px] border border-[rgba(255,255,255,0.07)] overflow-hidden">
+        <div className="p-6 border-b border-[rgba(255,255,255,0.07)]">
           <h2 className="text-lg font-semibold text-white flex items-center gap-2">
             <Trophy className="w-5 h-5 text-yellow-400" />
             Top 100 Agents
@@ -125,7 +140,7 @@ export const Rewards: React.FC = () => {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-slate-900">
+              <thead className="bg-[rgba(0,0,0,0.40)]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-300">
                     Rank
@@ -144,9 +159,9 @@ export const Rewards: React.FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700">
+              <tbody className="divide-y divide-[rgba(255,255,255,0.07)]">
                 {leaderboard.map((agent: any, idx: number) => (
-                  <tr key={idx} className="hover:bg-slate-900/50 transition">
+                  <tr key={idx} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         {idx === 0 && <Trophy className="w-5 h-5 text-yellow-400" />}
@@ -180,6 +195,64 @@ export const Rewards: React.FC = () => {
             </table>
           </div>
         )}
+      </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 backdrop-blur-md border-t border-white/10" style={{
+        background: 'linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.05) 50%, rgba(0, 0, 0, 0.2) 100%)'
+      }}>
+        <div className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-center gap-2 py-4 flex-wrap">
+            {[
+              { label: 'Dashboard', icon: BarChart01, href: '/agent/dashboard' },
+              { label: 'Schools', icon: Users, href: '/agent/schools' },
+              { label: 'Referrals', icon: TrendingUp, href: '/agent/referrals' },
+              { label: 'Rewards', icon: Trophy, href: '/agent/rewards' },
+              { label: 'Withdrawals', icon: DollarSign, href: '/agent/withdrawals' },
+              { label: 'Plans', icon: Calendar, href: '/agent/subscription-plans' },
+              { label: 'Profile', icon: User, href: '/agent/profile' },
+              { label: 'Logout', icon: LogOut, href: '#logout' },
+            ].map((item) => {
+              const Icon = item.icon;
+              const active = window.location.pathname === item.href;
+              const isLogout = item.href === '#logout';
+              
+              return (
+                <div key={item.href} className="relative group">
+                  <button
+                    onClick={() => {
+                      if (isLogout) {
+                        localStorage.clear();
+                        navigate('/auth/login');
+                      } else {
+                        navigate(item.href);
+                      }
+                    }}
+                    onMouseEnter={() => setHoveredItem(item.href)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    className={`flex items-center justify-center w-12 h-12 rounded-full transition-all duration-200 ${
+                      active && !isLogout
+                        ? 'text-white bg-white/15 border border-white/30 shadow-lg shadow-blue-500/20'
+                        : isLogout
+                        ? 'text-red-400 hover:text-red-300 hover:bg-red-500/5 border border-transparent'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    }`}
+                  >
+                    <Icon size={24} strokeWidth={1.5} />
+                  </button>
+                  {hoveredItem === item.href && (
+                    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-black/90 text-white text-xs py-1 px-2 rounded whitespace-nowrap pointer-events-none border border-white/10">
+                      {item.label}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

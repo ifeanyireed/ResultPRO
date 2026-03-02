@@ -1,5 +1,5 @@
-import { prisma } from '../../../lib/prisma';
-import { PasswordHelper } from '../../../helpers/password.helper';
+import { prisma } from '@lib/prisma';
+import { PasswordHelper } from '@utils/helpers/password.helper';
 
 class TeachersService {
   /**
