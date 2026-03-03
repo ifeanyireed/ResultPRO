@@ -190,8 +190,14 @@ export class SuperAdminController {
    */
   static async createAgent(req: Request, res: Response) {
     try {
-      const { email, firstName, lastName, specialization } = req.body;
-      const agent = await superAdminService.createAgent({ email, firstName, lastName, specialization });
+      const { email, firstName, lastName, state, subscriptionTier } = req.body;
+      const agent = await superAdminService.createAgent({
+        email,
+        firstName,
+        lastName,
+        state,
+        subscriptionTier,
+      });
 
       res.json({ success: true, data: agent });
     } catch (error: any) {
@@ -251,8 +257,14 @@ export class SuperAdminController {
    */
   static async bulkInviteAgents(req: Request, res: Response) {
     try {
-      const { emails, department, message } = req.body;
-      const result = await superAdminService.bulkInviteUsers(emails, 'AGENT', { department, message });
+      const { emails, agents, state, tier, message } = req.body;
+      // Support both old format (emails array) and new format (agents array with names)
+      const agentsData = agents || emails?.map((email: string) => ({ email })) || [];
+      const result = await superAdminService.bulkInviteUsers(agentsData, 'AGENT', {
+        state,
+        tier,
+        message,
+      });
 
       res.json({ success: true, data: result });
     } catch (error: any) {

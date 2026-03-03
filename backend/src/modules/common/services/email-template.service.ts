@@ -13,10 +13,19 @@ export class EmailTemplateService {
 
   private static getLogoHtml(): string {
     return this.logoUrl 
-      ? `<div style="display: inline-block; background: white; padding: 12px 16px; border-radius: 12px; margin-bottom: 16px;">
-           <img src="${this.logoUrl}" alt="Results Pro Logo" style="max-width: 40px; height: auto; display: block;" />
-         </div>`
-      : '<h1 style="color: #3b82f6; margin: 0 0 16px 0; font-size: 24px; font-weight: 700;">Results Pro</h1>';
+      ? `<img src="${this.logoUrl}" alt="Results Pro Logo" style="max-width: 50px; height: auto; margin-bottom: 12px; display: block;" />`
+      : '';
+  }
+
+  private static getHeaderContent(title: string): string {
+    return `
+      <div style="margin-bottom: 8px;">
+        ${this.getLogoHtml()}
+        <h1 style="color: white; font-size: 28px; margin: 0 0 8px 0; font-weight: 600; letter-spacing: -0.5px;">Results Pro</h1>
+      </div>
+      <h2 style="color: #60a5fa; font-size: 16px; margin: 0 0 12px 0; font-weight: 500; letter-spacing: -0.3px;">Effortless results management</h2>
+      <h3 style="color: #d1d5db; font-size: 18px; margin: 0; font-weight: 600; letter-spacing: -0.3px;">${title}</h3>
+    `;
   }
 
   private static getTemplateContent(title: string, content: string): string {
@@ -36,8 +45,7 @@ export class EmailTemplateService {
             <div style="position: relative; padding: 40px 30px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.07); background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(26, 26, 26, 0.4) 100%); overflow: hidden;">
                 <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(30, 64, 175, 0.05) 100%); pointer-events: none;"></div>
                 <div style="position: relative; z-index: 1;">
-                    ${this.getLogoHtml()}
-                    <h1 style="color: white; font-size: 28px; margin: 0; font-weight: 600; letter-spacing: -0.5px;">${title}</h1>
+                    ${this.getHeaderContent(title)}
                 </div>
             </div>
 
@@ -322,5 +330,61 @@ export class EmailTemplateService {
         </p>
     `;
     return this.getTemplateContent('Verification Documents Received', content);
+  }
+
+  static generateAgentInvitationEmail(email: string, tempPassword: string, department?: string): string {
+    const loginUrl = 'https://app.scholars.ng/auth/login';
+    const content = `
+        <p style="margin: 0 0 20px 0; font-size: 16px; color: #e5e7eb;">
+            Welcome to <strong style="color: #60a5fa;">Results Pro</strong>!
+        </p>
+        <p style="margin: 0 0 24px 0; font-size: 14px; color: #d1d5db;">
+            You have been invited to join our platform as an <strong>Agent</strong>${department ? ` in the <strong>${department}</strong> department` : ''}. We're excited to have you on board!
+        </p>
+        
+        <!-- Login Credentials -->
+        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(30, 64, 175, 0.2) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 15px; padding: 24px; margin: 30px 0;">
+            <p style="margin: 0 0 16px 0; color: #9ca3af; font-size: 12px; letter-spacing: 1px; text-transform: uppercase;">
+                Your Login Credentials
+            </p>
+            <p style="margin: 0 0 12px 0; font-size: 13px;">
+                <strong style="color: #d1d5db;">Email:</strong>
+                <span style="color: #9ca3af; font-family: 'Courier New', monospace; word-break: break-all;">${email}</span>
+            </p>
+            <p style="margin: 0; font-size: 13px;">
+                <strong style="color: #d1d5db;">Temporary Password:</strong>
+                <span style="color: #9ca3af; font-family: 'Courier New', monospace;">${tempPassword}</span>
+            </p>
+        </div>
+        
+        <!-- Action Button -->
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="${loginUrl}" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 15px; font-weight: 600; font-size: 14px; box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);">
+                Log In to Results Pro →
+            </a>
+        </div>
+        
+        <!-- Instructions -->
+        <div style="background: rgba(255, 255, 255, 0.03); border-left: 3px solid rgba(59, 130, 246, 0.5); border-radius: 8px; padding: 20px; margin: 24px 0;">
+            <p style="margin: 0 0 12px 0; color: #d1d5db; font-size: 13px; font-weight: 600;">
+                📋 Next Steps
+            </p>
+            <ol style="margin: 0; padding-left: 20px; color: #d1d5db; font-size: 13px;">
+                <li style="margin: 8px 0;">Visit the login page using the button above</li>
+                <li style="margin: 8px 0;">Enter your email and the temporary password provided above</li>
+                <li style="margin: 8px 0;">You'll be prompted to change your password on first login</li>
+                <li style="margin: 8px 0;">Start managing your agent dashboard</li>
+            </ol>
+        </div>
+        
+        <p style="margin: 0 0 12px 0; color: #9ca3af; font-size: 12px;">
+            💡 <strong>Tip:</strong> Keep your password secure and never share it with anyone.
+        </p>
+        
+        <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+            Questions? Contact our support team at <a href="mailto:support@resultspro.ng" style="color: #60a5fa; text-decoration: none;">support@resultspro.ng</a>
+        </p>
+    `;
+    return this.getTemplateContent('Welcome to Results Pro', content);
   }
 }

@@ -92,6 +92,10 @@ export async function createApp(): Promise<Express> {
   const superAdminRoutes = await import('@modules/super-admin/routes/super-admin.routes');
   app.use('/api/super-admin', superAdminRoutes.default);
 
+  // Email Template Preview routes (for development/testing)
+  const previewRoutes = await import('@modules/super-admin/routes/preview.routes');
+  app.use('/api/preview', previewRoutes.default);
+
   // School routes (protected)
   app.use('/api/schools', authMiddleware, onboardingRoutes.default);
 

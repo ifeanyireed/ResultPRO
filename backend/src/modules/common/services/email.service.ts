@@ -58,6 +58,16 @@ export class EmailService {
     );
     await sendMail('resultspro@scholars.ng', subject, html);
   }
+
+  async sendAgentInvitationEmail(
+    email: string,
+    tempPassword: string,
+    department?: string
+  ): Promise<void> {
+    const subject = 'Welcome to Results Pro - Your Agent Account Details';
+    const html = EmailTemplateService.generateAgentInvitationEmail(email, tempPassword, department);
+    await sendMail(email, subject, html);
+  }
 }
 
 export const emailService = new EmailService();

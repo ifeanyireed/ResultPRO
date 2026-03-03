@@ -353,9 +353,9 @@ export class SuperAdminService {
 
       if (filters?.search) {
         where.OR = [
-          { email: { contains: filters.search, mode: 'insensitive' } },
-          { firstName: { contains: filters.search, mode: 'insensitive' } },
-          { lastName: { contains: filters.search, mode: 'insensitive' } },
+          { email: { contains: filters.search } },
+          { firstName: { contains: filters.search } },
+          { lastName: { contains: filters.search } },
         ];
       }
 
@@ -369,6 +369,7 @@ export class SuperAdminService {
           skip: offset,
           take: limit,
           orderBy: { createdAt: 'desc' },
+          include: { agent: true },
         }),
         prisma.user.count({ where }),
       ]);
@@ -406,12 +407,18 @@ export class SuperAdminService {
   /**
    * Create new agent
    */
-  async createAgent(data: { email: string; firstName?: string; lastName?: string; specialization?: string }) {
+  async createAgent(data: {
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    state?: string;
+    subscriptionTier?: string;
+  }) {
     try {
       const tempPassword = this.generateTempPassword();
       const hashedPassword = await PasswordHelper.hashPassword(tempPassword);
 
-      const agent = await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
           email: data.email,
           firstName: data.firstName || '',
@@ -423,10 +430,22 @@ export class SuperAdminService {
         },
       });
 
+      // Create Agent record with subscription tier and state
+      const agent = await prisma.agent.create({
+        data: {
+          userId: user.id,
+          specialization: data.state || 'Lagos',
+          subscriptionTier: data.subscriptionTier || 'Free',
+          verificationStatus: 'PENDING',
+          uniqueReferralCode: `AGENT-${user.id.substring(0, 8).toUpperCase()}`,
+        },
+        include: { user: true },
+      });
+
       // Send invitation email (optional)
       // await this.emailService.sendInvitationEmail(data.email, tempPassword);
 
-      return agent;
+      return { ...agent, ...user };
     } catch (error) {
       throw error;
     }
@@ -485,9 +504,9 @@ export class SuperAdminService {
 
       if (filters?.search) {
         where.OR = [
-          { email: { contains: filters.search, mode: 'insensitive' } },
-          { firstName: { contains: filters.search, mode: 'insensitive' } },
-          { lastName: { contains: filters.search, mode: 'insensitive' } },
+          { email: { contains: filters.search } },
+          { firstName: { contains: filters.search } },
+          { lastName: { contains: filters.search } },
         ];
       }
 
@@ -628,30 +647,57 @@ export class SuperAdminService {
   /**
    * Bulk invite users
    */
-  async bulkInviteUsers(emails: string[], role: string, options?: { department?: string; message?: string }) {
+  async bulkInviteUsers(
+    agentsData: any[],
+    role: string,
+    options?: { state?: string; tier?: string; message?: string }
+  ) {
     try {
       const results = { success: 0, failed: 0, errors: [] as any[] };
       const tempPassword = this.generateTempPassword();
       const hashedPassword = await PasswordHelper.hashPassword(tempPassword);
 
-      for (const email of emails) {
+      for (const agentData of agentsData) {
         try {
-          await prisma.user.create({
+          const email = typeof agentData === 'string' ? agentData : agentData.email;
+          const firstName = typeof agentData === 'object' ? agentData.firstName || '' : '';
+          const lastName = typeof agentData === 'object' ? agentData.lastName || '' : '';
+
+          const user = await prisma.user.create({
             data: {
               email,
+              firstName,
+              lastName,
               passwordHash: hashedPassword,
               role,
               status: 'ACTIVE',
               firstLogin: true,
             },
           });
+
+          // Create Agent record if role is AGENT
+          if (role === 'AGENT') {
+            await prisma.agent.create({
+              data: {
+                userId: user.id,
+                specialization: options?.state || 'Lagos',
+                subscriptionTier: options?.tier || 'Free',
+                verificationStatus: 'PENDING',
+                uniqueReferralCode: `AGENT-${user.id.substring(0, 8).toUpperCase()}`,
+              },
+            });
+          }
+
           results.success++;
 
-          // Send invitation email (optional)
-          // await this.emailService.sendInvitationEmail(email, tempPassword, { role, department: options?.department });
+          // Send invitation email
+          await this.emailService.sendAgentInvitationEmail(email, tempPassword, options?.state);
         } catch (error: any) {
           results.failed++;
-          results.errors.push({ email, error: error.message });
+          results.errors.push({
+            email: typeof agentData === 'string' ? agentData : agentData.email,
+            error: error.message,
+          });
         }
       }
 
