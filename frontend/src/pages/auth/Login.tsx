@@ -83,9 +83,9 @@ const Login: React.FC = () => {
       }
 
       if (userRole === 'TEACHER') {
-        console.log('👨‍🏫 Teacher detected, redirecting to /school-admin/overview');
+        console.log('👨‍🏫 Teacher detected, redirecting to /teacher/dashboard');
         setLoading(false);
-        navigate('/school-admin/overview');
+        navigate('/teacher/dashboard');
         return;
       }
 

@@ -21,6 +21,7 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
+  Loader2,
   MessageSquare,
   Send,
   X,
@@ -262,133 +263,119 @@ const SupportAgentDashboard: React.FC = () => {
           <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Support Tickets</h1>
-        <p className="text-gray-600 mt-2">Manage and respond to your assigned tickets</p>
+        <h1 className="text-3xl font-bold text-white">My Support Tickets</h1>
+        <p className="text-gray-400 mt-2">Manage and respond to your assigned tickets</p>
       </div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-gray-600">{stats.total}</div>
-              <p className="text-sm text-gray-600 mt-1">Total Assigned</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6 hover:bg-white/5 transition-colors">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-white">{stats.total}</div>
+            <p className="text-sm text-gray-400 mt-1">Total Assigned</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">{stats.open}</div>
-              <p className="text-sm text-gray-600 mt-1">Open</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6 hover:bg-white/5 transition-colors">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-blue-400">{stats.open}</div>
+            <p className="text-sm text-gray-400 mt-1">Open</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-600">{stats.pending}</div>
-              <p className="text-sm text-gray-600 mt-1">Pending</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6 hover:bg-white/5 transition-colors">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-yellow-400">{stats.pending}</div>
+            <p className="text-sm text-gray-400 mt-1">Pending</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">{stats.inProgress}</div>
-              <p className="text-sm text-gray-600 mt-1">In Progress</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6 hover:bg-white/5 transition-colors">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-purple-400">{stats.inProgress}</div>
+            <p className="text-sm text-gray-400 mt-1">In Progress</p>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">{stats.resolved}</div>
-              <p className="text-sm text-gray-600 mt-1">Resolved</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6 hover:bg-white/5 transition-colors">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-400">{stats.resolved}</div>
+            <p className="text-sm text-gray-400 mt-1">Resolved</p>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Filter by Status
-              </label>
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium text-white mb-2 block">
+              Filter by Status
+            </label>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-[rgba(0,0,0,0.40)] border-[rgba(255,255,255,0.07)] text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">All Statuses</SelectItem>
-                  <SelectItem value="OPEN">Open</SelectItem>
-                  <SelectItem value="PENDING">Pending</SelectItem>
-                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                  <SelectItem value="RESOLVED">Resolved</SelectItem>
-                  <SelectItem value="CLOSED">Closed</SelectItem>
+                <SelectContent className="bg-[rgba(20,20,20,0.95)] border-[rgba(255,255,255,0.07)]">
+                  <SelectItem value="ALL" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">All Statuses</SelectItem>
+                  <SelectItem value="OPEN" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">Open</SelectItem>
+                  <SelectItem value="PENDING" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">Pending</SelectItem>
+                  <SelectItem value="IN_PROGRESS" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">In Progress</SelectItem>
+                  <SelectItem value="RESOLVED" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">Resolved</SelectItem>
+                  <SelectItem value="CLOSED" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">Closed</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Filter by Priority
-              </label>
+          <div>
+            <label className="text-sm font-medium text-white mb-2 block">
+              Filter by Priority
+            </label>
               <Select value={filterPriority} onValueChange={setFilterPriority}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-[rgba(0,0,0,0.40)] border-[rgba(255,255,255,0.07)] text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">All Priorities</SelectItem>
-                  <SelectItem value="LOW">Low</SelectItem>
-                  <SelectItem value="MEDIUM">Medium</SelectItem>
-                  <SelectItem value="HIGH">High</SelectItem>
-                  <SelectItem value="CRITICAL">Critical</SelectItem>
+                <SelectContent className="bg-[rgba(20,20,20,0.95)] border-[rgba(255,255,255,0.07)]">
+                  <SelectItem value="ALL" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">All Priorities</SelectItem>
+                  <SelectItem value="LOW" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">Low</SelectItem>
+                  <SelectItem value="MEDIUM" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">Medium</SelectItem>
+                  <SelectItem value="HIGH" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">High</SelectItem>
+                  <SelectItem value="CRITICAL" className="text-white hover:bg-white/20 hover:text-black focus:bg-white/20 focus:text-black">Critical</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Tickets List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Assigned Tickets ({tickets.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <LoadingSpinner size="lg" text="Loading tickets..." />
-            </div>
-          ) : tickets.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No tickets assigned to you at the moment
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {tickets.map((ticket) => (
-                <button
-                  key={ticket.id}
-                  onClick={() => {
-                    setSelectedTicket(ticket);
-                    setDialogOpen(true);
-                  }}
-                  className="w-full text-left p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+      <div className="bg-[rgba(255,255,255,0.02)] rounded-[20px] border border-[rgba(255,255,255,0.07)] p-6">
+        <h2 className="text-xl font-bold text-white mb-6">Assigned Tickets ({tickets.length})</h2>
+        <div>
+        {loading ? (
+          <div className="flex justify-center py-8">
+            <LoadingSpinner size="lg" text="Loading tickets..." />
+          </div>
+        ) : tickets.length === 0 ? (
+          <div className="text-center py-8 text-gray-400">
+            No tickets assigned to you at the moment
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {tickets.map((ticket) => (
+              <button
+                key={ticket.id}
+                onClick={() => {
+                  setSelectedTicket(ticket);
+                  setDialogOpen(true);
+                }}
+                className="w-full text-left p-4 border border-[rgba(255,255,255,0.07)] rounded-lg hover:bg-white/5 transition-colors bg-[rgba(0,0,0,0.20)]"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-mono text-sm font-semibold text-blue-600">
-                          {ticket.ticketNumber}
-                        </span>
+                  <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-mono text-sm font-semibold text-blue-400">
+                      {ticket.ticketNumber}
+                    </span>
                         <Badge className={`text-xs ${getStatusColor(ticket.status)}`}>
                           <span className="mr-1">{getStatusIcon(ticket.status)}</span>
                           {ticket.status}
@@ -398,10 +385,10 @@ const SupportAgentDashboard: React.FC = () => {
                         </Badge>
                       </div>
 
-                      <h3 className="font-semibold text-lg text-gray-900 mb-1">{ticket.title}</h3>
-                      <p className="text-sm text-gray-600 line-clamp-2">{ticket.description}</p>
+                    <h3 className="font-semibold text-lg text-white mb-1">{ticket.title}</h3>
+                    <p className="text-sm text-gray-400 line-clamp-2">{ticket.description}</p>
 
-                      <div className="flex items-center gap-6 mt-3 text-xs text-gray-600">
+                    <div className="flex items-center gap-6 mt-3 text-xs text-gray-400">
                         <span>📍 {ticket.school.name}</span>
                         <span>👤 {ticket.createdBy.name}</span>
                         <span className="flex items-center gap-1">
@@ -414,39 +401,39 @@ const SupportAgentDashboard: React.FC = () => {
                             hour: '2-digit',
                             minute: '2-digit',
                           })}
-                        </span>
-                      </div>
+                      </span>
                     </div>
-
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedTicket(ticket);
-                        setDialogOpen(true);
-                      }}
-                      size="sm"
-                      variant="outline"
-                    >
-                      View
-                    </Button>
                   </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTicket(ticket);
+                      setDialogOpen(true);
+                    }}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    View
+                  </Button>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+        </div>
+      </div>
 
       {/* Ticket Detail Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-96 overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-96 overflow-y-auto bg-[rgba(20,20,20,0.95)] border-[rgba(255,255,255,0.07)] text-white">
           {selectedTicket && (
             <>
-              <DialogHeader>
-                <div className="flex items-baseline justify-between w-full pr-8">
-                  <div>
-                    <DialogTitle className="text-2xl">{selectedTicket.title}</DialogTitle>
-                    <p className="text-sm text-gray-600 mt-1">{selectedTicket.ticketNumber}</p>
+            <DialogHeader>
+              <div className="flex items-baseline justify-between w-full pr-8">
+                <div>
+                  <DialogTitle className="text-2xl text-white">{selectedTicket.title}</DialogTitle>
+                  <p className="text-sm text-gray-400 mt-1">{selectedTicket.ticketNumber}</p>
                   </div>
                   <Badge className={`text-xs ${getStatusColor(selectedTicket.status)}`}>
                     {selectedTicket.status}
@@ -454,125 +441,125 @@ const SupportAgentDashboard: React.FC = () => {
                 </div>
               </DialogHeader>
 
-              <div className="space-y-4">
-                {/* Ticket Details Card */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-blue-100">
-                  <div className="grid grid-cols-2 gap-4 mb-3">
-                    <div>
-                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Priority
-                      </p>
+            <div className="space-y-4">
+              {/* Ticket Details Card */}
+              <div className="bg-[rgba(255,255,255,0.02)] p-4 rounded-lg border border-[rgba(255,255,255,0.07)]">
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Priority
+                  </p>
                       <Badge className={`mt-1 ${getPriorityColor(selectedTicket.priority)}`}>
                         {selectedTicket.priority}
                       </Badge>
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Category
-                      </p>
-                      <p className="text-sm font-medium text-gray-900 mt-1">
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Category
+                  </p>
+                  <p className="text-sm font-medium text-white mt-1">
                         {selectedTicket.category}
                       </p>
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-blue-200">
-                    <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">
-                      From
-                    </p>
-                    <p className="text-sm text-gray-900">
-                      {selectedTicket.createdBy.name}{' '}
-                      <span className="text-gray-500">({selectedTicket.createdBy.email})</span>
-                    </p>
-                    <p className="text-xs text-gray-600 mt-2">
-                      School: {selectedTicket.school.name}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-2">Description</h4>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {selectedTicket.description}
-                  </p>
-                </div>
-
-                {/* Messages */}
-                <div>
-                  <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4" />
-                    Conversation ({selectedTicket.messages.length})
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg p-4 max-h-48 overflow-y-auto space-y-3">
-                    {selectedTicket.messages.length === 0 ? (
-                      <p className="text-sm text-gray-500 text-center py-4">No messages yet</p>
-                    ) : (
-                      selectedTicket.messages.map((msg) => (
-                        <div key={msg.id} className="bg-white p-3 rounded-lg border border-gray-200">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-sm text-gray-900">
-                              {msg.sender.name}
-                              <span className="text-xs text-gray-500 ml-2">({msg.sender.role})</span>
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {new Date(msg.createdAt).toLocaleDateString()}{' '}
-                              {new Date(msg.createdAt).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
-                            </span>
-                          </div>
-                          <p className="text-sm text-gray-700">{msg.content}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                {/* Reply Section */}
-                <div className="space-y-2 pt-4 border-t">
-                  <label className="text-sm font-semibold text-gray-700">Send Reply</label>
-                  <Textarea
-                    placeholder="Type your response to the customer..."
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
-                    className="resize-none h-20 border-gray-300"
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={sendingMessage || !messageInput.trim()}
-                    className="w-full"
-                  >
-                    <Send className="w-4 h-4 mr-2" />
-                    {sendingMessage ? 'Sending...' : 'Send Reply'}
-                  </Button>
-                </div>
-
-                {/* Status Update */}
-                <div className="pt-4 border-t">
-                  <label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    Update Status
-                  </label>
-                  <Select
-                    value={selectedTicket.status}
-                    onValueChange={handleStatusChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="OPEN">Open</SelectItem>
-                      <SelectItem value="PENDING">Pending</SelectItem>
-                      <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-                      <SelectItem value="RESOLVED">Resolved</SelectItem>
-                      <SelectItem value="CLOSED">Closed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="pt-3 border-t border-[rgba(255,255,255,0.07)]">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                  From
+                </p>
+                <p className="text-sm text-white">
+                  {selectedTicket.createdBy.name}{' '}
+                  <span className="text-gray-400">({selectedTicket.createdBy.email})</span>
+                </p>
+                <p className="text-xs text-gray-400 mt-2">
+                  School: {selectedTicket.school.name}
+                </p>
               </div>
-            </>
-          )}
+            </div>
+
+            {/* Description */}
+            <div>
+              <h4 className="font-semibold text-white mb-2">Description</h4>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                {selectedTicket.description}
+              </p>
+            </div>
+
+            {/* Messages */}
+            <div>
+              <h4 className="font-semibold text-white mb-3 flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Conversation ({selectedTicket.messages.length})
+              </h4>
+              <div className="bg-[rgba(0,0,0,0.40)] rounded-lg p-4 max-h-48 overflow-y-auto space-y-3 border border-[rgba(255,255,255,0.07)]">
+                {selectedTicket.messages.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-4">No messages yet</p>
+                ) : (
+                  selectedTicket.messages.map((msg) => (
+                    <div key={msg.id} className="bg-[rgba(255,255,255,0.05)] p-3 rounded-lg border border-[rgba(255,255,255,0.07)]">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-sm text-white">
+                          {msg.sender.name}
+                          <span className="text-xs text-gray-400 ml-2">({msg.sender.role})</span>
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {new Date(msg.createdAt).toLocaleDateString()}{' '}
+                          {new Date(msg.createdAt).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-300">{msg.content}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Reply Section */}
+            <div className="space-y-2 pt-4 border-t border-[rgba(255,255,255,0.07)]">
+              <label className="text-sm font-semibold text-white">Send Reply</label>
+              <Textarea
+                placeholder="Type your response to the customer..."
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                className="resize-none h-20 border-[rgba(255,255,255,0.07)] bg-[rgba(0,0,0,0.40)] text-white placeholder:text-gray-500"
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={sendingMessage || !messageInput.trim()}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                {sendingMessage ? 'Sending...' : 'Send Reply'}
+              </Button>
+            </div>
+
+            {/* Status Update */}
+            <div className="pt-4 border-t border-[rgba(255,255,255,0.07)]">
+              <label className="text-sm font-semibold text-white mb-2 block">
+                Update Status
+              </label>
+              <Select
+                value={selectedTicket.status}
+                onValueChange={handleStatusChange}
+              >
+                <SelectTrigger className="bg-[rgba(0,0,0,0.40)] border-[rgba(255,255,255,0.07)] text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-[rgba(20,20,20,0.95)] border-[rgba(255,255,255,0.07)]">
+                  <SelectItem value="OPEN">Open</SelectItem>
+                  <SelectItem value="PENDING">Pending</SelectItem>
+                  <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                  <SelectItem value="RESOLVED">Resolved</SelectItem>
+                  <SelectItem value="CLOSED">Closed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            </div>
+          </>
+        )}
         </DialogContent>
       </Dialog>
           </div>
@@ -587,7 +574,7 @@ const SupportAgentDashboard: React.FC = () => {
           <div className="flex items-center justify-center gap-2 py-4 flex-wrap">
             {[
               { label: 'Dashboard', icon: BarChart01, href: '/support-agent/dashboard' },
-              { label: 'Profile', icon: User, href: '/support-agent/dashboard' },
+              { label: 'Profile', icon: User, href: '/support-agent/profile' },
               { label: 'Logout', icon: LogOut, href: '#logout' },
             ].map((item) => {
               const Icon = item.icon;

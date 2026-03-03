@@ -28,8 +28,10 @@ export class ParentAnalyticsService {
         },
       });
 
+      // Return empty array if parent profile doesn't exist yet
       if (!parent) {
-        throw new Error("Parent profile not found");
+        console.warn(`No parent profile found for userId: ${userId}`);
+        return [];
       }
 
       return parent.students.map((student: any) => ({
@@ -42,6 +44,7 @@ export class ParentAnalyticsService {
         schoolName: student.school.name,
       }));
     } catch (error) {
+      console.error('Error in getParentChildren:', error);
       throw error;
     }
   }
@@ -326,60 +329,86 @@ export class ParentAnalyticsService {
         },
       });
 
+      // Return empty dashboard if parent profile doesn't exist yet
       if (!parent) {
-        throw new Error("Parent profile not found");
+        const user = await prisma.user.findUnique({
+          where: { id: userId },
+        });
+
+        return {
+          parentName: user?.fullName || user?.firstName || "Parent",
+          totalChildren: 0,
+          children: [],
+          alerts: {
+            critical: 0,
+            high: 0,
+            medium: 0,
+          },
+        };
       }
 
       // Get latest results for all children
       const childrenSummaries = await Promise.all(
         parent.students.map(async (student: any) => {
-          const latestResult = await prisma.studentResult.findFirst({
-            where: { studentId: student.id },
-            orderBy: { createdAt: "desc" },
-          });
+          try {
+            const latestResult = await prisma.studentResult.findFirst({
+              where: { studentId: student.id },
+              orderBy: { createdAt: "desc" },
+            });
 
-          if (!latestResult) {
+            if (!latestResult) {
+              return {
+                studentId: student.id,
+                studentName: student.name,
+                className: student.class.name,
+                average: 0,
+                position: 0,
+                status: "NO_DATA",
+              };
+            }
+
+            // Get class metrics for risk score
+            const classResults = await prisma.studentResult.findMany({
+              where: {
+                classId: student.classId,
+                sessionId: latestResult.sessionId,
+                termId: latestResult.termId,
+              },
+            });
+
+            const classAverages = classResults.map(
+              (r: any) => r.overallAverage || 0,
+            );
+            const riskScore = await RiskScoreService.calculateStudentRiskScore(
+              latestResult,
+              {
+                average: StatisticsUtils.mean(classAverages),
+                median: StatisticsUtils.median(classAverages),
+                stdDev: StatisticsUtils.stdDeviation(classAverages),
+              },
+              [],
+            );
+
+            return {
+              studentId: student.id,
+              studentName: student.name,
+              className: student.class.name,
+              average: latestResult.overallAverage || 0,
+              position: latestResult.overallPosition || 0,
+              riskLevel: riskScore.riskLevel,
+              status: "OK",
+            };
+          } catch (studentError) {
+            console.error(`Error processing student ${student.id}:`, studentError);
             return {
               studentId: student.id,
               studentName: student.name,
               className: student.class.name,
               average: 0,
               position: 0,
-              status: "NO_DATA",
+              status: "ERROR",
             };
           }
-
-          // Get class metrics for risk score
-          const classResults = await prisma.studentResult.findMany({
-            where: {
-              classId: student.classId,
-              sessionId: latestResult.sessionId,
-              termId: latestResult.termId,
-            },
-          });
-
-          const classAverages = classResults.map(
-            (r: any) => r.overallAverage || 0,
-          );
-          const riskScore = await RiskScoreService.calculateStudentRiskScore(
-            latestResult,
-            {
-              average: StatisticsUtils.mean(classAverages),
-              median: StatisticsUtils.median(classAverages),
-              stdDev: StatisticsUtils.stdDeviation(classAverages),
-            },
-            [],
-          );
-
-          return {
-            studentId: student.id,
-            studentName: student.name,
-            className: student.class.name,
-            average: latestResult.overallAverage || 0,
-            position: latestResult.overallPosition || 0,
-            riskLevel: riskScore.riskLevel,
-            status: "OK",
-          };
         }),
       );
 
@@ -410,6 +439,11 @@ export class ParentAnalyticsService {
         },
       };
     } catch (error) {
+      console.error('Error in getParentDashboardOverview:', {
+        userId,
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
       throw error;
     }
   }

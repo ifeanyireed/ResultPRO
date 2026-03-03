@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Landing from "./pages/Landing";
+import AgentLanding from "./pages/AgentLanding";
 import Features from "./pages/Features";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
@@ -21,6 +22,7 @@ import PasswordResetConfirm from "./pages/auth/PasswordResetConfirm";
 import { OnboardingWizard } from "./pages/onboarding";
 import { PaymentComplete } from "./pages/PaymentComplete";
 import ProtectedSuperAdminRoute from "./components/ProtectedSuperAdminRoute";
+import ProtectedSupportAgentRoute from "./components/ProtectedSupportAgentRoute";
 import SuperAdminOverview from "./pages/super-admin/Overview";
 import SchoolVerifications from "./pages/super-admin/SchoolVerifications";
 import SchoolsManagement from "./pages/super-admin/SchoolsManagement";
@@ -34,6 +36,7 @@ import SystemSettings from "./pages/super-admin/Settings";
 import Support from "./pages/Support";
 import SuperAdminSupportDashboard from "./pages/super-admin/SupportDashboard";
 import SupportAgentDashboard from "./pages/SupportAgentDashboard";
+import SupportAgentProfile from "./pages/SupportAgentProfile";
 import NotificationsPage from "./pages/Notifications";
 import SuperAdminProfile from "./pages/super-admin/Profile";
 import SuperAdminNotifications from "./pages/super-admin/Notifications";
@@ -44,9 +47,25 @@ import BlogList from "./pages/blog/BlogList";
 import BlogPost from "./pages/blog/BlogPost";
 import BlogManagementCMS from "./pages/super-admin/BlogManagementCMS";
 import SchoolAdminLayout from "./components/SchoolAdminLayout";
+import TeacherDashboardLayout from "./components/TeacherDashboardLayout";
+import ParentDashboardLayout from "./components/ParentDashboardLayout";
 import SchoolRejected from "./pages/school-admin/SchoolRejected";
 import { Dashboard as AgentDashboard, Profile as AgentProfile, SchoolsManaged, Referrals, Rewards, Withdrawals, SubscriptionPlans } from "./pages/agent";
-import { ParentDashboard, ChildDetailPage } from "./pages/parent";
+import { 
+  ParentDashboard, 
+  ChildDetailPage, 
+  ParentPerformanceOverview,
+  ParentHolisticDevelopment,
+  ParentProfile
+} from "./pages/parent";
+import {
+  TeacherDashboard,
+  TeacherClassOverview,
+  TeacherAtRiskStudents,
+  TeacherCohortAnalysis,
+  TeacherStudentDetail,
+  TeacherProfile
+} from "./pages/teacher";
 import {
   Overview as SchoolOverview,
   SessionTermManagement,
@@ -80,6 +99,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/agents" element={<AgentLanding />} />
           <Route path="/features" element={<Features />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/about" element={<About />} />
@@ -114,7 +134,8 @@ const App = () => (
           <Route path="/super-admin/blog-management" element={<ProtectedSuperAdminRoute><BlogManagementCMS /></ProtectedSuperAdminRoute>} />
           
           {/* Support Agent Routes */}
-          <Route path="/support-agent/dashboard" element={<ProtectedSuperAdminRoute><SupportAgentDashboard /></ProtectedSuperAdminRoute>} />
+          <Route path="/support-agent/dashboard" element={<ProtectedSupportAgentRoute><SupportAgentDashboard /></ProtectedSupportAgentRoute>} />
+          <Route path="/support-agent/profile" element={<ProtectedSupportAgentRoute><SupportAgentProfile /></ProtectedSupportAgentRoute>} />
           
           {/* Agent Routes */}
           <Route path="/agent/dashboard" element={<AgentDashboard />} />
@@ -126,8 +147,19 @@ const App = () => (
           <Route path="/agent/subscription-plans" element={<SubscriptionPlans />} />
           
           {/* Parent Routes */}
-          <Route path="/parent/dashboard" element={<ParentDashboard />} />
+          <Route path="/parent/dashboard" element={<ParentDashboardLayout><ParentDashboard /></ParentDashboardLayout>} />
+          <Route path="/parent/profile" element={<ParentDashboardLayout><ParentProfile /></ParentDashboardLayout>} />
           <Route path="/parent/child/:childId" element={<ChildDetailPage />} />
+          <Route path="/parent/performance-overview/:childId" element={<ParentDashboardLayout><ParentPerformanceOverview /></ParentDashboardLayout>} />
+          <Route path="/parent/holistic-development/:childId" element={<ParentDashboardLayout><ParentHolisticDevelopment /></ParentDashboardLayout>} />
+          
+          {/* Teacher Routes */}
+          <Route path="/teacher/dashboard" element={<TeacherDashboardLayout><TeacherDashboard /></TeacherDashboardLayout>} />
+          <Route path="/teacher/profile" element={<TeacherDashboardLayout><TeacherProfile /></TeacherDashboardLayout>} />
+          <Route path="/teacher/class/:classId/overview" element={<TeacherDashboardLayout><TeacherClassOverview /></TeacherDashboardLayout>} />
+          <Route path="/teacher/class/:classId/at-risk" element={<TeacherDashboardLayout><TeacherAtRiskStudents /></TeacherDashboardLayout>} />
+          <Route path="/teacher/class/:classId/cohort" element={<TeacherDashboardLayout><TeacherCohortAnalysis /></TeacherDashboardLayout>} />
+          <Route path="/teacher/student/:studentId" element={<TeacherDashboardLayout><TeacherStudentDetail /></TeacherDashboardLayout>} />
           
           {/* Notifications Page */}
           <Route path="/notifications" element={<ProtectedSuperAdminRoute><NotificationsPage /></ProtectedSuperAdminRoute>} />

@@ -421,7 +421,7 @@ export class AuthService {
 
     console.log('✓ Password verified for email:', normalizedEmail);
 
-    // Handle system users (super-admin, etc.)
+    // Handle system users (super-admin, support-agent, etc.)
     if ((user as any).userType === 'system') {
       console.log('✓ System user found:', user.email, 'Role:', user.role);
 
@@ -450,6 +450,46 @@ export class AuthService {
         user: {
           id: user.id,
           schoolId: null,
+          email: user.email,
+          fullName: user.fullName,
+          role: user.role,
+        },
+        school: null,
+      };
+    }
+
+    // Handle general users (PARENT, TEACHER, STUDENT, etc.)
+    if ((user as any).userType === 'general') {
+      console.log('✓ General user found:', user.email, 'Role:', user.role);
+
+      const token = JwtHelper.generateToken({
+        id: user.id,
+        schoolId: (user as any).schoolId || '' as any,
+        email: user.email,
+        role: user.role,
+      });
+
+      const refreshToken = JwtHelper.generateRefreshToken({
+        id: user.id,
+        schoolId: (user as any).schoolId || '' as any,
+        email: user.email,
+        role: user.role,
+      });
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          lastLoginAt: new Date(),
+          firstLogin: false,
+        },
+      });
+
+      return {
+        token,
+        refreshToken,
+        user: {
+          id: user.id,
+          schoolId: (user as any).schoolId || null,
           email: user.email,
           fullName: user.fullName,
           role: user.role,

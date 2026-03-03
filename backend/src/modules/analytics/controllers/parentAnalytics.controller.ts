@@ -23,9 +23,15 @@ export class ParentAnalyticsController {
         data,
       });
     } catch (error: any) {
+      console.error('ParentAnalyticsController.getDashboard error:', {
+        message: error.message,
+        stack: error.stack,
+        code: error.code,
+      });
       return res.status(error.statusCode || 500).json({
         success: false,
         message: error.message || 'Failed to fetch parent dashboard',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
       });
     }
   }
@@ -50,9 +56,15 @@ export class ParentAnalyticsController {
         data: children,
       });
     } catch (error: any) {
+      console.error('ParentAnalyticsController.getChildren error:', {
+        message: error.message,
+        stack: error.stack,
+        code: error.code,
+      });
       return res.status(error.statusCode || 500).json({
         success: false,
         message: error.message || 'Failed to fetch children',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined,
       });
     }
   }

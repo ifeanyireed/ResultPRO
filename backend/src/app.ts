@@ -123,6 +123,10 @@ export async function createApp(): Promise<Express> {
   const analyticsRoutes = await import('@modules/analytics/routes/analytics.routes');
   app.use('/api/analytics', analyticsRoutes.default);
 
+  // Teacher Analytics routes (protected - for Teachers)
+  const teacherAnalyticsRoutes = await import('@modules/analytics/routes/teacherAnalytics.routes');
+  app.use('/api/teacher-analytics', teacherAnalyticsRoutes.default);
+
   // Parent Analytics routes (protected - for Parents)
   const parentAnalyticsRoutes = await import('@modules/analytics/routes/parentAnalytics.routes');
   app.use('/api/parent-analytics', parentAnalyticsRoutes.default);

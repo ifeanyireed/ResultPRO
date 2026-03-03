@@ -91,6 +91,14 @@ export class AuthRepository {
       return { ...schoolUser, userType: 'school-admin' } as any;
     }
 
+    // Check for teachers, parents, and other users in User table
+    const generalUser = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (generalUser) {
+      return { ...generalUser, userType: 'general' } as any;
+    }
+
     return null;
   }
 
